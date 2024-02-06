@@ -3,7 +3,7 @@ import neo4j from "neo4j-driver";
 export async function db() {
   const URI = "neo4j://localhost";
   const USER = "neo4j";
-  const PASSWORD = "changeme";
+  const PASSWORD = "00000000";
   let driver;
 
   try {
@@ -17,7 +17,6 @@ export async function db() {
 
   const { records, summary, keys } = await driver!.executeQuery(
     "MATCH (a) RETURN a",
-    //{ name: "LeBron James" },
     { database: "neo4j" }
   );
 
