@@ -16,8 +16,7 @@ export async function db() {
   }
 
   const { records, summary, keys } = await driver!.executeQuery(
-    "MATCH (p:PLAYER ) RETURN p",
-    //"MATCH (p:PLAYER {name:$name}) RETURN p",
+    "MATCH (a) RETURN a",
     //{ name: "LeBron James" },
     { database: "neo4j" }
   );
@@ -32,6 +31,6 @@ export async function db() {
   // Loop through results and do something with them
   console.log(">> Results");
   records.forEach((record) => {
-    console.log(record.get("p").properties.name);
+    console.log(record.get("a").properties);
   });
 }
