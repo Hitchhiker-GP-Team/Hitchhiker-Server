@@ -1,15 +1,22 @@
-import express from "express";
-import bodyParser from "body-parser";
-const app = express();
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import { typeDefs } from "./schema.js";
+import { resolvers } from "./resolver.js";
+export async function startServer() {
+  // The ApolloServer constructor requires two parameters: your schema
+  // definition and your set of resolvers.
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
 
-export function startServer() {
-  const PORT = 3000;
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
-  app.get("/", (req: any, res: any) => {
-    res.send("Hello World!!");
+  // Passing an ApolloServer instance to the `startStandaloneServer` function:
+  //  1. creates an Express app
+  //  2. installs your ApolloServer instance as middleware
+  //  3. prepares your app to handle incoming requests
+  const { url } = await startStandaloneServer(server, {
+    listen: { port: 4000 },
   });
-  app.listen(PORT, () => {
-    console.log("listen on Port: " + PORT);
-  });
+
+  console.log(`🚀  Server ready at: ${url}`);
 }
