@@ -34,6 +34,13 @@ export class User {
     this.username = UserCard.username;
   }
   */
+  loadAuthorCard(username: string, profilePic: string) {
+    this.username = username;
+    this.profilePic = profilePic;
+  }
+  
+
+
 }
 
 interface titles {
@@ -50,3 +57,9 @@ type sex = "m" | "f";
 let titles:titles = {};
 titles['hello'] = 123;
 */
+
+
+
+
+
+
