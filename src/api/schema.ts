@@ -10,7 +10,7 @@ export const typeDefs = `#graphql
   type Post {
 
     id: String
-    mediaUrls: [String!]!
+    mediaURL: [String]
     caption: String
     author:postAuthor
     tags: [String]
@@ -40,4 +40,3 @@ export const typeDefs = `#graphql
   }
 
 `;
-
