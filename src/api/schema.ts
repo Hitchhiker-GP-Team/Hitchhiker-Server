@@ -5,27 +5,39 @@
 export const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
-  # This "Book" type defines the queryable fields for every book in our data source.
-  type Book {
-    title: String
-    author: String
+  
+  
+  type Post {
+
+    id: String
+    mediaUrls: [String!]!
+    caption: String
+    author:postAuthor
+    tags: [String]
+    likesCntr: Int
+    commentsCntr: Int
+    category: String
+    keywords: [String]
+    hashtags: [String]
+    date: String
+    place: Place
+
   }
 
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
-  type Query {
-    books: [Book]
+  type Place{
+    name: String
+    mapsId: String
   }
+
+  type postAuthor{
+    username: String
+    profilePic: String
+  }
+
+
+  type Query {
+    getProfilePosts(username: String):[Post]
+  }
+
 `;
 
-export const books = [
-  {
-    title: "The Awakening",
-    author: "Kate Chopin",
-  },
-  {
-    title: "City of Glass",
-    author: "Paul Auster",
-  },
-];

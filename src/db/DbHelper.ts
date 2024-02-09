@@ -1,76 +1,12 @@
-import neo4j from 'neo4j-driver';
-import { Post } from '../entities';
-import { User } from '../entities';
+import neo4j, { Record } from 'neo4j-driver';
+import { Post, basicPost } from '../entities/Post.js';
+import { User, usercard } from "../entities/User.js";
+import { Category } from '../entities/Category.js';
+import { Place, placePostAppearance } from '../entities/Place.js';
 
-export async function db2() {
-  const URI = 'neo4j://localhost';
-  const USER = 'neo4j';
-  const PASSWORD = '12345678';
-  let driver;
 
-  try {
-    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-
-    const session = driver.session();
-    const result = await session.run('MATCH (a) RETURN a');
-    await session.close();
-
-    // Summary information
-    console.log(
-      `>> The query returned ${result.records.length} records in ${result.summary.resultAvailableAfter} ms.`
-    );
-
-    // Loop through results and do something with them
-    console.log('>> Results');
-    result.records.forEach(record => {
-      console.log(record.get('a').properties);
-    });
-  } catch (err) {
-    console.error(`Connection error\n${err}\nCause: ${err}`);
-  } finally {
-    if (driver) {
-      await driver.close();
-      console.log('Connection closed');
-    }
-  }
-}
-
-export async function db() : Promise<string>{
-  const URI = 'neo4j://localhost';
-  const USER = 'neo4j';
-  const PASSWORD = '12345678';
-  let driver;
-
-  try {
-    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-
-    const session = driver.session();
-    const result = await session.run('MATCH (a) RETURN a');
-    await session.close();
-
-    // Summary information
-    console.log(
-      `>> The query returned ${result.records.length} records in ${result.summary.resultAvailableAfter} ms.`
-    );
-
-    // Loop through results and do something with them
-    console.log('>> Results');
-    result.records.forEach(record => {
-      console.log(record.get('a').properties);
-    });
-    return "lol";
-  } catch (err) {
-    console.error(`Connection error\n${err}\nCause: ${err}`);
-  } finally {
-    if (driver) {
-      await driver.close();
-      console.log('Connection closed');
-    }
-  }
-  return "lol"
-}
-
-export async function fetchUserPosts(username: string): Promise<Post[]> {
+// a function to retrieve all posts a specific user posted (Profile Posts)
+export async function fetchUserPosts(username: string): Promise<basicPost[]> {
   const URI = 'neo4j://localhost';
   const USER = 'neo4j';
   const PASSWORD = '12345678';
@@ -82,19 +18,62 @@ export async function fetchUserPosts(username: string): Promise<Post[]> {
     
     const result = await session.run(
       `
-      MATCH (u:User {username: $username})-[:ADD_POST]->(p:Post)
-      RETURN p, u.username AS username, u.profilePic AS profilePic
+      MATCH (u:User {username: $username})-[:ADD_POST]->(p:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category), (p)-[:HAPPEND_AT]->(place:Place),(p)-[:TAG]->(tagged:User)
+      RETURN p, u.username AS username, u.profilePic AS profilePic, category.name AS categoryName, place , tagged , COLLECT(tagged.username) as taggedUsers
+
       `,
       { username }
     );
+
+    console.log("postProb")
+      //a list to hold all posts retrieved from database
+      const userPosts : basicPost[] =[];
+      
+      
     
-    const userPosts : Post[] =[];
+      result.records.forEach(record => {
 
-    result.records.forEach(record => {
+      //a list to hold all tagged users  
+      const tagged : String[] =[];
 
-      console.log(record.get('p').properties.caption)
-      const  lol = console.log(record.get('profilePic'));
-      //const user = new User();
+      // load the list with taggedUsers username's
+      const taggedUsers = record.get('taggedUsers');
+      taggedUsers.forEach((taggedUser:String)=> {
+          tagged.push(taggedUser);
+      });
+  
+    
+        
+      const postProb = record.get('p').properties
+      const placeProb = record.get('place').properties
+
+      //load placePostAppearance object
+      const place : placePostAppearance = {name:placeProb.name,mapsid:placeProb.mapsId}
+
+      //load usercard object
+      const Postauthor : usercard = { profilePic: record.get('profilePic'), username: record.get('username') }
+  
+      //load basicPost object
+      const currentPost : basicPost = {
+        
+        id: postProb.id,
+        mediaURL:postProb.mediaUrls,
+        author: Postauthor,
+        caption: postProb.caption,
+        date : postProb.postingDate.low, //test-driven
+        hashtags : postProb.hashtags,
+        tags : tagged,
+        place : place,
+        keywords : postProb.keywords,
+        likesCntr : postProb.likesCntr.low,//test-driven
+        commentsCntr : postProb.commentsCntr.low,//test-driven
+        category : record.get('categoryName')
+
+      }
+
+      
+      
+      userPosts.push(currentPost);
                      
     });
 
@@ -110,4 +89,7 @@ export async function fetchUserPosts(username: string): Promise<Post[]> {
     }
   }
 }
+
+
+
 

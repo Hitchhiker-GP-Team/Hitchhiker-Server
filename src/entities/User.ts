@@ -1,10 +1,15 @@
 import { Post, Review } from "./";
 
+export interface usercard{
+  username: string;
+  profilePic: String;
+}
+
+
 export class User {
-  private static counter: number = 0;
-  private id: number;
-  private username?: string;
-  private profilePic?: string;
+  private static counter?: number = 0;
+  public username?: string;
+  public profilePic?: string;
   private email?: string;
   private password?: string;
   private Name?: string;
@@ -22,10 +27,6 @@ export class User {
   private reviews?: Review[];
   private reviewsCntr?: number;
 
-  constructor() {
-    this.id = User.counter;
-    User.counter++;
-  }
   /*
   loadUserCard() {
     const UserCard: User = DbHelper.User.fetchUserCard;
