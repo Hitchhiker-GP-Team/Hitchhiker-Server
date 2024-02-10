@@ -1,8 +1,14 @@
+import { User } from "./User.js"
+
 export class Comment {
-  private static counter: number = 0;
-  private id: number;
-  constructor() {
-    this.id = Comment.counter;
-    Comment.counter++;
-  }
+
+  commentID?  : String
+  author? : User 
+  text? : String
+  date? : Date
+  likesCounter? : number
+  likedBy? : User[]
+  repliesCntr? : number
+  replies? : Comment[]
+
 }
