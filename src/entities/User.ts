@@ -1,49 +1,26 @@
-import { Post, Review } from "./";
-
-export interface usercard{
-  username: string;
-  profilePic: String;
-}
-
+import { Post } from "./Post.js";
+import { Review } from "./Review.js";
 
 export class User {
-  private static counter?: number = 0;
-  public username?: string;
-  public profilePic?: string;
-  private email?: string;
-  private password?: string;
-  private Name?: string;
-  private birthDate?: string; //date;
-  private homeLocation?: coordinates;
-  private sex?: sex;
-  private titles?: titles;
-  private Bio?: string;
-  private followingCntr?: number;
-  private followings?: User[];
-  private followersCntr?: number;
-  private followers?: User[];
-  private posts?: Post[];
-  private postCntr?: number;
-  private reviews?: Review[];
-  private reviewsCntr?: number;
-
-  /*
-  loadUserCard() {
-    const UserCard: User = DbHelper.User.fetchUserCard;
-    this.id = UserCard.id;
-    this.profilePic = UserCard.profilePic;
-    this.username = UserCard.username;
-  }
-  */
-  loadAuthorCard(username: string, profilePic: string) {
-    this.username = username;
-    this.profilePic = profilePic;
-  }
-  
-
-
+  username?: string;
+  profilePic?: string;
+  email?: string;
+  password?: string;
+  Name?: string;
+  birthDate?: string; //date;
+  homeLocation?: coordinates;
+  sex?: sex;
+  titles?: titles;
+  Bio?: string;
+  followingCntr?: number;
+  followings?: User[];
+  followersCntr?: number;
+  followers?: User[];
+  posts?: Post[];
+  postCntr?: number;
+  reviews?: Review[];
+  reviewsCntr?: number;
 }
-
 interface titles {
   [key: string]: number;
 }
@@ -58,9 +35,3 @@ type sex = "m" | "f";
 let titles:titles = {};
 titles['hello'] = 123;
 */
-
-
-
-
-
-

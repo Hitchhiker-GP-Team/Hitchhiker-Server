@@ -1,6 +1,7 @@
-import { INode } from "./INode";
+import { INode } from "./INode.js";
+import { User } from "../../entities/User.js";
 
-class UserNode<User> implements INode<User> {
+class UserNode implements INode<User> {
   create(user: User): boolean {
     throw new Error("Method not implemented.");
   }

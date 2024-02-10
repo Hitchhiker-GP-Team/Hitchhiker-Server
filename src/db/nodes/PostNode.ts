@@ -1,10 +1,10 @@
 import { INode } from "./INode";
 import { dbDriver } from "../dbConnection.js";
-import { basicPost } from "../../entities/Post.js";
-import { usercard } from "../../entities/User.js";
-import { placePostAppearance } from "../../entities/Place.js";
+import { Post } from "../../entities/Post.js";
+import { User } from "../../entities/User.js";
+import { Place } from "../../entities/Place.js";
 
-export class PostNode<Post> implements INode<Post> {
+export class PostNode implements INode<Post> {
   //Creations
   public create(post: Post): boolean {
     throw new Error("Method not implemented.");
@@ -14,7 +14,7 @@ export class PostNode<Post> implements INode<Post> {
   public fetch(primaryKey: string): Post {
     throw new Error("Method not implemented.");
   }
-  public async fetchUserProfilePosts(username: string): Promise<basicPost[]> {
+  public async fetchUserProfilePosts(username: string): Promise<Post[]> {
     try {
       const driver = dbDriver;
       const session = driver.session();
@@ -35,7 +35,7 @@ export class PostNode<Post> implements INode<Post> {
       session.close();
 
       //a list to hold all posts retrieved from database
-      const userPosts: basicPost[] = [];
+      const userPosts: Post[] = [];
 
       result.records.forEach((record) => {
         // load the list with tags username's
@@ -45,19 +45,19 @@ export class PostNode<Post> implements INode<Post> {
         const placeProb = record.get("place").properties;
 
         //load placePostAppearance object
-        const place: placePostAppearance = {
+        const place: Place = {
           name: placeProb.name,
           mapsid: placeProb.mapsId,
         };
 
         //load usercard object
-        const Postauthor: usercard = {
+        const Postauthor: User = {
           profilePic: record.get("profilePic"),
           username: record.get("username"),
         };
 
         //load basicPost object
-        const currentPost: basicPost = {
+        const currentPost: Post = {
           id: postProb.id,
           mediaURL: postProb.mediaUrls,
           author: Postauthor,
