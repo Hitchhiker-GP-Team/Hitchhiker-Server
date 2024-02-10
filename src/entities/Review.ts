@@ -1,8 +1,18 @@
+import { Place } from "./Place.js"
+import { IRating } from "./Rating/IRating.js"
+import { User } from "./User.js"
+
+
 export class Review {
-  private static counter: number = 0;
-  private id: number;
-  constructor() {
-    this.id = Review.counter;
-    Review.counter++;
-  }
+
+  id? : number
+  author? : User
+  place? : Place
+  text? : String
+  rating? : IRating
+  date? : Date
+  likesCntr? : number
+  dislikesCntr? : number
+    
+
 }

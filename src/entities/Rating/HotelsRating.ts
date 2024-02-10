@@ -8,7 +8,7 @@ export class HotelsRating implements IRating {
     totalRating!:    fiveStarRating
     //----------------------------------
     Comfort!:        fiveStarRating
-    hygiene!:         fiveStarRating
+    hygiene!:        fiveStarRating
     roomService!:    fiveStarRating
     aquaServices!:   fiveStarRating
     DinningQuality!: fiveStarRating   

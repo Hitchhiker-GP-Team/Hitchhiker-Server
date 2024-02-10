@@ -1,8 +1,8 @@
 export interface IRating {
 
-    totalRating : fiveStarRating
+    totalRating :   fiveStarRating
     affordability : fiveStarRating
-    priceRange : PriceRange
+    priceRange :    PriceRange
 
 
 }
