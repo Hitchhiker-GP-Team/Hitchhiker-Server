@@ -1,10 +1,9 @@
-import { INode } from "./INode";
 import { dbDriver } from "../dbConnection.js";
 import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
 import { Place } from "../../entities/Place.js";
 
-export class PostNode implements INode<Post> {
+export class PostNode  {
   //Creations
   public create(post: Post): boolean {
     throw new Error("Method not implemented.");
@@ -81,6 +80,7 @@ export class PostNode implements INode<Post> {
       throw err;
     }
   }
+
 
   public update(post: Post): boolean {
     throw new Error("Method not implemented.");
