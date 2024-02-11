@@ -9,11 +9,11 @@ export class Post {
   mediaURL?: string[];
   author?: User;
   caption?: string;
-  date?: Date;
-  hashtags?: String[];
+  date?: number;
+  hashtags?: string[];
   tags?: User[];
   place?: Place;
-  keywords?: String[];
+  keywords?: string[];
   likesCntr?: number;
   likedBy?: User[];
   commentsCntr?: number;

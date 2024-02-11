@@ -6,7 +6,7 @@ export class Review {
   id?: number;
   author?: User;
   place?: Place;
-  text?: String;
+  text?: string;
   rating?: IRating;
   date?: number;
   likesCntr?: number;

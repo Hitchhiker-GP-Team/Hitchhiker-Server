@@ -1,9 +1,9 @@
 import { User } from "./User.js";
 
 export class Comment {
-  id?: String;
+  id?: string;
   author?: User;
-  text?: String;
+  text?: string;
   date?: number;
   likesCounter?: number;
   likedBy?: User[];
