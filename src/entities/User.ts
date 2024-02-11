@@ -1,3 +1,4 @@
+import { Coordinates } from "./Place.js";
 import { Post } from "./Post.js";
 import { Review } from "./Review.js";
 
@@ -7,8 +8,8 @@ export class User {
   email?: string;
   password?: string;
   Name?: string;
-  birthDate?: string; //date;
-  homeLocation?: coordinates;
+  birthDate?: number;
+  homeLocation?: Coordinates;
   sex?: sex;
   titles?: titles;
   Bio?: string;
@@ -24,10 +25,6 @@ export class User {
 interface titles {
   [key: string]: number;
 }
-type coordinates = {
-  latitude: number;
-  longitude: number;
-};
 
 type sex = "m" | "f";
 

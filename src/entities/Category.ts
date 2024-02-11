@@ -1,7 +1,5 @@
 export class Category {
-  
-   name?          : String
-   Parent?        : Category
-   subCategories? : Category[]
-
+  name?: String;
+  parent?: Category;
+  subCategories?: Category[];
 }

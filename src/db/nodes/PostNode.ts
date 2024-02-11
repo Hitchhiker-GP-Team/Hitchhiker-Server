@@ -44,23 +44,23 @@ export class PostNode implements INode<Post> {
         const postProb = record.get("post").properties;
         const placeProb = record.get("place").properties;
 
-        //load placePostAppearance object
+        //load Place
         const place: Place = {
           name: placeProb.name,
-          mapsid: placeProb.mapsId,
+          mapsId: placeProb.mapsId,
         };
 
-        //load usercard object
-        const Postauthor: User = {
+        //load User Card
+        const author: User = {
           profilePic: record.get("profilePic"),
           username: record.get("username"),
         };
 
-        //load basicPost object
+        //load Post object
         const currentPost: Post = {
           id: postProb.id,
           mediaURL: postProb.mediaUrls,
-          author: Postauthor,
+          author: author,
           caption: postProb.caption,
           date: postProb.postingDate.low, //test-driven
           hashtags: postProb.hashtags,

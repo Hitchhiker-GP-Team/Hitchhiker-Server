@@ -1,16 +1,66 @@
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
-
 export const typeDefs = `#graphql
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
+  # Comments in GraphQL Strings (such as this one) start with the hash (#) symbol.
   
-  type Post {
+  type Category{
+    name: String
+    Parent: Category
+    subCategories: [Category]
+  }
 
+  type Comment{
+    id: String
+    author: User
+    text: String
+    date: Int
+    likesCounter: Int
+    likedBy: [User]
+    repliesCntr: Int
+    replies: [Comment]
+  }
+
+  type Coordinates{
+    latitude: Int
+    longitude: Int
+  }
+
+  type IRating{
+    totalRating: Int
+    affordability: Int
+    priceRange: PriceRange
+  }
+
+  type Journey{
+    id: String
+    author: User
+    title: String
+    date: Int
+    posts: [Post]
+  }
+
+  type Place{
+    id: String
+    mapsId: String
+    name: String
+    type: String
+    location: Coordinates
+    ratings: IRating
+    description: String
+    reviewsCntr: Int
+    reviews: [Review]
+    posts: [Post]
+  }
+
+  type PriceRange { 
+    min: Int
+    max: Int
+    currency: String
+  }
+
+  type Post {
     id: String
     mediaURL: [String]
     caption: String
-    author:postAuthor
+    author:User
     tags: [String]
     likesCntr: Int
     commentsCntr: Int
@@ -19,17 +69,38 @@ export const typeDefs = `#graphql
     hashtags: [String]
     date: String
     place: Place
-
   }
 
-  type Place{
-    name: String
-    mapsId: String
+  type Review { 
+    id: Int
+    author: User
+    place: Place
+    text: String
+    rating: IRating
+    date: Int
+    likesCntr: Int
+    dislikesCntr: Int
   }
 
-  type postAuthor{
+  type User{
     username: String
     profilePic: String
+    email: String
+    password: String
+    Name: String
+    birthDate: Int 
+    homeLocation: Coordinates
+    sex: String
+    #titles: titles #Not Handled
+    Bio: String
+    followingCntr: Int
+    followings: [User]
+    followersCntr: Int
+    followers: [User]
+    posts: [Post]
+    postCntr: Int
+    reviews: [Review]
+    reviewsCntr: Int
   }
 
 
@@ -38,3 +109,6 @@ export const typeDefs = `#graphql
   }
 
 `;
+// A schema is a collection of type definitions (hence "typeDefs")
+// that together define the "shape" of queries that are executed against
+// your data.

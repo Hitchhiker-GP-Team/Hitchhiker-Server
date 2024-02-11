@@ -2,10 +2,10 @@ import { User } from "./User.js";
 import { Place } from "./Place.js";
 import { Comment } from "./Comment.js";
 import { Category } from "./Category.js";
-import Journey from "./Journey.js";
+import { Journey } from "./Journey.js";
 
 export class Post {
-  id?: number;
+  id?: string;
   mediaURL?: string[];
   author?: User;
   caption?: string;
