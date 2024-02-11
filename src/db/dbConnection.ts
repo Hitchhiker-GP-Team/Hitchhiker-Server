@@ -4,13 +4,11 @@ export async function dbStart() {
   const URI = "neo4j://localhost";
   const USER = "neo4j";
   const PASSWORD = "00000000";
-  let driver;
   try {
-    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-    const serverInfo = await driver.getServerInfo();
+    dbDriver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+    const serverInfo = await dbDriver.getServerInfo();
     console.log("Connection established");
     console.log(serverInfo);
-    dbDriver = driver;
   } catch (err) {
     throw new Error(`DB Connection Failed.\nCause: ${err}`);
   }
