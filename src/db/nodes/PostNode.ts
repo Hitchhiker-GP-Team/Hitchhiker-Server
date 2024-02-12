@@ -15,7 +15,7 @@ export class PostNode  {
   // Fetches ------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async fetchUserProfilePosts(username: string): Promise<Post[]> {
+  public async FetchUserProfilePosts(username: string): Promise<Post[]> {
     try {
 
         const driver = dbDriver;
@@ -86,7 +86,7 @@ export class PostNode  {
     }
   }
 
-  public async fetchFollowingsPosts(username: string): Promise<Post[]> {
+  public async FetchFollowingsPosts(username: string): Promise<Post[]> {
     try {
 
 
@@ -158,7 +158,7 @@ export class PostNode  {
     }
   }
 
-  public async fetchSavedPosts(username: string): Promise<Post[]> {
+  public async FetchSavedPosts(username: string): Promise<Post[]> {
     try {
 
 
@@ -230,7 +230,7 @@ export class PostNode  {
     }
   }
 
-  public async fetchLikedPosts(username: string): Promise<Post[]> {
+  public async FetchLikedPosts(username: string): Promise<Post[]> {
     try {
 
 
@@ -302,7 +302,7 @@ export class PostNode  {
     }
   }
 
-  public async fetchPlacePosts(placeId : String): Promise<Post[]> {
+  public async FetchPlacePosts(placeId : string): Promise<Post[]> {
     try {
 
 
@@ -374,6 +374,80 @@ export class PostNode  {
     }
   }
 
+  public async FetchCategoryPosts(category : string): Promise<Post[]> {
+    try {
+
+
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category{name:$category}),
+                  (post)-[:HAPPEND_AT]->(place:Place),
+                  (post)-[:TAG]->(tagged:User)
+            RETURN post,
+                   author.username AS username,
+                   author.profilePic AS profilePic,
+                   category.name AS categoryName,
+                   place,
+                   COLLECT(tagged.username) as tags
+            ORDER BY post.postingDate DESC
+            SKIP 0
+            LIMIT 50
+            `,
+            {category}
+        );
+
+        // a list to hold all posts retrieved from the database
+        const userPosts: Post[] = [];
+
+        result.records.forEach((record) => {
+            // load the list with tags usernames
+            const taggedUsers = record.get("tags");
+
+            const postProb = record.get("post").properties;
+            const placeProb = record.get("place").properties;
+
+            // load Place
+            const place: Place = {
+                name: placeProb.name,
+                mapsId: placeProb.mapsId,
+                id : placeProb.id
+            };
+
+            // load User Card
+            const author: User = {
+                profilePic: record.get("profilePic"),
+                username: record.get("username"),
+            };
+
+            // load Post object
+            const currentPost: Post = {
+                id: postProb.id,
+                mediaURL: postProb.mediaUrls,
+                author: author,
+                caption: postProb.caption,
+                date: parseFloat(postProb.postingDate.low), // test-driven
+                hashtags: postProb.hashtags,
+                tags: taggedUsers,
+                place: place,
+                keywords: postProb.keywords,
+                likesCntr: parseFloat(postProb.likesCntr.low), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr.low), // test-driven
+                category: record.get("categoryName"),
+            };
+
+            userPosts.push(currentPost);
+        });
+
+        return userPosts;
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+
+
 
   // --------------------------------------------------------------------------------------
   // Creations ----------------------------------------------------------------------------
@@ -442,6 +516,196 @@ export class PostNode  {
         throw err;
     }
   }
+
+  public async LikePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User {username : $username}),
+            (post : Post{id:$id})
+    
+        CREATE (user)-[:LIKES_POST]->(post)
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async SavePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User {username : $username}),
+            (post : Post{id:$id})
+    
+        CREATE (user)-[:SAVE_POST]->(post)
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async ArchivePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (u:User{username:$username})-[r:ADD_POST]->(p:Post{id:$id})
+        DELETE r
+        CREATE (u)-[:ARCHIVE_POST]->(p)
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+
+  // --------------------------------------------------------------------------------------
+  // Updates ------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------
+  
+  public async UnLikePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User {username : $username})-[like:LIKES_POST]->(post : Post{id:$id})
+        DELETE like 
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async UnSavePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User {username : $username})-[save:SAVE_POST]->(post : Post{id:$id})
+        DELETE save 
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async UnArchivePost(us :string , postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (u:User{username:$username})-[r:ARCHIVE_POST]->(p:Post{id:$id})
+        DELETE r
+        CREATE (u)-[:ADD_POST]->(p)
+        `    
+        ,{username : us , id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+
+  // --------------------------------------------------------------------------------------
+  // Deletions ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------
+
+  public async DeletePost(postId: string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (post:Post{id:$id})
+        DETACH DELETE post
+        `    
+        ,{ id : postId}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async DeleteALLPosts(username:string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User{username:$username})-[:ADD_POST]->(post:Post)
+        DETACH DELETE post
+        `    
+        ,{ username : username}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+  public async DeleteAllArchivedPosts(username:string) : Promise<void>
+  {
+
+    try{
+
+    const driver =dbDriver
+    const result = await driver.executeQuery(
+        `
+        MATCH (user:User{username:$username})-[:ARCHIVE_POST]->(post:Post)
+        DETACH DELETE post
+        `    
+        ,{ username : username}
+    )
+    } catch (err) {
+        console.error(`Error fetching user posts: ${err}`);
+        throw err;
+    }
+  }
+
+
+  
 
 
 }
