@@ -67,7 +67,7 @@ export const typeDefs = `#graphql
     category: String
     keywords: [String]
     hashtags: [String]
-    date: String
+    date: Int
     place: Place
   }
 

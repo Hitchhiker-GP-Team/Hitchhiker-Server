@@ -71,7 +71,7 @@ export class PostNode  {
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: 19387098, // test-driven
+                likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
@@ -210,13 +210,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: parseFloat(postProb.postingDate.low), // test-driven
+                date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr.low), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr.low), // test-driven
+                likesCntr: parseFloat(postProb.likesCntr), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -354,13 +354,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: parseFloat(postProb.postingDate.low), // test-driven
+                date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr.low), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr.low), // test-driven
+                likesCntr: parseFloat(postProb.likesCntr), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
 
