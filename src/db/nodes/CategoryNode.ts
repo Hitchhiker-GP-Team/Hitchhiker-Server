@@ -19,33 +19,43 @@ export class CategoryNode {
             }
         )
         `,
-        { name: category.name }
+        { name: category.name },
+        { database: "neo4j" }
       );
       //link to Parent Category
+      const childName: string = category.name!;
       let parentName: string = "Origin";
       if (category.parent !== undefined) parentName = category.parent.name!;
-      const childName: string = category.name!;
-      this.linkChild(parentName, childName);
+      this.linkChild(childName, parentName);
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.create(): ${err}`);
       throw err;
     }
   }
   //-6- Update/Create
   //link (neo4j: make relationships between) two categories as the child category is a sub-category of the parent category.
-  // UPDATE NOT WORKING!!!!!
   async linkChild(childName: string, parentName: string) {
     try {
+      //Delete the existing relationship (if exist).
       await dbDriver.executeQuery(
         `
-        MATCH (subCategory:Category),(category:Category)
-        WHERE subCategory.name = $childName AND category.name = $parentName
-        MERGE (subCategory)-[related_to:SUB_CATEGORY_TO]->(category)
+        MATCH (:Category{name:$childName})-[r:SUB_CATEGORY_TO]->()
+        DELETE r
+        `,
+        { childName: childName },
+        { database: "neo4j" }
+      );
+      //Link with the Parent.
+      await dbDriver.executeQuery(
+        `
+        MATCH (childCategory:Category),(parentCategory:Category)
+        WHERE childCategory.name = $childName AND parentCategory.name = $parentName
+        MERGE (childCategory)-[related_to:SUB_CATEGORY_TO]->(parentCategory)
         `,
         { childName: childName, parentName: parentName }
       );
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.linkChild(): ${err}`);
       throw err;
     }
   }
@@ -58,10 +68,11 @@ export class CategoryNode {
         MATCH (category:Category {name:$name})
         DETACH DELETE category
         `,
-        { name: name }
+        { name: name },
+        { database: "neo4j" }
       );
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.delete(): ${err}`);
       throw err;
     }
   }
@@ -75,10 +86,11 @@ export class CategoryNode {
         MATCH (category:Category {name:$oldName})
         SET category.name = $newName
         `,
-        { oldName: oldName, newName: newName }
+        { oldName: oldName, newName: newName },
+        { database: "neo4j" }
       );
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.rename(): ${err}`);
       throw err;
     }
   }
@@ -88,9 +100,11 @@ export class CategoryNode {
     try {
       const { records } = await dbDriver.executeQuery(
         `
-      MATCH (category:Category)
-      RETURN category
-      `
+        MATCH (category:Category)
+        RETURN category
+        `,
+        {},
+        { database: "neo4j" }
       );
       let categories: string[] = [];
       records.forEach((record) => {
@@ -99,7 +113,7 @@ export class CategoryNode {
       console.log(categories);
       return categories;
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.fetchAllName(): ${err}`);
       throw err;
     }
   }
@@ -108,23 +122,53 @@ export class CategoryNode {
     try {
       const { records } = await dbDriver.executeQuery(
         `
-      MATCH (category:Category{name:$name})
-      RETURN category
-      `,
-        { name: name }
+        MATCH (category:Category{name:$name}) 
+        RETURN category
+        `,
+        { name: name },
+        { database: "neo4j" }
       );
       let category: Category = new Category();
       category.name = records[0].get("category").properties.name;
       console.log(category);
       return category;
     } catch (err) {
-      console.error(`Error create Category: ${err}`);
+      console.error(`Error CategoryNode.fetch(): ${err}`);
       throw err;
     }
   }
   //-5- Read(could be canceled)
   //like 'fetchAllName()' but it returns them recursively as it gets the category from its parent.
-  async fetchTree() {
-    throw new Error("Method not implemented.");
+
+  async fetchTree(name: string): Promise<Category> {
+    //let name = cName;
+    //if (name === undefined) name = "Origin";
+    try {
+      const { records } = await dbDriver.executeQuery(
+        `
+        MATCH (:Category  {name:$name})<-[:SUB_CATEGORY_TO]-(leaf:Category )
+        RETURN leaf
+          `,
+        { name: name },
+        { database: "neo4j" }
+      );
+      let category: Category = new Category();
+      category.name = name;
+      //if found leaf(s)
+      if (records[0]) {
+        category.subCategories = [];
+        for (let record of records) {
+          {
+            let leafName: string = record.get("leaf").properties.name;
+            let leafCategory: Category = await this.fetchTree(leafName);
+            category.subCategories!.push(leafCategory);
+          }
+        }
+      }
+      return category;
+    } catch (err) {
+      console.error(`Error CategoryNode.fetchTree(): ${err}`);
+      throw err;
+    }
   }
 }
