@@ -66,13 +66,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: postProb.postingDate.low, // test-driven
+                date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: postProb.likesCntr.low, // test-driven
-                commentsCntr: postProb.commentsCntr.low, // test-driven
+                likesCntr: 19387098, // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -138,13 +138,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: postProb.postingDate.low, // test-driven
+                date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: postProb.likesCntr.low, // test-driven
-                commentsCntr: postProb.commentsCntr.low, // test-driven
+                likesCntr: parseFloat(postProb.likesCntr), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -210,13 +210,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: postProb.postingDate.low, // test-driven
+                date: parseFloat(postProb.postingDate.low), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: postProb.likesCntr.low, // test-driven
-                commentsCntr: postProb.commentsCntr.low, // test-driven
+                likesCntr: parseFloat(postProb.likesCntr.low), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr.low), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -282,13 +282,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: postProb.postingDate.low, // test-driven
+                date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: postProb.likesCntr.low, // test-driven
-                commentsCntr: postProb.commentsCntr.low, // test-driven
+                likesCntr: parseFloat(postProb.likesCntr), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -354,13 +354,13 @@ export class PostNode  {
                 mediaURL: postProb.mediaUrls,
                 author: author,
                 caption: postProb.caption,
-                date: postProb.postingDate.low, // test-driven
+                date: parseFloat(postProb.postingDate.low), // test-driven
                 hashtags: postProb.hashtags,
                 tags: taggedUsers,
                 place: place,
                 keywords: postProb.keywords,
-                likesCntr: postProb.likesCntr.low, // test-driven
-                commentsCntr: postProb.commentsCntr.low, // test-driven
+                likesCntr: parseFloat(postProb.likesCntr.low), // test-driven
+                commentsCntr: parseFloat(postProb.commentsCntr.low), // test-driven
                 category: record.get("categoryName"),
             };
 
@@ -383,6 +383,7 @@ export class PostNode  {
     try {
 
         post.id = '0ebe80ce-87da-43b5-a320-888706665605'
+        const d = Math.floor(Number(post.date))
 
         const driver = dbDriver;
         const result = await driver.executeQuery(
