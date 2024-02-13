@@ -134,4 +134,66 @@ export class ReviewNode {
         }
     }
 
+    public async AddReview(review: Review): Promise<Review> {
+        try {
+
+            if (!review.place || !review.author) {
+                throw new Error("Place ID is missing in the review data.");
+              }
+
+            const driver = dbDriver;
+            const session = driver.session();
+
+            const result = await session.run(
+                `
+          MATCH (author:User {username: $username}),
+                (place:Place {id: $placeId})
+    
+          CREATE (review:Review {
+            id: $reviewId,
+            text: $text,
+            rating: $rating,
+            date: $date,
+            likesCntr: 0,
+            dislikesCntr: 0
+          })<-[:ADD_REVIEW]-(author),
+          (review)-[:REVIEW_ON_PLACE]->(place)
+          
+          RETURN review
+          `,
+                {
+                    username: review.author.username,
+                    placeId: review.place.id,
+                    reviewId: review.id, // Assuming review ID is provided
+                    text: review.text,
+                    rating: review.rating,
+                    date: review.date
+                }
+            );
+
+            return review;
+
+        } catch (err) {
+            console.error(`Error adding review: ${err}`);
+            throw err;
+        }
+    }
+    
+    public async DeleteReview(reviewId: string): Promise<void> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (review:Review {id: $id})
+                DETACH DELETE review
+                `,
+                { id: reviewId }
+            );
+        } catch (err) {
+            console.error(`Error deleting review: ${err}`);
+            throw err;
+        }
+    }
+    
+
 }
