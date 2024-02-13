@@ -69,6 +69,8 @@ export const typeDefs = `#graphql
     hashtags: [String]
     date: Int
     place: Place
+    liked:Boolean
+    saved:Boolean
   }
 
   type Review { 
