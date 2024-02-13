@@ -2,6 +2,7 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolver.js";
+import { DbHelper } from "../db/DbHelper.js";
 export async function startServer() {
   // The ApolloServer constructor requires two parameters: your schema
   // definition and your set of resolvers.
@@ -18,5 +19,7 @@ export async function startServer() {
     listen: { port: 4000 },
   });
 
+ // console.log(await  DbHelper.ReviewNode.fetchUserReviews("kandeel00"));
+  console.log(await  DbHelper.ReviewNode.fetchPlaceReviews("0ebe80ce-87dd-44b5-a320-888705855605"));
   console.log(`🚀  Server ready at: ${url}`);
 }

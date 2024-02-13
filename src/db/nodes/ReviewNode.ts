@@ -1,0 +1,137 @@
+import { dbDriver } from "../dbConnection.js";
+import { Post } from "../../entities/Post.js";
+import { User } from "../../entities/User.js";
+import { Place } from "../../entities/Place.js";
+import { Review } from "../../entities/Review.js";
+
+
+
+export class ReviewNode {
+    //Creations
+    public create(review: Review): boolean {
+        throw new Error("Method not implemented.");
+    }
+
+    // --------------------------------------------------------------------------------------
+    // Fetches ------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
+    public async fetchUserReviews(username: string): Promise<Review[]> {
+        try {
+            const driver = dbDriver;
+            const session = driver.session();
+            const result = await session.run(
+                `
+        MATCH (user:User {username: $username})-[:ADD_REVIEW]->(review:Review)-[:REVIEW_ON_PLACE]->(place:Place)
+        RETURN review,
+               user.username AS authorUsername,
+               user.profilePic AS authorProfilePic,
+               place,
+               review.text AS text,
+               review.rating AS rating,
+               review.date AS date,
+               review.likesCntr AS likesCntr,
+               review.dislikesCntr AS dislikesCntr
+        `,
+                { username }
+            );
+            session.close();
+
+            const userReviews: Review[] = [];
+
+            result.records.forEach((record) => {
+                const reviewProb = record.get("review").properties;
+                const placeProb = record.get("place").properties;
+
+                const author: User = {
+                    username: record.get("authorUsername"),
+                    profilePic: record.get("authorProfilePic"),
+                    // Add other user properties as needed
+                };
+
+                const currentReview: Review = {
+                    id: reviewProb.id,
+                    author: author,
+                    place: {
+                        id: placeProb.id,
+                        mapsId: placeProb.mapsId,
+                        name: placeProb.name,
+                        type: placeProb.type,
+                        location: placeProb.location,
+                        ratings: placeProb.ratings,
+                        description: placeProb.description,
+                        reviewsCntr: placeProb.reviewsCntr,
+                        reviews: placeProb.reviews,
+                        posts: placeProb.posts,
+                    },
+                    text: record.get("text"),
+                    rating: record.get("rating"),
+                    date: record.get("date"),
+                    likesCntr: record.get("likesCntr"),
+                    dislikesCntr: record.get("dislikesCntr"),
+                };
+
+                userReviews.push(currentReview);
+            });
+
+            console.log(userReviews);
+            return userReviews;
+        } catch (err) {
+            console.error(`Error fetching user reviews: ${err}`);
+            throw err;
+        }
+    }
+
+    public async fetchPlaceReviews(placeId: string): Promise<Review[]> {
+        try {
+            const driver = dbDriver;
+            const session = driver.session();
+            const result = await session.run(
+                `
+      MATCH (place:Place {id: $placeId})<-[:REVIEW_ON_PLACE]-(review:Review)<-[:ADD_REVIEW]-(author:User)
+      RETURN review,
+             author.username AS authorUsername,
+             author.profilePic AS authorProfilePic,
+             place,
+             review.text AS text,
+             review.rating AS rating,
+             review.date AS date,
+             review.likesCntr AS likesCntr,
+             review.dislikesCntr AS dislikesCntr
+      `,
+                { placeId }
+            );
+            session.close();
+
+            const placeReviews: Review[] = [];
+
+            result.records.forEach((record) => {
+                const reviewProb = record.get("review").properties;
+                const author: User = {
+                    username: record.get("authorUsername"),
+                    profilePic: record.get("authorProfilePic"),
+                };
+
+                const currentReview: Review = {
+                    id: reviewProb.id,
+                    author: author,
+                    place: record.get("place"), // Assuming place is a complete Place object
+                    text: record.get("text"),
+                    rating: record.get("rating"),
+                    date: record.get("date"),
+                    likesCntr: record.get("likesCntr"),
+                    dislikesCntr: record.get("dislikesCntr"),
+                };
+
+                placeReviews.push(currentReview);
+            });
+
+            console.log(placeReviews);
+            return placeReviews;
+        } catch (err) {
+            console.error(`Error fetching place reviews: ${err}`);
+            throw err;
+        }
+    }
+
+}
