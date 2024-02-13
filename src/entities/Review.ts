@@ -1,3 +1,4 @@
+import { Integer } from "neo4j-driver";
 import { Place } from "./Place.js";
 import { IRating } from "./Rating/IRating.js";
 import { User } from "./User.js";
@@ -7,7 +8,7 @@ export class Review {
   author?: User;
   place?: Place;
   text?: string;
-  rating?: IRating;
+  rating?: number;
   date?: number;
   likesCntr?: number;
   dislikesCntr?: number;
