@@ -1,12 +1,21 @@
 import { Category } from "../../entities/Category.js";
 import { dbDriver } from "../dbConnection.js";
 
+/**
+ * @param {string} name - Category's name used as Primary Key to access the Nodes..
+ * This class is a collection of needed functions to query the 'Category' Nodes from the DB.
+ *
+ * Note: all basic Categories Node have 'Origin' Node as a parent.
+ */
 export class CategoryNode {
-  //Primary Key(name: string)
-  //(note: we have to make 'Origin' node for all basic categories)
-
   //-1- Create
-  //if it's not have parent make it the 'Origin'.
+  //
+  /**
+   * Create - Add new Category Node to the DB and link it to it's parent Category Node.
+   *
+   * If it not have parent make it the 'Origin' Node.
+   * @param {Category} category - Category object.
+   */
   async create(category: Category) {
     try {
       //Create Category
@@ -32,8 +41,11 @@ export class CategoryNode {
       throw err;
     }
   }
-  //-6- Update/Create
-  //link (neo4j: make relationships between) two categories as the child category is a sub-category of the parent category.
+  /**
+   * Create/Update - Make relationship "SUB_CATEGORY_TO" between (link) twoCategories.
+   * @param {string} childName - child (sub) Category's name.
+   * @param {string} parentName - parent Category's name.
+   */
   async linkChild(childName: string, parentName: string) {
     try {
       //Delete the existing relationship (if exist).
@@ -60,25 +72,11 @@ export class CategoryNode {
     }
   }
 
-  //-2- Delete
-  async delete(name: string) {
-    try {
-      await dbDriver.executeQuery(
-        `
-        MATCH (category:Category {name:$name})
-        DETACH DELETE category
-        `,
-        { name: name },
-        { database: "neo4j" }
-      );
-    } catch (err) {
-      console.error(`Error CategoryNode.delete(): ${err}`);
-      throw err;
-    }
-  }
-  //note: it has to be safe for children.
-
-  //-3- Update
+  /**
+   * Update - Rename an existing Category.
+   * @param {string} oldName - old (existing) Category's name.
+   * @param {string} newName - new Category's name.
+   */
   async rename(oldName: string, newName: string) {
     try {
       await dbDriver.executeQuery(
@@ -94,8 +92,35 @@ export class CategoryNode {
       throw err;
     }
   }
-
-  //-4- Read
+  /**
+   * Read - Takes a Category's name as a parameter
+   * and returns (reads) its Category object from the DB.
+   * @param {string} name - Category's name
+   * @returns {Promise<Category>} Category object with this name.
+   */
+  async fetchOne(name: string): Promise<Category> {
+    try {
+      const { records } = await dbDriver.executeQuery(
+        `
+        MATCH (category:Category{name:$name}) 
+        RETURN category
+        `,
+        { name: name },
+        { database: "neo4j" }
+      );
+      let category: Category = new Category();
+      category.name = records[0].get("category").properties.name;
+      console.log(category);
+      return category;
+    } catch (err) {
+      console.error(`Error CategoryNode.fetch(): ${err}`);
+      throw err;
+    }
+  }
+  /**
+   * Read - Returns (reads) all existing Categories names in the DB.
+   * @returns {Promise<string[]>} list of all existing Categories.
+   */
   async fetchAllName(): Promise<string[]> {
     try {
       const { records } = await dbDriver.executeQuery(
@@ -117,32 +142,14 @@ export class CategoryNode {
       throw err;
     }
   }
-
-  async fetch(name: string): Promise<Category> {
-    try {
-      const { records } = await dbDriver.executeQuery(
-        `
-        MATCH (category:Category{name:$name}) 
-        RETURN category
-        `,
-        { name: name },
-        { database: "neo4j" }
-      );
-      let category: Category = new Category();
-      category.name = records[0].get("category").properties.name;
-      console.log(category);
-      return category;
-    } catch (err) {
-      console.error(`Error CategoryNode.fetch(): ${err}`);
-      throw err;
-    }
-  }
-  //-5- Read(could be canceled)
-  //like 'fetchAllName()' but it returns them recursively as it gets the category from its parent.
-
+  /**
+   * Read - Returns (reads) the Sub-Categories (children) of an arbitrary Category (parent)
+   *
+   * this method call itself recursively to traverse in all children Categories
+   * @param {string} name - parent Category's name
+   * @returns {Promise<Category>} Category object with this name with all children Categories of it.
+   */
   async fetchTree(name: string): Promise<Category> {
-    //let name = cName;
-    //if (name === undefined) name = "Origin";
     try {
       const { records } = await dbDriver.executeQuery(
         `
@@ -168,6 +175,60 @@ export class CategoryNode {
       return category;
     } catch (err) {
       console.error(`Error CategoryNode.fetchTree(): ${err}`);
+      throw err;
+    }
+  }
+
+  /**
+   * Delete - Delete one Category
+   * and returns (reads) its Category object from the DB.
+   *
+   *    * note: it has to be safe for children Nodes.
+   * @param {string} name - Category's name
+   */
+  async deleteOne(name: string) {
+    try {
+      await dbDriver.executeQuery(
+        `
+        MATCH (category:Category {name:$name})
+        DETACH DELETE category
+        `,
+        { name: name },
+        { database: "neo4j" }
+      );
+    } catch (err) {
+      console.error(`Error CategoryNode.delete(): ${err}`);
+      throw err;
+    }
+  }
+  /**
+   * Delete - Delete Category Node and all its Sub-Categories (children) Nodes.
+   *
+   * this method call itself recursively to traverse in all children Categories
+   * @param {string} name - parent Category's name
+   * @returns {Promise<Category>} Category object with this name with all children Categories of it.
+   */
+  async deleteTree(name: string) {
+    try {
+      const { records } = await dbDriver.executeQuery(
+        `
+      MATCH (:Category  {name:$name})<-[:SUB_CATEGORY_TO]-(leaf:Category )
+      RETURN leaf
+        `,
+        { name: name },
+        { database: "neo4j" }
+      );
+      //if found leaf(s)
+      if (records[0]) {
+        for (let record of records) {
+          let leafName: string = record.get("leaf").properties.name;
+          await this.deleteTree(leafName);
+        }
+      }
+      await this.deleteOne(name);
+      return;
+    } catch (err) {
+      console.error(`Error CategoryNode.deleteTree(): ${err}`);
       throw err;
     }
   }
