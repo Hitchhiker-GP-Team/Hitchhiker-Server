@@ -751,7 +751,7 @@ export class PostNode  {
   // Deletions ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async DeletePost(postId: string , username:string) : Promise<void>
+  public async DeletePost(postId: string ) : Promise<void>
   {
 
     try{
@@ -759,11 +759,11 @@ export class PostNode  {
     const driver =dbDriver
     const result = await driver.executeQuery(
         `
-        MATCH (post:Post{id:$id}) , (user:User{username:$username})
+        MATCH (post:Post{id:$id})<-[:ADD_POST]-(user:User)
         SET user.postCntr = user.postCntr -1
         DETACH DELETE post
         `    
-        ,{ id : postId , username : username}
+        ,{ id : postId}
     )
     } catch (err) {
         console.error(`Error fetching user posts: ${err}`);

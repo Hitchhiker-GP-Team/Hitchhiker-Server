@@ -123,7 +123,6 @@ export class JourneyNode {
         }
     }
 
-
     //updates
     public async AddPostToJourney(postId: string, journeyId: string): Promise<void> {
         try {
@@ -143,7 +142,6 @@ export class JourneyNode {
         }
     }
     
-
     //deletions
     public async DeleteJourney(journeyId: string): Promise<void> {
         try {
