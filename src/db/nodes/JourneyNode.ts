@@ -5,7 +5,11 @@ import { Place } from "../../entities/Place.js";
 import { User } from "../../entities/User.js";
 
 export class JourneyNode {
-    //Creations
+  
+    // --------------------------------------------------------------------------------------
+    // creations ----------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
     public create(journey: Journey): boolean {
         throw new Error("Method not implemented.");
     }
@@ -43,7 +47,49 @@ export class JourneyNode {
         }
     }
 
-    //fetches
+
+    // --------------------------------------------------------------------------------------
+    // Fetches ------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
+    public async FetchUserJournies(username : string): Promise<Journey[]> {
+      try {       
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (journey:Journey)<-[:ADD_JOURNEY]-(author:User{username:$username})
+            RETURN journey               
+            `,
+            {username}
+
+        );
+
+        // a list to hold all journies retrieved from the database
+        const userJournies: Journey[] = [];
+
+        result.records.forEach((record) => {
+            
+        const journeyProb = record.get("journey").properties    
+        
+        const journey : Journey = {
+
+            title : journeyProb.title ,
+            id : journeyProb.id ,
+            date : parseFloat(journeyProb.date) ,
+
+        }
+
+        userJournies.push(journey);
+        })
+
+      return userJournies  
+
+      } catch (err) {
+            console.error(`Error retrieving journeys: ${err}`);
+            throw err;
+      }
+    }
+    
     public async FetchJourneyPosts(username: string, journeyId:string): Promise<Post[]> {
         try {
             const driver = dbDriver;
@@ -123,17 +169,19 @@ export class JourneyNode {
         }
     }
 
-    //updates
+
+    // --------------------------------------------------------------------------------------
+    // Updates ------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
+
     public async AddPostToJourney(postId: string, journeyId: string): Promise<void> {
         try {
             const driver = dbDriver;
             const result = await driver.executeQuery(
                 `
-            MATCH (post:Post {id: $postId}),
-                  (journey:Journey {id: $journeyId})
-          
-            CREATE (post)-[:POST_BELONGS_TO_JOURNEY]->(journey)
-            `
+                MATCH (post:Post {id: $postId}), (journey:Journey {id: $journeyId})
+                CREATE (post)-[:POST_BELONGS_TO_JOURNEY]->(journey)
+                `
                 , { postId: postId, journeyId: journeyId }
             );
         } catch (err) {
@@ -141,16 +189,19 @@ export class JourneyNode {
             throw err;
         }
     }
-    
-    //deletions
+
+
+    // --------------------------------------------------------------------------------------
+    // Deletions ----------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------
     public async DeleteJourney(journeyId: string): Promise<void> {
         try {
             const driver = dbDriver;
             const result = await driver.executeQuery(
                 `
-      MATCH (journey:Journey {id: $journeyId})
-      DETACH DELETE journey
-      `
+                MATCH (journey:Journey {id: $journeyId})
+                DETACH DELETE journey
+                `
                 , { journeyId: journeyId }
             );
         } catch (err) {
@@ -158,5 +209,23 @@ export class JourneyNode {
             throw err;
         }
     }
+
+    public async DeletePostFromJourney(journeyId: string ,postId :string): Promise<void> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (journey:Journey {id: $journeyId})<-[relation:POST_BELONGS_TO_JOURNEY]-(post:Post{id:$postId})
+                DELETE relation
+                `
+                , { journeyId: journeyId , postId : postId }
+            );
+        } catch (err) {
+            console.error(`Error deleting journey: ${err}`);
+            throw err;
+        }
+    }
+
+
 
 }

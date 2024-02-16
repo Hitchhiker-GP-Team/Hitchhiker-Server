@@ -6,10 +6,6 @@ import { Place } from "../../entities/Place.js";
 
 
 export class PostNode  {
-  //Creations
-  public create(post: Post): boolean {
-    throw new Error("Method not implemented.");
-  }
 
   // --------------------------------------------------------------------------------------
   // Fetches ------------------------------------------------------------------------------
