@@ -1,7 +1,5 @@
 import { dbDriver } from "../dbConnection.js";
-import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
-import { Place } from "../../entities/Place.js";
 import { Review } from "../../entities/Review.js";
 
 
