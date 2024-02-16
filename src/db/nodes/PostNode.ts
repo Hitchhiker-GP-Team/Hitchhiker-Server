@@ -587,6 +587,8 @@ export class PostNode  {
             MATCH (tu:User {username: taggedUser.username})
             CREATE (post)-[:TAG]->(tu)
             
+            SET author.postCntr = author.postCntr + 1 
+
             RETURN post
             
             `
@@ -627,10 +629,9 @@ export class PostNode  {
     const driver =dbDriver
     const result = await driver.executeQuery(
         `
-        MATCH (user:User {username : $username}),
-            (post : Post{id:$id})
-    
+        MATCH (user:User {username : $username}),(post : Post{id:$id})
         CREATE (user)-[:LIKES_POST]->(post)
+        SET post.likesCntr = post.likesCntr + 1
         `    
         ,{username : us , id : postId}
     )
@@ -696,6 +697,7 @@ export class PostNode  {
         `
         MATCH (user:User {username : $username})-[like:LIKES_POST]->(post : Post{id:$id})
         DELETE like 
+        SET post.likesCntr = post.likesCntr -1 
         `    
         ,{username : us , id : postId}
     )
@@ -749,7 +751,7 @@ export class PostNode  {
   // Deletions ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async DeletePost(postId: string) : Promise<void>
+  public async DeletePost(postId: string , username:string) : Promise<void>
   {
 
     try{
@@ -757,10 +759,11 @@ export class PostNode  {
     const driver =dbDriver
     const result = await driver.executeQuery(
         `
-        MATCH (post:Post{id:$id})
+        MATCH (post:Post{id:$id}) , (user:User{username:$username})
+        SET user.postCntr = user.postCntr -1
         DETACH DELETE post
         `    
-        ,{ id : postId}
+        ,{ id : postId , username : username}
     )
     } catch (err) {
         console.error(`Error fetching user posts: ${err}`);
@@ -777,6 +780,7 @@ export class PostNode  {
     const result = await driver.executeQuery(
         `
         MATCH (user:User{username:$username})-[:ADD_POST]->(post:Post)
+        SET user.postCntr = 0
         DETACH DELETE post
         `    
         ,{ username : username}

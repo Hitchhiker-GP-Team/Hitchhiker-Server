@@ -33,8 +33,25 @@ export class CommentNode {
                 `
         MATCH (user:User {username : $username}),
               (comment:Comment {id:$id})
-      
+        SET comment.likesCntr = comment.likesCntr + 1        
         CREATE (user)-[:LIKES_COMMENT]->(comment)
+        `
+                , { username: us, id: commentId }
+            );
+        } catch (err) {
+            console.error(`Error liking comment: ${err}`);
+            throw err;
+        }
+    }
+
+    public async UnLikeComment(us: string, commentId: string): Promise<void> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+        MATCH (user:User {username : $username})-[like:LIKES_COMMENT]->(comment:Comment {id:$id})
+        SET comment.likesCntr = comment.likesCntr - 1       
+        DELETE like
         `
                 , { username: us, id: commentId }
             );
