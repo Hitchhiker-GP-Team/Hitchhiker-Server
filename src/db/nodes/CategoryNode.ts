@@ -186,7 +186,7 @@ export class CategoryNode {
    *    * note: it has to be safe for children Nodes.
    * @param {string} name - Category's name
    */
-  async deleteOne(name: string) {
+  private async deleteOne(name: string) {
     try {
       await dbDriver.executeQuery(
         `
