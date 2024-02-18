@@ -157,6 +157,8 @@ export class ReviewNode {
           })<-[:ADD_REVIEW]-(author),
           (review)-[:REVIEW_ON_PLACE]->(place)
           
+          SET author.reviewsCntr = author.reviewsCntr + 1
+
           RETURN review
           `,
                 {
@@ -182,7 +184,8 @@ export class ReviewNode {
             const driver = dbDriver;
             const result = await driver.executeQuery(
                 `
-                MATCH (review:Review {id: $id})
+                MATCH (review:Review {id: $id})<-[:ADD_REVIEW]-(author:User)
+                SET author.reviewsCntr = author.reviewsCntr - 1
                 DETACH DELETE review
                 `,
                 { id: reviewId }
