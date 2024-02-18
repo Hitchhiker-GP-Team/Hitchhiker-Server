@@ -8,5 +8,4 @@ export class DbHelper {
   public static CategoryNode: CategoryNode = new CategoryNode();
   public static ReviewNode: ReviewNode = new ReviewNode();
   public static UserNode: UserNode = new UserNode();
-
 }
