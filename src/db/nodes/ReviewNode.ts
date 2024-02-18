@@ -14,7 +14,7 @@ export class ReviewNode {
     // Fetches ------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
 
-    public async fetchUserReviews(username: string): Promise<Review[]> {
+    public async FetchUserReviews(username: string): Promise<Review[]> {
         try {
             const driver = dbDriver;
             const session = driver.session();
@@ -80,7 +80,7 @@ export class ReviewNode {
         }
     }
 
-    public async fetchPlaceReviews(placeId: string): Promise<Review[]> {
+    public async FetchPlaceReviews(placeId: string): Promise<Review[]> {
         try {
             const driver = dbDriver;
             const session = driver.session();
