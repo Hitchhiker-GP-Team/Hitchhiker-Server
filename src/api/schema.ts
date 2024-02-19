@@ -108,6 +108,7 @@ export const typeDefs = `#graphql
 
   type Query {
     getProfilePosts(username: String):[Post]
+    getUserProfile(username: String):[User]
   }
 
 `;
