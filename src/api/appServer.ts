@@ -23,6 +23,6 @@ export async function startServer() {
 // console.log(await  DbHelper.ReviewNode.FetchPlaceReviews("0ebe80ce-87dd-44b5-a320-888705855605"));
 // console.log(await DbHelper.ReviewNode.AddReview({id: 0 ,author: {username: "authorUsername",profilePic: "authorProfilePic"},place: {id: "placeId", mapsId: "mapsId", name: "placeName", type: "placeType", },text: "Review text", rating: 5,  date: Date.now(), likesCntr: 0,dislikesCntr: 0}));
 // console.log(await  DbHelper.ReviewNode.DeleteReview("0ebe80ce-87dd-44b5-a320-885605855605"));
-  console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
+//  console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
   console.log(`🚀  Server ready at: ${url}`);
 }
