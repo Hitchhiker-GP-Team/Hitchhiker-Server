@@ -10,7 +10,7 @@ export class User {
   Name?: string;
   birthDate?: number;
   homeLocation?: Coordinates;
-  sex?: sex;
+  sex?:sex;
   titles?: titles;
   Bio?: string;
   followingCntr?: number;

@@ -199,5 +199,50 @@ export class CommentNode {
     return comment;
   }
 
+  public async UpdateComment(commentId: string, updatedComment: Comment): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
+        MATCH (comment:Comment {id: $id})
+        SET comment.text = $text,
+            comment.date = $date,
+            comment.likesCounter = $likesCounter,
+            comment.likedBy = $likedBy,
+            comment.repliesCntr = $repliesCntr
+        `,
+        {
+          id: commentId,
+          text: updatedComment.text,
+          date: updatedComment.date,
+          likesCounter: updatedComment.likesCounter,
+          likedBy: updatedComment.likedBy,
+          repliesCntr: updatedComment.repliesCntr
+        }
+      );
+    } catch (err) {
+      console.error(`Error updating comment: ${err}`);
+      throw err;
+    }
+  }
+
+  public async DeleteComment(commentId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
+        MATCH (comment:Comment {id: $id})
+        DETACH DELETE comment
+        `,
+        {
+          id: commentId
+        }
+      );
+    } catch (err) {
+      console.error(`Error deleting comment: ${err}`);
+      throw err;
+    }
+  }
+  
   
 }
