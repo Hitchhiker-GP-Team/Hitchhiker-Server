@@ -19,10 +19,15 @@ export async function startServer() {
     listen: { port: 4000 },
   });
 
-// console.log(await  DbHelper.ReviewNode.FetchUserReviews("kandeel00"));
-// console.log(await  DbHelper.ReviewNode.FetchPlaceReviews("0ebe80ce-87dd-44b5-a320-888705855605"));
-// console.log(await DbHelper.ReviewNode.AddReview({id: 0 ,author: {username: "authorUsername",profilePic: "authorProfilePic"},place: {id: "placeId", mapsId: "mapsId", name: "placeName", type: "placeType", },text: "Review text", rating: 5,  date: Date.now(), likesCntr: 0,dislikesCntr: 0}));
-// console.log(await  DbHelper.ReviewNode.DeleteReview("0ebe80ce-87dd-44b5-a320-885605855605"));
-//  console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
+  // console.log(await  DbHelper.ReviewNode.FetchUserReviews("kandeel00"));
+  // console.log(await  DbHelper.ReviewNode.FetchPlaceReviews("0ebe80ce-87dd-44b5-a320-888705855605"));
+  // console.log(await DbHelper.ReviewNode.AddReview({id: 0 ,author: {username: "authorUsername",profilePic: "authorProfilePic"},place: {id: "placeId", mapsId: "mapsId", name: "placeName", type: "placeType", },text: "Review text", rating: 5,  date: Date.now(), likesCntr: 0,dislikesCntr: 0}));
+  // console.log(await  DbHelper.ReviewNode.DeleteReview("0ebe80ce-87dd-44b5-a320-885605855605"));
+  // console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
+  // console.log(await DbHelper.CommentNode.DeleteComment("0ebe80ce-87dd-44b5-a320-888734565605"));
+  // console.log(await DbHelper.CommentNode.UpdateComment("0ebe80ce-87dd-44b5-a320-888734565605", {id: "0ebe80ce-87dd-44b5-a320-888734565605",text: "Updated comment text",date: Date.now(),likesCounter: 10,repliesCntr: 0,}));
+  console.log(await DbHelper.UserNode.DeleteUser("alimo"));
+
+  
   console.log(`🚀  Server ready at: ${url}`);
 }

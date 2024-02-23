@@ -10,10 +10,6 @@ export class JourneyNode {
     // creations ----------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
 
-    public create(journey: Journey): boolean {
-        throw new Error("Method not implemented.");
-    }
-
     public async CreateJourney(journey: Journey): Promise<Journey> {
         try {
             if (!journey.author) {

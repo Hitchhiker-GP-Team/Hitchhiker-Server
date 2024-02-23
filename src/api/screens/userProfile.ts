@@ -22,6 +22,30 @@ export async function getUserProfileFun(_: any, { username }: { username: string
     throw error;
   }
 }
+export async function getReviewsFun(_: any, { username }: { username: string }) {
+  try {
+    // Fetch user posts using the database module function
+    const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username);
+    console.log(userReviews);
+    return userReviews; 
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
+    throw error;
+  }
+}
+export async function getUserJourneys(_: any, { username }: { username: string }) {
+  try {
+    // Fetch user posts using the database module function
+    const userJournies = await DbHelper.JourneyNode.FetchUserJournies(username);
+    console.log(userJournies);
+    return userJournies; 
+  } catch (error) {
+    console.error("Error fetching user journeys:", error);
+    throw error;
+  }
+} 
+
+
 export function numSevFun() {
   return 7;
 }
