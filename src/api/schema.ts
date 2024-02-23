@@ -111,6 +111,7 @@ export const typeDefs = `#graphql
     getUserProfile(username: String):[User]
     getReviewsFun(username: String):[Review]
     getUserJourneys(username: String):[Journey]
+    getFeedFun(username: String):[User]
   }
 
 `;

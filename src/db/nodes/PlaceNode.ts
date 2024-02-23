@@ -3,10 +3,6 @@ import { Place } from "../../entities/Place.js";
 
 
 export class PlaceNode {
-    create(place: Place): boolean {
-        throw new Error("Method not implemented.");
-    }
-
     public async AddPlace(place: Place): Promise<void> {
         try {
             const driver = dbDriver;

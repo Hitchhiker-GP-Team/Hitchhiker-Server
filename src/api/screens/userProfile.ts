@@ -24,7 +24,7 @@ export async function getUserProfileFun(_: any, { username }: { username: string
 }
 export async function getReviewsFun(_: any, { username }: { username: string }) {
   try {
-    // Fetch user posts using the database module function
+    // Fetch user reviews using the database module function
     const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username);
     console.log(userReviews);
     return userReviews; 
@@ -35,7 +35,7 @@ export async function getReviewsFun(_: any, { username }: { username: string }) 
 }
 export async function getUserJourneys(_: any, { username }: { username: string }) {
   try {
-    // Fetch user posts using the database module function
+    // Fetch user journey using the database module function
     const userJournies = await DbHelper.JourneyNode.FetchUserJournies(username);
     console.log(userJournies);
     return userJournies; 
