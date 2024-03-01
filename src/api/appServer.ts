@@ -26,7 +26,7 @@ export async function startServer() {
   // console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
   // console.log(await DbHelper.CommentNode.DeleteComment("0ebe80ce-87dd-44b5-a320-888734565605"));
   // console.log(await DbHelper.CommentNode.UpdateComment("0ebe80ce-87dd-44b5-a320-888734565605", {id: "0ebe80ce-87dd-44b5-a320-888734565605",text: "Updated comment text",date: Date.now(),likesCounter: 10,repliesCntr: 0,}));
-  console.log(await DbHelper.UserNode.DeleteUser("alimo"));
+ // console.log(await DbHelper.UserNode.DeleteUser("alimo"));
 
   
   console.log(`🚀  Server ready at: ${url}`);

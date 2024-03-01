@@ -5,11 +5,6 @@ import { Review } from "../../entities/Review.js";
 
 
 export class ReviewNode {
-    //Creations
-    public create(review: Review): boolean {
-        throw new Error("Method not implemented.");
-    }
-
     // --------------------------------------------------------------------------------------
     // Fetches ------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------

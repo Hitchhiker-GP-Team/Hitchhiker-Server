@@ -5,7 +5,7 @@ import { v4 } from "uuid";
 console.log(v4());
 
 export class CommentNode {
-  async addComment(comment: Comment): Promise<string> {
+  public async addComment(comment: Comment): Promise<string> {
     try {
       comment.id = v4();
       await dbDriver.executeQuery(
@@ -42,8 +42,7 @@ export class CommentNode {
       throw err;
     }
   }
-
-  async replyComment(reply: Comment): Promise<string> {
+  public async replyComment(reply: Comment): Promise<string> {
     try {
       reply.id = v4();
       await dbDriver.executeQuery(
