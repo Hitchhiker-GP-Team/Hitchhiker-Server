@@ -106,14 +106,14 @@ export class ReviewNode {
                 };
 
                 const currentReview: Review = {
-                    id: reviewProb.id,
+                    id: parseInt(reviewProb.id),
                     author: author,
                     place: record.get("place"), // Assuming place is a complete Place object
                     text: record.get("text"),
-                    rating: record.get("rating"),
-                    date: record.get("date"),
-                    likesCntr: record.get("likesCntr"),
-                    dislikesCntr: record.get("dislikesCntr"),
+                    rating: parseInt(record.get("rating")),
+                    date: parseInt(record.get("date")),
+                    likesCntr: parseInt(record.get("likesCntr")),
+                    dislikesCntr: parseInt(record.get("dislikesCntr")),
                 };
 
                 placeReviews.push(currentReview);

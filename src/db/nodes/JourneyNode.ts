@@ -48,42 +48,79 @@ export class JourneyNode {
     // Fetches ------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
 
-    public async FetchUserJournies(username : string): Promise<Journey[]> {
-      try {       
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
-            MATCH (journey:Journey)<-[:ADD_JOURNEY]-(author:User{username:$username})
-            RETURN journey               
-            `,
-            {username}
+    // public async FetchUserJournies(username : string): Promise<Journey[]> {
+    //   try {       
+    //     const driver = dbDriver;
+    //     const result = await driver.executeQuery(
+    //         `
+    //         MATCH (journey:Journey)<-[:ADD_JOURNEY]-(author:User{username:$username})
+    //         RETURN journey               
+    //         `,
+    //         {username}
 
-        );
+    //     );
 
-        // a list to hold all journies retrieved from the database
-        const userJournies: Journey[] = [];
+    //     // a list to hold all journies retrieved from the database
+    //     const userJournies: Journey[] = [];
 
-        result.records.forEach((record) => {
+    //     result.records.forEach((record) => {
             
-        const journeyProb = record.get("journey").properties    
+    //     const journeyProb = record.get("journey").properties    
         
-        const journey : Journey = {
+    //     const journey : Journey = {
 
-            title : journeyProb.title ,
-            id : journeyProb.id ,
-            date : parseFloat(journeyProb.date) ,
+    //         title : journeyProb.title ,
+    //         id : journeyProb.id ,
+    //         date : parseFloat(journeyProb.date) ,
 
-        }
+    //     }
 
-        userJournies.push(journey);
-        })
+    //     userJournies.push(journey);
+    //     })
 
-      return userJournies  
+    //   return userJournies  
 
-      } catch (err) {
+    //   } catch (err) {
+    //         console.error(`Error retrieving journeys: ${err}`);
+    //         throw err;
+    //   }
+    // }
+    
+    public async FetchUserJournies(username: string): Promise<Journey[]> {
+        try {
+            const driver = dbDriver;
+            const session = driver.session();
+            const result = await session.run(
+                `
+                MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_JOURNEY]->(journey:Journey)
+                WHERE NOT (user)-[:ADD_JOURNEY]->(journey)
+                MERGE (user)-[:ADD_JOURNEY]->(journey)
+                RETURN journey
+                `,
+                { username }
+            );
+            session.close();
+    
+            const userJournies: Journey[] = [];
+    
+            result.records.forEach((record) => {
+                const journeyProb = record.get("journey").properties;
+    
+                const journey: Journey = {
+                    title: journeyProb.title,
+                    id: journeyProb.id,
+                    date: parseFloat(journeyProb.date),
+                };
+    
+                userJournies.push(journey);
+            });
+    
+            console.log(userJournies);
+            return userJournies;
+        } catch (err) {
             console.error(`Error retrieving journeys: ${err}`);
             throw err;
-      }
+        }
     }
     
     public async FetchJourneyPosts(username: string, journeyId:string): Promise<Post[]> {

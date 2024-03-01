@@ -98,7 +98,7 @@ export class CategoryNode {
    * @param {string} name - Category's name
    * @returns {Promise<Category>} Category object with this name.
    */
-  async fetchOne(name: string): Promise<Category> {
+  async fetchOne(name: string): Promise<Category[]> {
     try {
       const { records } = await dbDriver.executeQuery(
         `
@@ -108,15 +108,16 @@ export class CategoryNode {
         { name: name },
         { database: "neo4j" }
       );
-      let category: Category = new Category();
+      const category: Category = new Category();
       category.name = records[0].get("category").properties.name;
       console.log(category);
-      return category;
+      return [category]; // Return an array with a single element
     } catch (err) {
       console.error(`Error CategoryNode.fetch(): ${err}`);
       throw err;
     }
   }
+
   /**
    * Read - Returns (reads) all existing Categories names in the DB.
    * @returns {Promise<string[]>} list of all existing Categories.
@@ -149,36 +150,63 @@ export class CategoryNode {
    * @param {string} name - parent Category's name
    * @returns {Promise<Category>} Category object with this name with all children Categories of it.
    */
-  async fetchTree(name: string): Promise<Category> {
+  // async fetchTree(name: string): Promise<Category> {
+  //   try {
+  //     const { records } = await dbDriver.executeQuery(
+  //       `
+  //       MATCH (:Category  {name:$name})<-[:SUB_CATEGORY_TO]-(leaf:Category )
+  //       RETURN leaf
+  //         `,
+  //       { name: name },
+  //       { database: "neo4j" }
+  //     );
+  //     let category: Category = new Category();
+  //     category.name = name;
+  //     //if found leaf(s)
+  //     if (records[0]) {
+  //       category.subCategories = [];
+  //       for (let record of records) {
+  //         {
+  //           let leafName: string = record.get("leaf").properties.name;
+  //           let leafCategory: Category = await this.fetchTree(leafName);
+  //           category.subCategories!.push(leafCategory);
+  //         }
+  //       }
+  //     }
+  //     return category;
+  //   } catch (err) {
+  //     console.error(`Error CategoryNode.fetchTree(): ${err}`);
+  //     throw err;
+  //   }
+  // }
+  async fetchTree(name: string): Promise<Category[]> {
     try {
       const { records } = await dbDriver.executeQuery(
         `
-        MATCH (:Category  {name:$name})<-[:SUB_CATEGORY_TO]-(leaf:Category )
+        MATCH (:Category {name:$name})<-[:SUB_CATEGORY_TO]-(leaf:Category)
         RETURN leaf
-          `,
+        `,
         { name: name },
         { database: "neo4j" }
       );
       let category: Category = new Category();
       category.name = name;
+      let subCategories: Category[] = [];
       //if found leaf(s)
       if (records[0]) {
-        category.subCategories = [];
         for (let record of records) {
-          {
-            let leafName: string = record.get("leaf").properties.name;
-            let leafCategory: Category = await this.fetchTree(leafName);
-            category.subCategories!.push(leafCategory);
-          }
+          let leafName: string = record.get("leaf").properties.name;
+          let leafCategory: Category[] = await this.fetchTree(leafName);
+          subCategories = subCategories.concat(leafCategory);
         }
       }
-      return category;
+      category.subCategories = subCategories;
+      return [category]; // Return an array with a single element
     } catch (err) {
       console.error(`Error CategoryNode.fetchTree(): ${err}`);
       throw err;
     }
   }
-
   /**
    * Delete - Delete one Category
    * and returns (reads) its Category object from the DB.

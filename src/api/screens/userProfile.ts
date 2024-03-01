@@ -1,7 +1,7 @@
 import { DbHelper } from "../../db/DbHelper.js";
 import { Category } from "../../entities/Category.js";
 import { Journey } from "../../entities/Journey.js";
-import { Place } from "../../entities/Place.js";
+import { Coordinates, Place } from "../../entities/Place.js";
 import { Post } from "../../entities/Post.js";
 import { Review } from "../../entities/Review.js";
 import { User } from "../../entities/User.js";
@@ -452,7 +452,8 @@ export async function getReviewsFun(_: any, { username }: { username: string }) 
     // Fetch user reviews using the database module function
     const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username);
     console.log(userReviews);
-    return userReviews;
+    const arr =[userReviews];
+    return arr;
   } catch (error) {
     console.error("Error fetching user reviews:", error);
     throw error;
@@ -517,16 +518,27 @@ export async function deleteCategory(_: any, { name }: { name: string }): Promis
     throw error;
   }
 }
-export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category> {
+// export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category> {
+//   try {
+//     const fetchedCategory = await DbHelper.CategoryNode.fetchOne(name);
+//     console.log("Category fetched:", fetchedCategory);
+//     return fetchedCategory;
+//   } catch (error) {
+//     console.error("Error fetching category:", error);
+//     throw error;
+//   }
+// }
+export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category[]> {
   try {
-    const fetchedCategory = await DbHelper.CategoryNode.fetchOne(name);
-    console.log("Category fetched:", fetchedCategory);
-    return fetchedCategory;
+    const fetchedCategories = await DbHelper.CategoryNode.fetchOne(name);
+    console.log("Categories fetched:", fetchedCategories);
+    return fetchedCategories;
   } catch (error) {
-    console.error("Error fetching category:", error);
+    console.error("Error fetching categories:", error);
     throw error;
   }
 }
+
 export async function fetchAllCategories(): Promise<string[]> {
   try {
     const allCategories = await DbHelper.CategoryNode.fetchAllName();
@@ -537,7 +549,18 @@ export async function fetchAllCategories(): Promise<string[]> {
     throw error;
   }
 }
-export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category> {
+// export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category> {
+//   try {
+//     const categoryTree = await DbHelper.CategoryNode.fetchTree(name);
+//     console.log("Category tree fetched:", categoryTree);
+//     return categoryTree;
+//   } catch (error) {
+//     console.error("Error fetching category tree:", error);
+//     throw error;
+//   }
+// }
+
+export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category[]> {
   try {
     const categoryTree = await DbHelper.CategoryNode.fetchTree(name);
     console.log("Category tree fetched:", categoryTree);
