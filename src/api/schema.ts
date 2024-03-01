@@ -107,12 +107,74 @@ export const typeDefs = `#graphql
 
 
   type Query {
-    getProfilePosts(username: String):[Post]
+    # USER
     getUserProfile(username: String):[User]
-    getReviewsFun(username: String):[Review]
+    #addUser(user: User): [User]
+    #updateUser(username: String, updatedUser: User): [User]
+    deleteUser(username: String): [User]
+    followUser(username: String, userToFollow: String): [User]
+    unfollowUser(username: String, userToUnfollow: String): [User]
+    # END USER
+
+    #POST
+    getFeedFun(username: String):[Post]
+    getPostsFun(username: String):[Post]
+    getSavedPosts(username: String):[Post]
+    getLikedPosts(username: String):[Post]
+    getPlacePosts(username: String, placeId: String):[Post]
+    getCategoryPosts(username: String, category: String):[Post]
+    getArchivedPosts(username: String):[Post]
+    #createPost(post: Post): [Post]
+    likePost(username: String, postId: String): [Post]
+    savePost(username: String, postId: String): [Post]
+    archivePost(username: String, postId: String): [Post]
+    unlikePost(username: String, postId: String): [Post]
+    unsavePost(username: String, postId: String): [Post]
+    unarchivePost(username: String, postId: String): [Post]
+    deletePost(postId: String): [Post]
+    deleteAllPosts(username: String): [Post]
+    deleteAllArchivedPosts(username: String): [Post]
+    #END POST
+
+    #PLACE
+    #addPlace(place: Place): [Place]
+    #editPlace(placeId: String, updatedPlace: Place): [Place]
+    deletePlace(placeId: String): [Place]
+    addPostToPlace(postId: String, placeId: String): [Place]
+    addPlaceToCategory(placeId: String, categoryName: String): [Place]
+    addReviewToPlace(reviewId: String, placeId: String): [Place]
+    addRatingToPlace(ratingId: String, placeId: String): [Place]
+    addUserVisitedPlace(username: String, placeId: String): [Place]
+    #END PLACE
+
+    #JOURNEY 
+    #createJourney(journey: Journey): [Journey]
     getUserJourneys(username: String):[Journey]
-    getFeedFun(username: String):[User]
+    fetchJourneyPosts(username: String, journeyId: String): [Journey]
+    addPostToJourney(postId: String, journeyId: String): [Journey]
+    deleteJourney(journeyId: String): [Journey]
+    deletePostFromJourney(journeyId: String, postId: String): [Journey]
+    #END JOURNEY
+
+    #REVIEW
+    getReviewsFun(username: String):[Review]
+    fetchPlaceReviews(placeId: String):[Review]
+    #addReview(review: Review):[Review]
+    deleteReview(reviewId: String):[Review]
+    #END REVIEW
+
+    #CATEGORY
+    #createCategory(category: Category):[Category]
+    updateCategory(oldName: String, newName: String):[Category]
+    deleteCategory(name: String):[Category]
+    fetchCategory(name: String):[Category]
+    #fetchAllCategories():[Category]
+    fetchCategoryTree(name: String):[Category]
+    #END CATEGORY
+
   }
+
+
 
 `;
 // A schema is a collection of type definitions (hence "typeDefs")
