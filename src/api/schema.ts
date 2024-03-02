@@ -109,8 +109,8 @@ export const typeDefs = `#graphql
   type Query {
     # USER
     getUserProfile(username: String):[User]
-    #addUser(user: User): [User]
-    #updateUser(username: String, updatedUser: User): [User]
+    #addUser(username: String; profilePic: String; email: String; password: String; Name: String; birthDate: number;sex: String; Bio: String; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number): [User]
+    #updateUser( username: String; Bio: String; profilePic: String; email: String; Name: String): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
     unfollowUser(username: String, userToUnfollow: String): [User]
@@ -124,7 +124,7 @@ export const typeDefs = `#graphql
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]
-    #createPost(post: Post): [Post]
+    #createPost(authorUsername: String; caption: String; date: number; likesCntr: number; mediaUrls: String[]; hashtags: String[]; commentsCntr: number; tags: String[]; placeId: String; categoryName: String): [Post]
     likePost(username: String, postId: String): [Post]
     savePost(username: String, postId: String): [Post]
     archivePost(username: String, postId: String): [Post]
@@ -137,8 +137,8 @@ export const typeDefs = `#graphql
     #END POST
 
     #PLACE
-    #addPlace(place: Place): [Place]
-    #editPlace(placeId: String, updatedPlace: Place): [Place]
+    #addPlace(id: String; name: String; mapsId: String; type: String; description: String): [Place]
+    #editPlace(placeId: String ; name?: String; mapsId?: String; type?: String; description?: String): [Place]
     deletePlace(placeId: String): [Place]
     addPostToPlace(postId: String, placeId: String): [Place]
     addPlaceToCategory(placeId: String, categoryName: String): [Place]
@@ -148,7 +148,7 @@ export const typeDefs = `#graphql
     #END PLACE
 
     #JOURNEY 
-    #createJourney(journey: Journey): [Journey]
+    #createJourney(authorUsername: String; journeyId: String; title: String; date: number): [Journey]
     getUserJourneys(username: String):[Journey]
     fetchJourneyPosts(username: String, journeyId: String): [Journey]
     addPostToJourney(postId: String, journeyId: String): [Journey]
@@ -159,12 +159,12 @@ export const typeDefs = `#graphql
     #REVIEW
     getReviewsFun(username: String):[Review]
     fetchPlaceReviews(placeId: String):[Review]
-    #addReview(review: Review):[Review]
+    #addReview(authorUsername: string; placeId: string; reviewId: string; text: string; rating: number; date: number):[Review]
     deleteReview(reviewId: String):[Review]
     #END REVIEW
 
     #CATEGORY
-    #createCategory(category: Category):[Category]
+    #createCategory(name: string; parentName?: string):[Category]
     updateCategory(oldName: String, newName: String):[Category]
     deleteCategory(name: String):[Category]
     fetchCategory(name: String):[Category]
@@ -173,7 +173,91 @@ export const typeDefs = `#graphql
     #END CATEGORY
 
   }
+  type Mutation {
+  updateUser(
+    username: String!
+    profilePic: String
+    email: String
+    password: String
+    Name: String
+    Bio: String
+  ): User
+}
+type Mutation {
+  addUser(
+    username: String!
+    profilePic: String
+    email: String!
+    password: String!
+    Name: String!
+    birthDate: Int!
+    sex: String!
+    Bio: String!
+    followingCntr: Int!
+    followersCntr: Int!
+    postCntr: Int!
+    reviewsCntr: Int!
+  ): User
+}
 
+type Mutation {
+  createPost(
+    authorUsername: String!
+    caption: String!
+    date: Int!
+    likesCntr: Int!
+    mediaUrls: [String]!
+    hashtags: [String]!
+    commentsCntr: Int!
+    placeId: String!
+    categoryName: String!
+  ): Post
+}
+type Mutation {
+  addPlace(
+    id: String!
+    name: String!
+    mapsId: String!
+    type: String!
+    description: String!
+  ): Place
+}
+type Mutation {
+  editPlace(
+    placeId: String!
+    name: String
+    mapsId: String
+    type: String
+    description: String
+  ): Place
+}
+
+type Mutation {
+  createJourney(
+    authorUsername: String!
+    journeyId: String!
+    title: String!
+    date: Float!
+  ): Journey
+}
+
+type Mutation {
+  addReview(
+    authorUsername: String!
+    placeId: String!
+    reviewId: String!
+    text: String!
+    rating: Float!
+    date: Float!
+  ): Review
+}
+
+type Mutation {
+  createCategory(
+    name: String!,
+    parentName: String
+    ): Category
+}
 
 
 `;
