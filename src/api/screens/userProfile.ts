@@ -1,14 +1,15 @@
 import { DbHelper } from "../../db/DbHelper.js";
 import { dbDriver } from "../../db/dbConnection.js";
 import { Category } from "../../entities/Category.js";
+import { Comment } from "../../entities/Comment.js";
 import { Journey } from "../../entities/Journey.js";
 import { Coordinates, Place } from "../../entities/Place.js";
 import { Post } from "../../entities/Post.js";
 import { Review } from "../../entities/Review.js";
-import { User } from "../../entities/User.js";
+import { User , sex } from "../../entities/User.js";
 
 // USER NODE FUNCTIONALITES TILL LINE 66//
-export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number; }): Promise<User> {
+export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
   try {
     const newUser: User = {
       username,
@@ -17,16 +18,19 @@ export async function addUser(_: any, { username, profilePic, email, password, N
       password,
       Name,
       birthDate,
+      sex,
       Bio,
       followingCntr,
       followersCntr,
       postCntr,
-      reviewsCntr
+      reviewsCntr,
+      homeLocation
     };
 
-    await DbHelper.UserNode.AddUser(newUser);
+    
+    const u =[await DbHelper.UserNode.AddUser(newUser)];
     console.log("User added:", newUser);
-    return newUser;
+    return u
   } catch (error) {
     console.error("Error adding user:", error);
     throw error;
@@ -384,16 +388,16 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
 //   }
 // }
 // /////// ERROR  ////////
-// export async function replyComment(_: any, { reply }: { reply: Comment }): Promise<string> {
-//   try {
-//     const replyId = await DbHelper.CommentNode.replyComment(reply);
-//     console.log("Reply added with ID:", replyId);
-//     return replyId;
-//   } catch (error) {
-//     console.error("Error replying to comment:", error);
-//     throw error;
-//   }
-// }
+export async function replyComment(_: any, { reply ,parentId }: { reply: Comment , parentId :string }): Promise<string> {
+  try {
+    const replyId = await DbHelper.CommentNode.replyComment(reply);
+    console.log("Reply added with ID:", replyId);
+    return replyId;
+  } catch (error) {
+    console.error("Error replying to comment:", error);
+    throw error;
+  }
+}
 // export async function likeComment(_: any, { username, commentId }: { username: string; commentId: string }): Promise<void> {
 //   try {
 //     await DbHelper.CommentNode.LikeComment(username, commentId);

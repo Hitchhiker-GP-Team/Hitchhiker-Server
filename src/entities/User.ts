@@ -1,3 +1,4 @@
+import { Integer } from "neo4j-driver";
 import { Coordinates } from "./Place.js";
 import { Post } from "./Post.js";
 import { Review } from "./Review.js";
@@ -8,25 +9,25 @@ export class User {
   email?: string;
   password?: string;
   Name?: string;
-  birthDate?: number;
-  homeLocation?: Coordinates;
-  sex?:sex;
+  birthDate?: Number;
+  homeLocation?: [Number];
+  sex?:string;
   titles?: titles;
   Bio?: string;
-  followingCntr?: number;
+  followingCntr?: Number;
   followings?: User[];
-  followersCntr?: number;
+  followersCntr?: Number;
   followers?: User[];
   posts?: Post[];
-  postCntr?: number;
+  postCntr?: Number;
   reviews?: Review[];
-  reviewsCntr?: number;
+  reviewsCntr?: Number;
 }
 interface titles {
   [key: string]: number;
 }
 
-type sex = "m" | "f";
+export type sex = "m" | "f";
 
 /*
 let titles:titles = {};

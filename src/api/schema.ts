@@ -107,9 +107,13 @@ export const typeDefs = `#graphql
 
 
   type Query {
+
+    #Comment
+    replyComment( reply: Comment , parentId: String):String
+
     # USER
     getUserProfile(username: String):[User]
-    addUser(username: String; profilePic: String; email: String; password: String; Name: String; birthDate: number;Bio: String; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number): [User]
+    addUser(username: String, profilePic: String, email: String, password: String, Name: String,sex:String, birthDate: Int,Bio: String, followingCntr: Int, followersCntr: Int, postCntr: Int, reviewsCntr: Int,homeLocation:[Int]): [User]
     #updateUser( username: String; Bio: String; profilePic: String; email: String; Name: String): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
@@ -181,11 +185,13 @@ export const typeDefs = `#graphql
     password: String!,
     Name: String!,
     birthDate: Int!,
+    sex: String!,
     Bio: String!,
     followingCntr: Int!,
     followersCntr: Int!,
     postCntr: Int!,
     reviewsCntr: Int!
+    homeLocation: [Int!]!
   ): User
   updateUser(
     username: String!,
@@ -239,9 +245,7 @@ export const typeDefs = `#graphql
     parentName: String
   ): Category
 }
-
-
-`;
+`
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.

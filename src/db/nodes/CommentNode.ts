@@ -5,7 +5,7 @@ import { v4 } from "uuid";
 console.log(v4());
 
 export class CommentNode {
-  public async addComment(comment: Comment): Promise<string> {
+  public async addComment(comment: Comment, postId: string): Promise<string> {
     try {
       comment.id = v4();
       await dbDriver.executeQuery(
@@ -32,7 +32,7 @@ export class CommentNode {
           text: comment.text,
           date: comment.date,
           username: comment.author!.username,
-          postId: comment.parentId,
+          postId: postId,
         },
         { database: "neo4j" }
       );
