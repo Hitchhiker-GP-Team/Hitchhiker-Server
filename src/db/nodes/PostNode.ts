@@ -16,11 +16,11 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User)
-            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
-            OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+            MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)
+            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post),
+                          (post)-[:HAPPEND_AT]->(place:Place),(post)-[:TAG]->(tagged:User),
+                          (user)-[save:SAVE_POST]->(post),
+                          (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             RETURN post,
                    user.username AS username,
                    user.profilePic AS profilePic,
@@ -41,17 +41,17 @@ export class PostNode  {
 
         result.records.forEach((record) => {
             // load the list with tagged usernames
-            const taggedUsers = record.get("tags");
+            //const taggedUsers = record.get("tags");
 
             const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
+            //const placeProb = record.get("place").properties;
 
             // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id: placeProb.id
-            };
+            // const place: Place = {
+            //     name: placeProb.name,
+            //     mapsId: placeProb.mapsId,
+            //     id: placeProb.id
+            // };
 
             // load User Card
             const author: User = {
@@ -67,12 +67,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
-                place: place,
+                //tags: taggedUsers,
+                //place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                //category: record.get("categoryName"),
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };

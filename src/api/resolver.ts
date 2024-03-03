@@ -69,8 +69,5 @@ export const resolvers = {
     //END CATEGORY
 
 
-    //Comment
-    replyComment: replyComment,
-
   },
 }

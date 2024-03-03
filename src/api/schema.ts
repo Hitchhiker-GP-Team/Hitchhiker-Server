@@ -109,7 +109,7 @@ export const typeDefs = `#graphql
   type Query {
 
     #Comment
-    replyComment( reply: Comment , parentId: String):String
+    #replyComment( reply: Comment , parentId: String):String
 
     # USER
     getUserProfile(username: String):[User]
