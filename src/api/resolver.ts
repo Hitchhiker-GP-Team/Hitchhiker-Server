@@ -1,11 +1,17 @@
-import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, editPlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, replyComment, } from "./screens/userProfile.js";
+import { createCategory, updateCategory, deleteCategory, fetchCategory, fetchAllCategories, fetchCategoryTree } from "./screens/CategoryApi.js";
+import { createJourney, getUserJourneys, fetchJourneyPosts, addPostToJourney, deleteJourney, deletePostFromJourney } from "./screens/JourneyApi.js";
+import { addPlace, updatePlace, deletePlace, addPostToPlace, addPlaceToCategory, addReviewToPlace, addRatingToPlace, addUserVisitedPlace } from "./screens/PlaceApi.js";
+import { getFeedFun, getPostsFun, getSavedPosts, getLikedPosts, getPlacePosts, getCategoryPosts, getArchivedPosts, createPost, likePost, savePost, archivePost, unlikePost, unsavePost, unarchivePost, deletePost, deleteAllPosts, deleteAllArchivedPosts } from "./screens/PostApi.js";
+import { getReviewsFun, fetchPlaceReviews, addReview, deleteReview } from "./screens/ReviewApi.js";
+import { getUserProfileFun, addUser, updateUser, deleteUser, followUser, unfollowUser } from "./screens/UserApi.js";
+import {  replyComment} from "./screens/CommentApi.js";
 
 export const resolvers = {
   Query: {
     // USER NODE
     getUserProfile: getUserProfileFun,
     addUser: addUser,
-    //updateUser: updateUser,
+    updateUser: updateUser,
     //updatebio: updatebio,
     deleteUser: deleteUser,
     followUser: followUser,
@@ -20,7 +26,7 @@ export const resolvers = {
     getPlacePosts: getPlacePosts,
     getCategoryPosts: getCategoryPosts,
     getArchivedPosts: getArchivedPosts,
-    //createPost: createPost,
+    createPost: createPost,
     likePost: likePost,
     savePost: savePost,
     archivePost: archivePost,
@@ -33,8 +39,8 @@ export const resolvers = {
     //END POST
 
     //PLACE 
-    //addPlace: addPlace,
-    //editPlace: editPlace,
+    addPlace: addPlace,
+    updatePlace: updatePlace,
     deletePlace: deletePlace,
     addPostToPlace: addPostToPlace,
     addPlaceToCategory: addPlaceToCategory,
@@ -44,7 +50,7 @@ export const resolvers = {
     //END PLACE
 
     //JOURNEY
-    //createJourney: createJourney,
+    createJourney: createJourney,
     getUserJourneys: getUserJourneys,
     fetchJourneyPosts: fetchJourneyPosts,
     addPostToJourney: addPostToJourney,
@@ -55,22 +61,22 @@ export const resolvers = {
     //REVIEW
     getReviewsFun: getReviewsFun,
     fetchPlaceReviews: fetchPlaceReviews,
-    //addReview: addReview,
+    addReview: addReview,
     deleteReview: deleteReview,
     //END REVIEW
 
     //CATEGORY
-    //createCategory: createCategory,
+    createCategory: createCategory,
     updateCategory: updateCategory,
     deleteCategory: deleteCategory,
     fetchCategory: fetchCategory,
-    //fetchAllCategories: fetchAllCategories,
+    fetchAllCategories: fetchAllCategories,
     fetchCategoryTree: fetchCategoryTree,
     //END CATEGORY
 
 
     //Comment
-    replyComment: replyComment,
+    //replyComment: replyComment,
 
   },
 }

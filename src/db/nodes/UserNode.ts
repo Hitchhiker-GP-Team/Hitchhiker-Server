@@ -51,7 +51,47 @@ export class UserNode {
     }
   }
 
-  public async UpdateUser(username: string, updatedUser: User): Promise<void> {
+  // public async UpdateUser(username: string, updatedUser: User): Promise<void> {
+  //   try {
+  //     const driver = dbDriver;
+  //     const result = await driver.executeQuery(
+  //       `
+  //       MATCH (user:User {username: $username})
+  //       SET user.profilePic = $profilePic,
+  //           user.email = $email,
+  //           user.password = $password,
+  //           user.Name = $name,
+  //           user.birthDate = $birthDate,
+  //           user.homeLocation = $homeLocation,
+  //           user.sex = $sex,
+  //           user.Bio = $bio,
+  //           user.followingCntr = $followingCntr,
+  //           user.followersCntr = $followersCntr,
+  //           user.postCntr = $postCntr,
+  //           user.reviewsCntr = $reviewsCntr
+  //       `,
+  //       {
+  //         username: username,
+  //         profilePic: updatedUser.profilePic,
+  //         email: updatedUser.email,
+  //         password: updatedUser.password,
+  //         name: updatedUser.Name,
+  //         birthDate: updatedUser.birthDate,
+  //         homeLocation: updatedUser.homeLocation,
+  //         sex: updatedUser.sex,
+  //         bio: updatedUser.Bio,
+  //         followingCntr: updatedUser.followingCntr,
+  //         followersCntr: updatedUser.followersCntr,
+  //         postCntr: updatedUser.postCntr,
+  //         reviewsCntr: updatedUser.reviewsCntr
+  //       }
+  //     );
+  //   } catch (err) {
+  //     console.error(`Error updating user: ${err}`);
+  //     throw err;
+  //   }
+  // }
+  public async UpdateUser(username: string, updatedUser: User): Promise<User> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -59,39 +99,24 @@ export class UserNode {
         MATCH (user:User {username: $username})
         SET user.profilePic = $profilePic,
             user.email = $email,
-            user.password = $password,
             user.Name = $name,
-            user.birthDate = $birthDate,
-            user.homeLocation = $homeLocation,
-            user.sex = $sex,
-            user.Bio = $bio,
-            user.followingCntr = $followingCntr,
-            user.followersCntr = $followersCntr,
-            user.postCntr = $postCntr,
-            user.reviewsCntr = $reviewsCntr
+            user.Bio = $bio
         `,
         {
           username: username,
           profilePic: updatedUser.profilePic,
           email: updatedUser.email,
-          password: updatedUser.password,
           name: updatedUser.Name,
-          birthDate: updatedUser.birthDate,
-          homeLocation: updatedUser.homeLocation,
-          sex: updatedUser.sex,
-          bio: updatedUser.Bio,
-          followingCntr: updatedUser.followingCntr,
-          followersCntr: updatedUser.followersCntr,
-          postCntr: updatedUser.postCntr,
-          reviewsCntr: updatedUser.reviewsCntr
+          bio: updatedUser.Bio
         }
       );
+      return updatedUser;
     } catch (err) {
       console.error(`Error updating user: ${err}`);
       throw err;
     }
   }
-
+  
   public async DeleteUser(username: string): Promise<void> {
     try {
       const driver = dbDriver;
@@ -191,4 +216,5 @@ export class UserNode {
       throw err;
     }
   }
+  
 }
