@@ -109,7 +109,7 @@ export const typeDefs = `#graphql
   type Query {
     # USER
     getUserProfile(username: String):[User]
-    #addUser(username: String; profilePic: String; email: String; password: String; Name: String; birthDate: number;sex: String; Bio: String; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number): [User]
+    addUser(username: String; profilePic: String; email: String; password: String; Name: String; birthDate: number;Bio: String; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number): [User]
     #updateUser( username: String; Bio: String; profilePic: String; email: String; Name: String): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
@@ -174,89 +174,70 @@ export const typeDefs = `#graphql
 
   }
   type Mutation {
-  updateUser(
-    username: String!
-    profilePic: String
-    email: String
-    password: String
-    Name: String
-    Bio: String
-  ): User
-}
-type Mutation {
   addUser(
-    username: String!
-    profilePic: String
-    email: String!
-    password: String!
-    Name: String!
-    birthDate: Int!
-    sex: String!
-    Bio: String!
-    followingCntr: Int!
-    followersCntr: Int!
-    postCntr: Int!
+    username: String!,
+    profilePic: String,
+    email: String!,
+    password: String!,
+    Name: String!,
+    birthDate: Int!,
+    Bio: String!,
+    followingCntr: Int!,
+    followersCntr: Int!,
+    postCntr: Int!,
     reviewsCntr: Int!
   ): User
-}
-
-type Mutation {
+  updateUser(
+    username: String!,
+    profilePic: String,
+    email: String,
+    password: String,
+    Name: String,
+    Bio: String
+  ): User
   createPost(
-    authorUsername: String!
-    caption: String!
-    date: Int!
-    likesCntr: Int!
-    mediaUrls: [String]!
-    hashtags: [String]!
-    commentsCntr: Int!
-    placeId: String!
+    authorUsername: String!,
+    caption: String!,
+    date: Int!,
+    likesCntr: Int!,
+    mediaUrls: [String]!,
+    hashtags: [String]!,
+    commentsCntr: Int!,
+    placeId: String!,
     categoryName: String!
   ): Post
-}
-type Mutation {
   addPlace(
-    id: String!
-    name: String!
-    mapsId: String!
-    type: String!
+    id: String!,
+    name: String!,
+    mapsId: String!,
+    type: String!,
     description: String!
   ): Place
-}
-type Mutation {
   editPlace(
-    placeId: String!
-    name: String
-    mapsId: String
-    type: String
+    placeId: String!,
+    name: String,
+    mapsId: String,
+    type: String,
     description: String
   ): Place
-}
-
-type Mutation {
   createJourney(
-    authorUsername: String!
-    journeyId: String!
-    title: String!
+    authorUsername: String!,
+    journeyId: String!,
+    title: String!,
     date: Float!
   ): Journey
-}
-
-type Mutation {
   addReview(
-    authorUsername: String!
-    placeId: String!
-    reviewId: String!
-    text: String!
-    rating: Float!
+    authorUsername: String!,
+    placeId: String!,
+    reviewId: String!,
+    text: String!,
+    rating: Float!,
     date: Float!
   ): Review
-}
-
-type Mutation {
   createCategory(
     name: String!,
     parentName: String
-    ): Category
+  ): Category
 }
 
 
