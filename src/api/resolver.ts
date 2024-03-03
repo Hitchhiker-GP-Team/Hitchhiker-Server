@@ -4,7 +4,7 @@ import { addPlace, updatePlace, deletePlace, addPostToPlace, addPlaceToCategory,
 import { getFeedFun, getPostsFun, getSavedPosts, getLikedPosts, getPlacePosts, getCategoryPosts, getArchivedPosts, createPost, likePost, savePost, archivePost, unlikePost, unsavePost, unarchivePost, deletePost, deleteAllPosts, deleteAllArchivedPosts } from "./screens/PostApi.js";
 import { getReviewsFun, fetchPlaceReviews, addReview, deleteReview } from "./screens/ReviewApi.js";
 import { getUserProfileFun, addUser, updateUser, deleteUser, followUser, unfollowUser } from "./screens/UserApi.js";
-import {  replyComment} from "./screens/CommentApi.js";
+import {  addComment, deleteComment, fetchComment, likeComment, replyComment, unLikeComment, updateComment} from "./screens/CommentApi.js";
 
 export const resolvers = {
   Query: {
@@ -75,8 +75,14 @@ export const resolvers = {
     //END CATEGORY
 
 
-    //Comment
-    //replyComment: replyComment,
-
+    //COMMENT
+    addComment: addComment,
+    replyComment: replyComment,
+    likeComment: likeComment,
+    unLikeComment: unLikeComment,
+    fetchComment: fetchComment,
+    updateComment: updateComment,
+    deleteComment: deleteComment,
+    //END COMMENT
   },
 }
