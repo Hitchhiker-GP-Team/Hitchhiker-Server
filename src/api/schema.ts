@@ -172,6 +172,15 @@ export const typeDefs = `#graphql
     fetchCategoryTree(name: String):[Category]
     #END CATEGORY
 
+    #COMMENT
+    addComment(text: String, date: Int, authorUsername: String, postId: String):[Comment]
+    # replyComment():[Comment]
+    # likeComment():[Comment]
+    # unLikeComment():[Comment]
+    # fetchComment():[Comment]
+    # updateComment():[Comment]
+    # deleteComment():[Comment]
+    #END COMMENT
   }
   type Mutation {
   addUser(

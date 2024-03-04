@@ -375,16 +375,26 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
 
 // // COMMENT NODE FUNCTIONALITES TILL LINE 351//
 // /////// ERROR  ////////
-// export async function addComment(_: any, { comment }: { comment: Comment }): Promise<void> {
-//   try {
-//     await DbHelper.CommentNode.addComment(comment);
-//     console.log("Comment added");
-//   } catch (error) {
-//     console.error("Error adding comment:", error);
-//     throw error;
-//   }
-// }
-// /////// ERROR  ////////
+export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<{ id: string }[]> {
+  try {
+    const comment: Comment = {
+      text,
+      date,
+      likesCounter: 0,
+      repliesCntr: 0, 
+      author: { username: authorUsername },
+      likedBy: [], 
+      replies: []
+    };
+    const commentId = await DbHelper.CommentNode.addComment(comment, postId);
+    console.log("Comment added:", commentId);
+    return [{ id: commentId }];
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    throw error;
+  }
+}
+// // /////// ERROR  ////////
 // export async function replyComment(_: any, { reply ,parentId }: { reply: Comment , parentId :string }): Promise<string> {
 //   try {
 //     const replyId = await DbHelper.CommentNode.replyComment(reply);
@@ -413,7 +423,7 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
 //     throw error;
 //   }
 // }
-// /////// ERROR  ////////
+// // /////// ERROR  ////////
 // export async function fetchComment(_: any, { id }: { id: string }): Promise<Comment> {
 //   try {
 //     const fetchedComment = await DbHelper.CommentNode.fetchComment(id);
@@ -424,7 +434,7 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
 //     throw error;
 //   }
 // }
-// /////// ERROR  ////////
+// // /////// ERROR  ////////
 // export async function updateComment(_: any, { commentId, updatedComment }: { commentId: string, updatedComment: Comment }): Promise<void> {
 //   try {
 //     await DbHelper.CommentNode.UpdateComment(commentId, updatedComment);

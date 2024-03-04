@@ -242,6 +242,6 @@ export class CommentNode {
       throw err;
     }
   }
-  
-  
+
+
 }
