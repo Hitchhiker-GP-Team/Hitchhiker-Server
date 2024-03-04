@@ -2,15 +2,22 @@ import { DbHelper } from "../../db/DbHelper.js";
 import { Comment } from "../../entities/Comment.js";
 
 // /////// ERROR  ////////
-export async function addComment(_: any, { comment }: { comment: Comment }): Promise<void> {
+export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<string> {
   try {
-    await DbHelper.CommentNode.addComment(comment);
+    const comment: Comment = {
+      text,
+      date,
+      author: { username: authorUsername }
+    };
+    const commentId = await DbHelper.CommentNode.addComment(comment, postId);
     console.log("Comment added");
+    return commentId;
   } catch (error) {
     console.error("Error adding comment:", error);
     throw error;
   }
 }
+
 // /////// ERROR  ////////
 export async function replyComment(_: any, { reply ,parentId }: { reply: Comment , parentId :string }): Promise<string> {
   try {

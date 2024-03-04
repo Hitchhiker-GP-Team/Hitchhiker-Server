@@ -241,6 +241,12 @@ export const typeDefs = `#graphql
     name: String!,
     parentName: String
   ): Category
+  addComment(
+    text: String!,
+    date: Int!,
+    authorUsername: String!,
+    postId: String!
+    ): Comment
 }
 `
 // A schema is a collection of type definitions (hence "typeDefs")
