@@ -50,7 +50,6 @@ export class UserNode {
       throw err;
     }
   }
-
   public async UpdateUser(username: string, updatedUser: User): Promise<User> {
     try {
       const driver = dbDriver;
@@ -76,7 +75,6 @@ export class UserNode {
       throw err;
     }
   }
-  
   public async DeleteUser(username: string): Promise<void> {
     try {
       const driver = dbDriver;
@@ -94,7 +92,6 @@ export class UserNode {
       throw err;
     }
   }
-
   public async FetchUserProfile(username: string): Promise<User> {
     try {
       const driver = dbDriver;
@@ -142,7 +139,6 @@ export class UserNode {
       throw err;
     }
   }
-
   public async FollowUser(username: string, userToFollow: string): Promise<void> {
     try {
       const driver = dbDriver;
@@ -160,7 +156,6 @@ export class UserNode {
       throw err;
     }
   }
-
   public async UnfollowUser(username: string, userToUnfollow: string): Promise<void> {
     try {
       const driver = dbDriver;
