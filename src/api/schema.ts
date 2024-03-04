@@ -174,12 +174,13 @@ export const typeDefs = `#graphql
 
     #COMMENT
     addComment(text: String, date: Int, authorUsername: String, postId: String):[Comment]
-    # replyComment():[Comment]
-    # likeComment():[Comment]
-    # unLikeComment():[Comment]
-    # fetchComment():[Comment]
-    # updateComment():[Comment]
-    # deleteComment():[Comment]
+    replyComment(text: String!,date: Int!,authorUsername: String!,parentId: String!):[Comment]
+    likeComment(username: String, commentId: String):[Comment]
+    unLikeComment(username: String, commentId: String):[Comment]
+    fetchComment(commentId: String!):[Comment]
+    updateComment(commentId: String!,text: String!,date: Int!,likesCounter: Int!,repliesCntr: Int!):[Comment]
+    fetchReplies(parentCommentId: String):[Comment]
+    deleteComment(commentId: String):[Comment]
     #END COMMENT
   }
   type Mutation {
@@ -256,6 +257,20 @@ export const typeDefs = `#graphql
     authorUsername: String!,
     postId: String!
     ): Comment
+  replyComment(
+    text: String!,
+    date: Int!,
+    authorUsername: String!,
+    parentId: String!
+  ): Comment
+  updateComment(
+    commentId: String!,
+    text: String!,
+    date: Int!,
+    likesCounter: Int!,
+    repliesCntr: Int!
+  ): Comment
+
 }
 `
 // A schema is a collection of type definitions (hence "typeDefs")
