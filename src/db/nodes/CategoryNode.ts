@@ -16,32 +16,7 @@ export class CategoryNode {
    * If it not have parent make it the 'Origin' Node.
    * @param {Category} category - Category object.
    */
-  // async create(category: Category) {
-  //   try {
-  //     //Create Category
-  //     await dbDriver.executeQuery(
-  //       `
-  //       CREATE (
-  //           :Category
-  //           {
-  //               name:$name
-  //           }
-  //       )
-  //       `,
-  //       { name: category.name },
-  //       { database: "neo4j" }
-  //     );
-  //     //link to Parent Category
-  //     const childName: string = category.name!;
-  //     let parentName: string = "Origin";
-  //     if (category.parent !== undefined) parentName = category.parent.name!;
-  //     this.linkChild(childName, parentName);
-  //   } catch (err) {
-  //     console.error(`Error CategoryNode.create(): ${err}`);
-  //     throw err;
-  //   }
-  // }
-  async create(category: Category): Promise<Category> {
+  public async create(category: Category): Promise<Category> {
     try {
       // Create Category
       await dbDriver.executeQuery(
@@ -75,7 +50,7 @@ export class CategoryNode {
    * @param {string} childName - child (sub) Category's name.
    * @param {string} parentName - parent Category's name.
    */
-  async linkChild(childName: string, parentName: string) {
+  public async linkChild(childName: string, parentName: string) {
     try {
       //Delete the existing relationship (if exist).
       await dbDriver.executeQuery(
@@ -106,7 +81,7 @@ export class CategoryNode {
    * @param {string} oldName - old (existing) Category's name.
    * @param {string} newName - new Category's name.
    */
-  async rename(oldName: string, newName: string) {
+  public async rename(oldName: string, newName: string) {
     try {
       await dbDriver.executeQuery(
         `
@@ -127,7 +102,7 @@ export class CategoryNode {
    * @param {string} name - Category's name
    * @returns {Promise<Category>} Category object with this name.
    */
-  async fetchOne(name: string): Promise<Category[]> {
+  public async fetchOne(name: string): Promise<Category[]> {
     try {
       const { records } = await dbDriver.executeQuery(
         `
@@ -151,7 +126,7 @@ export class CategoryNode {
    * Read - Returns (reads) all existing Categories names in the DB.
    * @returns {Promise<string[]>} list of all existing Categories.
    */
-  async fetchAllName(): Promise<string[]> {
+  public async fetchAllName(): Promise<string[]> {
     try {
       const { records } = await dbDriver.executeQuery(
         `
@@ -208,7 +183,7 @@ export class CategoryNode {
   //     throw err;
   //   }
   // }
-  async fetchTree(name: string): Promise<Category[]> {
+  public async fetchTree(name: string): Promise<Category[]> {
     try {
       const { records } = await dbDriver.executeQuery(
         `
@@ -243,7 +218,7 @@ export class CategoryNode {
    *    * note: it has to be safe for children Nodes.
    * @param {string} name - Category's name
    */
-  private async deleteOne(name: string) {
+  public async deleteOne(name: string) {
     try {
       await dbDriver.executeQuery(
         `
@@ -265,7 +240,7 @@ export class CategoryNode {
    * @param {string} name - parent Category's name
    * @returns {Promise<Category>} Category object with this name with all children Categories of it.
    */
-  async deleteTree(name: string) {
+  public async deleteTree(name: string) {
     try {
       const { records } = await dbDriver.executeQuery(
         `
