@@ -3,7 +3,7 @@ import { Place } from "../../entities/Place.js";
 
 
 export class PlaceNode {
-    public async AddPlace(place: Place): Promise<void> {
+    public async AddPlace(place: Place): Promise<Place> {
         try {
             const driver = dbDriver;
             const result = await driver.executeQuery(
@@ -24,13 +24,14 @@ export class PlaceNode {
                     description: place.description
                 }
             );
+            return place;
         } catch (err) {
             console.error(`Error adding place: ${err}`);
             throw err;
         }
     }
 
-    public async EditPlace(placeId: string, updatedPlace: Place): Promise<void> {
+    public async EditPlace(placeId: string, updatedPlace: Place): Promise<Place> {
         try {
             const driver = dbDriver;
             const result = await driver.executeQuery(
@@ -49,11 +50,13 @@ export class PlaceNode {
                     description: updatedPlace.description
                 }
             );
+            return updatedPlace;
         } catch (err) {
             console.error(`Error editing place: ${err}`);
             throw err;
         }
     }
+
 
     public async DeletePlace(placeId: string): Promise<void> {
         try {

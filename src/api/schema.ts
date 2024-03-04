@@ -107,14 +107,10 @@ export const typeDefs = `#graphql
 
 
   type Query {
-
-    #Comment
-    #replyComment( reply: Comment , parentId: String):String
-
     # USER
     getUserProfile(username: String):[User]
     addUser(username: String, profilePic: String, email: String, password: String, Name: String,sex:String, birthDate: Int,Bio: String, followingCntr: Int, followersCntr: Int, postCntr: Int, reviewsCntr: Int,homeLocation:[Int]): [User]
-    #updateUser( username: String; Bio: String; profilePic: String; email: String; Name: String): [User]
+    updateUser(username: String, Bio: String, profilePic: String, email: String, Name: String): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
     unfollowUser(username: String, userToUnfollow: String): [User]
@@ -128,7 +124,7 @@ export const typeDefs = `#graphql
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]
-    #createPost(authorUsername: String; caption: String; date: number; likesCntr: number; mediaUrls: String[]; hashtags: String[]; commentsCntr: number; tags: String[]; placeId: String; categoryName: String): [Post]
+    createPost(authorUsername: String!,caption: String!,tags:[String]!,date: Int!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!,categoryName: String!): Post
     likePost(username: String, postId: String): [Post]
     savePost(username: String, postId: String): [Post]
     archivePost(username: String, postId: String): [Post]
@@ -141,8 +137,8 @@ export const typeDefs = `#graphql
     #END POST
 
     #PLACE
-    #addPlace(id: String; name: String; mapsId: String; type: String; description: String): [Place]
-    #editPlace(placeId: String ; name?: String; mapsId?: String; type?: String; description?: String): [Place]
+    addPlace(id: String, name: String, mapsId: String, type: String, description: String): [Place]
+    updatePlace(placeId: String , name: String, mapsId: String, type: String, description: String): [Place]
     deletePlace(placeId: String): [Place]
     addPostToPlace(postId: String, placeId: String): [Place]
     addPlaceToCategory(placeId: String, categoryName: String): [Place]
@@ -152,7 +148,7 @@ export const typeDefs = `#graphql
     #END PLACE
 
     #JOURNEY 
-    #createJourney(authorUsername: String; journeyId: String; title: String; date: number): [Journey]
+    createJourney(authorUsername: String, journeyId: String, title: String, date: Float): [Journey]
     getUserJourneys(username: String):[Journey]
     fetchJourneyPosts(username: String, journeyId: String): [Journey]
     addPostToJourney(postId: String, journeyId: String): [Journey]
@@ -163,16 +159,16 @@ export const typeDefs = `#graphql
     #REVIEW
     getReviewsFun(username: String):[Review]
     fetchPlaceReviews(placeId: String):[Review]
-    #addReview(authorUsername: string; placeId: string; reviewId: string; text: string; rating: number; date: number):[Review]
+    addReview(authorUsername: String, placeId: String, reviewId: String, text: String, rating: Float, date: Float):[Review]
     deleteReview(reviewId: String):[Review]
     #END REVIEW
 
     #CATEGORY
-    #createCategory(name: string; parentName?: string):[Category]
+    createCategory(name: String, parentName: String):[Category]
     updateCategory(oldName: String, newName: String):[Category]
     deleteCategory(name: String):[Category]
     fetchCategory(name: String):[Category]
-    #fetchAllCategories():[Category]
+    fetchAllCategories:[Category]
     fetchCategoryTree(name: String):[Category]
     #END CATEGORY
 
@@ -206,9 +202,10 @@ export const typeDefs = `#graphql
     caption: String!,
     date: Int!,
     likesCntr: Int!,
-    mediaUrls: [String]!,
-    hashtags: [String]!,
+    mediaUrls: [String!]!,  
+    hashtags: [String!]!,    
     commentsCntr: Int!,
+    tags: [String!]!,
     placeId: String!,
     categoryName: String!
   ): Post
@@ -244,6 +241,12 @@ export const typeDefs = `#graphql
     name: String!,
     parentName: String
   ): Category
+  addComment(
+    text: String!,
+    date: Int!,
+    authorUsername: String!,
+    postId: String!
+    ): Comment
 }
 `
 // A schema is a collection of type definitions (hence "typeDefs")
