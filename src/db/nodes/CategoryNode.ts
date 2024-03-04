@@ -16,31 +16,60 @@ export class CategoryNode {
    * If it not have parent make it the 'Origin' Node.
    * @param {Category} category - Category object.
    */
-  async create(category: Category) {
+  // async create(category: Category) {
+  //   try {
+  //     //Create Category
+  //     await dbDriver.executeQuery(
+  //       `
+  //       CREATE (
+  //           :Category
+  //           {
+  //               name:$name
+  //           }
+  //       )
+  //       `,
+  //       { name: category.name },
+  //       { database: "neo4j" }
+  //     );
+  //     //link to Parent Category
+  //     const childName: string = category.name!;
+  //     let parentName: string = "Origin";
+  //     if (category.parent !== undefined) parentName = category.parent.name!;
+  //     this.linkChild(childName, parentName);
+  //   } catch (err) {
+  //     console.error(`Error CategoryNode.create(): ${err}`);
+  //     throw err;
+  //   }
+  // }
+  async create(category: Category): Promise<Category> {
     try {
-      //Create Category
+      // Create Category
       await dbDriver.executeQuery(
         `
         CREATE (
             :Category
             {
-                name:$name
+                name: $name
             }
         )
         `,
         { name: category.name },
         { database: "neo4j" }
       );
-      //link to Parent Category
+      // Link to Parent Category
       const childName: string = category.name!;
       let parentName: string = "Origin";
       if (category.parent !== undefined) parentName = category.parent.name!;
       this.linkChild(childName, parentName);
+  
+      // Return the created category
+      return category;
     } catch (err) {
       console.error(`Error CategoryNode.create(): ${err}`);
       throw err;
     }
   }
+  
   /**
    * Create/Update - Make relationship "SUB_CATEGORY_TO" between (link) twoCategories.
    * @param {string} childName - child (sub) Category's name.

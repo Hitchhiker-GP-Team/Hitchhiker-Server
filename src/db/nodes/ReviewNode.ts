@@ -129,14 +129,13 @@ export class ReviewNode {
 
     public async AddReview(review: Review): Promise<Review> {
         try {
-
             if (!review.place || !review.author) {
-                throw new Error("Place ID is missing in the review data.");
-              }
-
+                throw new Error("Place ID or author is missing in the review data.");
+            }
+    
             const driver = dbDriver;
             const session = driver.session();
-
+    
             const result = await session.run(
                 `
           MATCH (author:User {username: $username}),
@@ -153,26 +152,27 @@ export class ReviewNode {
           (review)-[:REVIEW_ON_PLACE]->(place)
           
           SET author.reviewsCntr = author.reviewsCntr + 1
-
+    
           RETURN review
           `,
                 {
-                    username: review.author.username,
-                    placeId: review.place.id,
+                    username: review.author?.username,
+                    placeId: review.place?.id,
                     reviewId: review.id, // Assuming review ID is provided
                     text: review.text,
                     rating: review.rating,
                     date: review.date
                 }
             );
-
+    
             return review;
-
+    
         } catch (err) {
             console.error(`Error adding review: ${err}`);
             throw err;
         }
     }
+    
     
     public async DeleteReview(reviewId: string): Promise<void> {
         try {

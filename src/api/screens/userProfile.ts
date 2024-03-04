@@ -36,20 +36,20 @@ export async function addUser(_: any, { username, profilePic, email, password, N
     throw error;
   }
 }
- export async function updateUser(_: any, { username, profilePic, email, password, Name, Bio }: { username: string; profilePic: string; email: string; password: string; Name: string; Bio: string; }): Promise<User> {
+export async function updateUser(_: any, { username, profilePic, email, password, Name, Bio }: { username: string; profilePic: string; email: string; password: string; Name: string; Bio: string; }): Promise<User[]>{
   try {
     const updatedUser: User = {
       username: username,
       profilePic: profilePic,
       email: email,
-      password: password, // Assuming you also want to update the password
+      password: password, 
       Name: Name,
       Bio: Bio
     };
 
-    await DbHelper.UserNode.UpdateUser(username, updatedUser);
+    const up = [await DbHelper.UserNode.UpdateUser(username, updatedUser)];
     console.log("User updated:", updatedUser);
-    return updatedUser;
+    return up;
   } catch (error) {
     console.error("Error updating user:", error);
     throw new Error("Failed to update user.");
@@ -197,7 +197,6 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
     throw error;
   }
 }
-
 export async function likePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
   try {
     await DbHelper.PostNode.LikePost(username, postId);
@@ -282,9 +281,9 @@ export async function deleteAllArchivedPosts(_: any, { username }: { username: s
 // END OF POST NODE FUNCTIONALITIES //
 
 // PLACE NODE FUNCTIONALITES TILL LINE  281//
-export async function addPlace(_: any, { id, name, mapsId, type, description }: { id: string; name: string; mapsId: string; type: string; description: string; }): Promise<Place> {
+export async function addPlace(_: any, { id, name, mapsId, type, description }: { id: string; name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
   try {
-    const place: Place = {
+    const newPlace: Place = {
       id,
       name,
       mapsId,
@@ -292,16 +291,15 @@ export async function addPlace(_: any, { id, name, mapsId, type, description }: 
       description
     };
 
-    await DbHelper.PlaceNode.AddPlace(place);
-    console.log("Place added:", place);
-    return place;
+    const p = [await DbHelper.PlaceNode.AddPlace(newPlace)];
+    console.log("Place added:", newPlace);
+    return p;
   } catch (error) {
     console.error("Error adding place:", error);
     throw error;
   }
 }
-
-export async function editPlace(_: any, { placeId, name, mapsId, type, description }: { placeId: string; name?: string; mapsId?: string; type?: string; description?: string; }): Promise<Place> {
+export async function updatePlace(_: any, { placeId, name, mapsId, type, description }: { placeId: string; name?: string; mapsId?: string; type?: string; description?: string; }): Promise<Place[]>{
   try {
     const updatedPlace: Place = {
       id: placeId,
@@ -311,15 +309,14 @@ export async function editPlace(_: any, { placeId, name, mapsId, type, descripti
       description
     };
 
-    await DbHelper.PlaceNode.EditPlace(placeId, updatedPlace);
-    console.log("Place edited:", updatedPlace);
-    return updatedPlace;
+    const p = [await DbHelper.PlaceNode.EditPlace(placeId, updatedPlace)];
+    console.log("Place updated:", updatedPlace);
+    return p;
   } catch (error) {
-    console.error("Error editing place:", error);
-    throw error;
+    console.error("Error updating place:", error);
+    throw new Error("Failed to update place.");
   }
 }
-
 export async function deletePlace(_: any, { placeId }: { placeId: string }): Promise<void> {
   try {
     await DbHelper.PlaceNode.DeletePlace(placeId);
@@ -388,16 +385,16 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
 //   }
 // }
 // /////// ERROR  ////////
-export async function replyComment(_: any, { reply ,parentId }: { reply: Comment , parentId :string }): Promise<string> {
-  try {
-    const replyId = await DbHelper.CommentNode.replyComment(reply);
-    console.log("Reply added with ID:", replyId);
-    return replyId;
-  } catch (error) {
-    console.error("Error replying to comment:", error);
-    throw error;
-  }
-}
+// export async function replyComment(_: any, { reply ,parentId }: { reply: Comment , parentId :string }): Promise<string> {
+//   try {
+//     const replyId = await DbHelper.CommentNode.replyComment(reply);
+//     console.log("Reply added with ID:", replyId);
+//     return replyId;
+//   } catch (error) {
+//     console.error("Error replying to comment:", error);
+//     throw error;
+//   }
+// }
 // export async function likeComment(_: any, { username, commentId }: { username: string; commentId: string }): Promise<void> {
 //   try {
 //     await DbHelper.CommentNode.LikeComment(username, commentId);
@@ -449,7 +446,7 @@ export async function replyComment(_: any, { reply ,parentId }: { reply: Comment
 // //END OF COMMENT NODE FUNCTIONALITIES // 
 
 // JOURNEY NODE FUNCTIONALITES TILL LINE 401//
-export async function createJourney(_: any, { authorUsername, journeyId, title, date }: { authorUsername: string; journeyId: string; title: string; date: number; }): Promise<Journey> {
+export async function createJourney(_: any, { authorUsername, journeyId, title, date }: { authorUsername: string; journeyId: string; title: string; date: number; }): Promise<Journey[]> {
   try {
     const journey: Journey = {
       id: journeyId,
@@ -460,15 +457,14 @@ export async function createJourney(_: any, { authorUsername, journeyId, title, 
     const author = { username: authorUsername };
     journey.author = author;
 
-    await DbHelper.JourneyNode.CreateJourney(journey);
+    const j = [await DbHelper.JourneyNode.CreateJourney(journey)];
     console.log("Journey created:", journey);
-    return journey;
+    return j;
   } catch (error) {
     console.error("Error creating journey:", error);
     throw error;
   }
 }
-
 export async function getUserJourneys(_: any, { username }: { username: string }) {
   try {
     // Fetch user journey using the database module function
@@ -542,10 +538,10 @@ export async function fetchPlaceReviews(_: any, { placeId }: { placeId: string }
     throw error;
   }
 }
-export async function addReview(_: any, { authorUsername, placeId, reviewId, text, rating, date }: { authorUsername: string; placeId: string; reviewId: string; text: string; rating: number; date: number; }): Promise<Review> {
+export async function addReview(_: any, { authorUsername, placeId, reviewId, text, rating, date }: { authorUsername: string; placeId: string; reviewId: string; text: string; rating: number; date: number; }): Promise<Review[]> {
   try {
     const review: Review = {
-      //id: reviewId,
+      id: 123,
       text,
       rating,
       date,
@@ -555,15 +551,14 @@ export async function addReview(_: any, { authorUsername, placeId, reviewId, tex
       place: { id: placeId }
     };
 
-    await DbHelper.ReviewNode.AddReview(review);
+    const r = [await DbHelper.ReviewNode.AddReview(review)];
     console.log("Review added:", review);
-    return review;
+    return r;
   } catch (error) {
     console.error("Error adding review:", error);
     throw error;
   }
 }
-
 export async function deleteReview(_: any, { reviewId }: { reviewId: string }): Promise<void> {
   try {
     await DbHelper.ReviewNode.DeleteReview(reviewId);
@@ -576,25 +571,21 @@ export async function deleteReview(_: any, { reviewId }: { reviewId: string }): 
 //END OF REVIEW NODE FUNCTIONALITIES // 
 
 // CATEGORY NODE FUNCTIONALITES TILL LINE 434//
-export async function createCategory(_: any, { name, parentName }: { name: string; parentName?: string; }): Promise<Category> {
+export async function createCategory(_: any, { name, parentName }: { name: string; parentName?: string; }): Promise<Category[]> {
   try {
-    const category: Category = new Category();
-    category.name = name;
+    const category: Category = {
+      name,
+      parent: parentName ? { name: parentName } : undefined
+    };
 
-    if (parentName) {
-      category.parent = new Category();
-      category.parent.name = parentName;
-    }
-
-    await DbHelper.CategoryNode.create(category);
+    const c = [await DbHelper.CategoryNode.create(category)];
     console.log("Category created:", category);
-    return category;
+    return c;
   } catch (error) {
     console.error("Error creating category:", error);
     throw error;
   }
 }
-
 export async function updateCategory(_: any, { oldName, newName }: { oldName: string; newName: string }): Promise<void> {
   try {
     await DbHelper.CategoryNode.rename(oldName, newName);
@@ -613,16 +604,7 @@ export async function deleteCategory(_: any, { name }: { name: string }): Promis
     throw error;
   }
 }
-// export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category> {
-//   try {
-//     const fetchedCategory = await DbHelper.CategoryNode.fetchOne(name);
-//     console.log("Category fetched:", fetchedCategory);
-//     return fetchedCategory;
-//   } catch (error) {
-//     console.error("Error fetching category:", error);
-//     throw error;
-//   }
-// }
+
 export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category[]> {
   try {
     const fetchedCategories = await DbHelper.CategoryNode.fetchOne(name);
@@ -633,28 +615,17 @@ export async function fetchCategory(_: any, { name }: { name: string }): Promise
     throw error;
   }
 }
-
-export async function fetchAllCategories(): Promise<string[]> {
+export async function fetchAllCategories(): Promise<{ name: string }[]> {
   try {
     const allCategories = await DbHelper.CategoryNode.fetchAllName();
-    console.log("All categories fetched:", allCategories);
-    return allCategories;
+    const categoriesWithNameField = allCategories.map((categoryName) => ({ name: categoryName }));
+    console.log("All categories fetched:", categoriesWithNameField);
+    return categoriesWithNameField;
   } catch (error) {
     console.error("Error fetching all categories:", error);
     throw error;
   }
 }
-// export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category> {
-//   try {
-//     const categoryTree = await DbHelper.CategoryNode.fetchTree(name);
-//     console.log("Category tree fetched:", categoryTree);
-//     return categoryTree;
-//   } catch (error) {
-//     console.error("Error fetching category tree:", error);
-//     throw error;
-//   }
-// }
-
 export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category[]> {
   try {
     const categoryTree = await DbHelper.CategoryNode.fetchTree(name);
