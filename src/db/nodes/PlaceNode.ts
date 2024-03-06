@@ -165,4 +165,51 @@ export class PlaceNode {
             throw err;
         }
     }
+
+    // public async searchPlaces(place: string): Promise<Place[]> {
+    //     try {
+    //         const driver = dbDriver;
+    //         const session = driver.session();
+    
+    //         const result = await session.run(
+    //             `
+    //             MATCH (place:Place)
+    //             WHERE place.name CONTAINS $place
+    //             RETURN place
+    //             `,
+    //             { place: place }
+    //         );
+    
+    //         session.close();
+    
+    //         return result.records.map(record => record.get("place").properties as Place);
+    //     } catch (err) {
+    //         console.error(`Error searching places: ${err}`);
+    //         throw err;
+    //     }
+    // }
+    public async searchPlaces(place: string): Promise<Place[]> {
+        try {
+            const driver = dbDriver;
+            const session = driver.session();
+    
+            const result = await session.run(
+                `
+                MATCH (place:Place)
+                WHERE place.name STARTS WITH $place
+                RETURN place
+                `,
+                { place: place }
+            );
+    
+            session.close();
+    
+            return result.records.map(record => record.get("place").properties as Place);
+        } catch (err) {
+            console.error(`Error searching places: ${err}`);
+            throw err;
+        }
+    }
+    
+    
 }
