@@ -145,6 +145,7 @@ export const typeDefs = `#graphql
     addReviewToPlace(reviewId: String, placeId: String): [Place]
     addRatingToPlace(ratingId: String, placeId: String): [Place]
     addUserVisitedPlace(username: String, placeId: String): [Place]
+    searchPlaces(place: String): [Place]
     #END PLACE
 
     #JOURNEY 

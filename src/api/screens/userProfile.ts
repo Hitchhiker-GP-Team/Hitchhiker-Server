@@ -731,6 +731,18 @@ export async function fetchCategoryTree(_: any, { name }: { name: string }): Pro
 }
 //END OF CATEGORY NODE FUNCTIONALITIES // 
 
+export async function searchPlaces(_: any, { place }: { place: string }): Promise<Place[]> {
+  try {
+      const places = await DbHelper.PlaceNode.searchPlaces(place);
+      console.log(`Places found for query "${place}":`, places);
+      return places;
+  } catch (error) {
+      console.error(`Error searching places for query "${place}":`, error);
+      throw error;
+  }
+}
+
+
 export function numSevFun() {
   return 7;
 }
