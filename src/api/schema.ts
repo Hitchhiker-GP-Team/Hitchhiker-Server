@@ -115,7 +115,7 @@ export const typeDefs = `#graphql
     followUser(username: String, userToFollow: String): [User]
     unfollowUser(username: String, userToUnfollow: String): [User]
     searchUser(user: String): [User]
-    # END USER
+    # END USER with search
 
     #POST
     getFeedFun(username: String):[Post]
