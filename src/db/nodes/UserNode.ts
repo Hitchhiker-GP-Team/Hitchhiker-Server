@@ -171,4 +171,21 @@ export class UserNode {
       throw err;
     }
   }
+  public async searchUser(user: string): Promise<User[]> {
+    try {
+        const result = await dbDriver.executeQuery(
+            `
+            MATCH (user:User)
+            WHERE user.username STARTS WITH $user
+            RETURN user
+            `,
+            { user: user }
+        );
+        return result.records.map(record => record.get("user").properties as User);
+      } catch (err) {
+        console.error(`Error searching for users: ${err}`);
+        throw err;
+    }
+}
+
 }
