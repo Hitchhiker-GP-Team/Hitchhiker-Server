@@ -1,4 +1,4 @@
-import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, searchPlaces, searchUser } from "./screens/userProfile.js";
+import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, SearchPlace, SearchUser } from "./screens/userProfile.js";
 
 export const resolvers = {
   Query: {
@@ -10,7 +10,7 @@ export const resolvers = {
     deleteUser: deleteUser,
     followUser: followUser,
     unfollowUser: unfollowUser,
-    searchUser: searchUser,
+    SearchUser: SearchUser,
     //END USER
 
     // POST NODE
@@ -42,7 +42,7 @@ export const resolvers = {
     addReviewToPlace: addReviewToPlace,
     addRatingToPlace: addRatingToPlace,
     addUserVisitedPlace: addUserVisitedPlace,
-    searchPlaces:searchPlaces,
+    SearchPlace:SearchPlace,
     //END PLACE
 
     //JOURNEY

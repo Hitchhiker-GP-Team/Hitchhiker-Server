@@ -94,9 +94,9 @@ export async function unfollowUser(_: any, { username, userToUnfollow }: { usern
     throw error;
   }
 }
-export async function searchUser(_: any, { user }: { user: string }): Promise<User[]> {
+export async function SearchUser(_: any, { user }: { user: string }): Promise<User[]> {
   try {
-      const users = await DbHelper.UserNode.searchUser(user);
+      const users = await DbHelper.UserNode.SearchUser(user);
       console.log(`Users found with query '${user}':`, users);
       return users;
   } catch (error) {
@@ -383,9 +383,9 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
   }
 }
 
-export async function searchPlaces(_: any, { place }: { place: string }): Promise<Place[]> {
+export async function SearchPlace(_: any, { place }: { place: string }): Promise<Place[]> {
   try {
-      const places = await DbHelper.PlaceNode.searchPlaces(place);
+      const places = await DbHelper.PlaceNode.SearchPlace(place);
       console.log(`Places found for query "${place}":`, places);
       return places;
   } catch (error) {

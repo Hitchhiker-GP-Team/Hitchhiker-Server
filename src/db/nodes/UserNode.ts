@@ -171,12 +171,12 @@ export class UserNode {
       throw err;
     }
   }
-  public async searchUser(user: string): Promise<User[]> {
+  public async SearchUser(user: string): Promise<User[]> {
     try {
         const result = await dbDriver.executeQuery(
             `
             MATCH (user:User)
-            WHERE user.username STARTS WITH $user
+            WHERE toLower(user.username) STARTS WITH toLower($user)
             RETURN user
             `,
             { user: user }
