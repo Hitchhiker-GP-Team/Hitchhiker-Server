@@ -188,7 +188,7 @@ export class PlaceNode {
     //         throw err;
     //     }
     // }
-    public async searchPlaces(place: string): Promise<Place[]> {
+    public async SearchPlace(place: string): Promise<Place[]> {
         try {
             const driver = dbDriver;
             const session = driver.session();
@@ -196,7 +196,7 @@ export class PlaceNode {
             const result = await session.run(
                 `
                 MATCH (place:Place)
-                WHERE place.name STARTS WITH $place
+                WHERE toLower(place.name) STARTS WITH toLower($place)
                 RETURN place
                 `,
                 { place: place }

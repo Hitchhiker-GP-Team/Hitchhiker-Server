@@ -94,6 +94,17 @@ export async function unfollowUser(_: any, { username, userToUnfollow }: { usern
     throw error;
   }
 }
+export async function SearchUser(_: any, { user }: { user: string }): Promise<User[]> {
+  try {
+      const users = await DbHelper.UserNode.SearchUser(user);
+      console.log(`Users found with query '${user}':`, users);
+      return users;
+  } catch (error) {
+      console.error(`Error searching for users: ${error}`);
+      throw error;
+  }
+}
+
 //END OF USER NODE FUNCTIONALITIES // 
 
 // POST NODE FUNCTIONALITES  TILL LINE 205 BEL TARTEEB//
@@ -371,6 +382,18 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
     throw error;
   }
 }
+
+export async function SearchPlace(_: any, { place }: { place: string }): Promise<Place[]> {
+  try {
+      const places = await DbHelper.PlaceNode.SearchPlace(place);
+      console.log(`Places found for query "${place}":`, places);
+      return places;
+  } catch (error) {
+      console.error(`Error searching places for query "${place}":`, error);
+      throw error;
+  }
+}
+//s//
 //END OF PLACE NODE FUNCTIONALITIES // 
 
 // // COMMENT NODE FUNCTIONALITES TILL LINE 351//
@@ -730,18 +753,6 @@ export async function fetchCategoryTree(_: any, { name }: { name: string }): Pro
   }
 }
 //END OF CATEGORY NODE FUNCTIONALITIES // 
-
-export async function searchPlaces(_: any, { place }: { place: string }): Promise<Place[]> {
-  try {
-      const places = await DbHelper.PlaceNode.searchPlaces(place);
-      console.log(`Places found for query "${place}":`, places);
-      return places;
-  } catch (error) {
-      console.error(`Error searching places for query "${place}":`, error);
-      throw error;
-  }
-}
-
 
 export function numSevFun() {
   return 7;
