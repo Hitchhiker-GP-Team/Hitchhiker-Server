@@ -16,11 +16,12 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)
-            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post),
-                          (post)-[:HAPPEND_AT]->(place:Place),(post)-[:TAG]->(tagged:User),
-                          (user)-[save:SAVE_POST]->(post),
-                          (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
+            MATCH (user:User {username: "kandeel00"})-[:ADD_POST]->(post:Post)
+            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
+            OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             RETURN post,
                    user.username AS username,
                    user.profilePic AS profilePic,
@@ -92,11 +93,14 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User)
+            MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)-[:ADD_POST]->(post:Post)
+
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
+
             RETURN post,
                    following.username AS username,
                    following.profilePic AS profilePic,
@@ -168,10 +172,11 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:SAVE_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User)
+            MATCH (user:User {username: $username})-[:SAVE_POST]->(post:Post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             RETURN post,
                    user.username AS username,
                    user.profilePic AS profilePic,
@@ -243,9 +248,11 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:LIKES_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User)
+            MATCH (user:User {username: $username})-[:LIKES_POST]->(post:Post)
+            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
             RETURN post,
                    user.username AS username,
@@ -320,14 +327,14 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place {id : $placeId}),
-                  (post)-[:TAG]->(tagged:User),
-                  (user:User{username:$username})
+            MATCH (author:User)-[:ADD_POST]->(post:Post)-[:HAPPEND_AT]->(place:Place {id : $placeId})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (user:User{username:$username})
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
+            OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
             RETURN post,
-                   author.username AS username,
+                   author.username AS authorUsername,
                    author.profilePic AS profilePic,
                    category.name AS categoryName,
                    place,
@@ -361,7 +368,7 @@ export class PostNode  {
             // load User Card
             const author: User = {
                 profilePic: record.get("profilePic"),
-                username: record.get("username"),
+                username: record.get("authorUsername"),
             };
 
             // load Post object
@@ -399,12 +406,14 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category{name:$category}),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User),
-                  (user:User{username:$username})
+            MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category{name:$category})
+
+            OPTIONAL MATCH (user:User{username:$username})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+
             RETURN post,
                    author.username AS username,
                    author.profilePic AS profilePic,
@@ -476,10 +485,11 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:ARCHIVE_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
-                  (post)-[:HAPPEND_AT]->(place:Place),
-                  (post)-[:TAG]->(tagged:User)
+            MATCH (user:User {username: $username})-[:ARCHIVE_POST]->(post:Post)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+            OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
             RETURN post,
                    user.username AS username,
                    user.profilePic AS profilePic,
@@ -805,10 +815,6 @@ export class PostNode  {
         throw err;
     }
   }
-
-
-  
-
 
 }
 
