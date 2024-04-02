@@ -7,6 +7,7 @@ import { Coordinates, Place } from "../../entities/Place.js";
 import { Post } from "../../entities/Post.js";
 import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
+import { v4 as uuidv4 } from 'uuid';
 
 // USER NODE FUNCTIONALITES TILL LINE 66//
 export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
@@ -292,8 +293,28 @@ export async function deleteAllArchivedPosts(_: any, { username }: { username: s
 // END OF POST NODE FUNCTIONALITIES //
 
 // PLACE NODE FUNCTIONALITES TILL LINE  281//
-export async function addPlace(_: any, { id, name, mapsId, type, description }: { id: string; name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
+// export async function addPlace(_: any, { id, name, mapsId, type, description }: { id: string; name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
+//   try {
+//     const newPlace: Place = {
+//       id,
+//       name,
+//       mapsId,
+//       type,
+//       description
+//     };
+
+//     const p = [await DbHelper.PlaceNode.AddPlace(newPlace)];
+//     console.log("Place added:", newPlace);
+//     return p;
+//   } catch (error) {
+//     console.error("Error adding place:", error);
+//     throw error;
+//   }
+// }
+
+export async function addPlace(_: any, { name, mapsId, type, description }: { name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
   try {
+    const id = uuidv4(); // Generate a UUID for the place ID
     const newPlace: Place = {
       id,
       name,
@@ -310,6 +331,9 @@ export async function addPlace(_: any, { id, name, mapsId, type, description }: 
     throw error;
   }
 }
+
+
+
 export async function updatePlace(_: any, { placeId, name, mapsId, type, description }: { placeId: string; name?: string; mapsId?: string; type?: string; description?: string; }): Promise<Place[]>{
   try {
     const updatedPlace: Place = {
@@ -419,7 +443,6 @@ export async function SearchPlace(_: any, { place }: { place: string }): Promise
 //     throw error;
 //   }
 // }
-import { v4 as uuidv4 } from 'uuid';
 
 export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<Comment[]> {
   try {
