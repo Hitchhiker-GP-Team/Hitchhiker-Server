@@ -2,6 +2,7 @@ import { dbDriver } from "../dbConnection.js";
 import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
 import { Place } from "../../entities/Place.js";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -561,71 +562,136 @@ export class PostNode  {
   // Creations ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async CreatePost(post : Post): Promise<Post> {
-    try {
+//   public async CreatePost(post : Post): Promise<Post> {
+//     try {
 
-        post.id = '0ebe80ce-87da-43b5-a320-888706665605'
-        const d = Math.floor(Number(post.date))
+//         post.id = '0ebe80ce-87da-43b5-a320-888706665605'
+//         const d = Math.floor(Number(post.date))
 
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
-            MATCH (author:User {username : $username}),
-                (place : Place{id:$placeId}),
-                (category : Category{name:$CategoryName})
+//         const driver = dbDriver;
+//         const result = await driver.executeQuery(
+//             `
+//             MATCH (author:User {username : $username}),
+//                 (place : Place{id:$placeId}),
+//                 (category : Category{name:$CategoryName})
 
-            CREATE (post:Post {
-                id:$postId ,
-                caption: $caption ,
-                postingDate: $postingDate ,
-                likesCntr: $likesCntr,
-                mediaUrls: $mediaUrls,
-                hashtags: $hashtags,
-                commentsCntr: $commentsCntr
+//             CREATE (post:Post {
+//                 id:$postId ,
+//                 caption: $caption ,
+//                 postingDate: $postingDate ,
+//                 likesCntr: $likesCntr,
+//                 mediaUrls: $mediaUrls,
+//                 hashtags: $hashtags,
+//                 commentsCntr: $commentsCntr
 
-            })<-[:ADD_POST]-(author),  
-            (post)-[:HAPPEND_AT]->(place),
-            (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
+//             })<-[:ADD_POST]-(author),  
+//             (post)-[:HAPPEND_AT]->(place),
+//             (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
 
 
-            WITH post  
-            UNWIND $tags AS taggedUser
-            MATCH (tu:User {username: taggedUser.username})
-            CREATE (post)-[:TAG]->(tu)
+//             WITH post  
+//             UNWIND $tags AS taggedUser
+//             MATCH (tu:User {username: taggedUser.username})
+//             CREATE (post)-[:TAG]->(tu)
             
-            SET author.postCntr = author.postCntr + 1 
+//             SET author.postCntr = author.postCntr + 1 
 
-            RETURN post
+//             RETURN post
             
-            `
-            ,
-            {
-              //user
-              username    :post.author?.username, 
-              //post
-              postId      :post.id,
-              caption     :post.caption,
-              postingDate :post.date,
-              likesCntr   :post.likesCntr,
-              mediaUrls   :post.mediaURL,
-              hashtags    :post.hashtags,
-              commentsCntr:post.commentsCntr,
-              tags :post.tags,
-              //place
-              placeId     :post.place?.id,
-              //category
-              CategoryName:post.category?.name,
-            }
-        );
+//             `
+//             ,
+//             {
+//               //user
+//               username    :post.author?.username, 
+//               //post
+//               postId      :post.id,
+//               caption     :post.caption,
+//               postingDate :post.date,
+//               likesCntr   :post.likesCntr,
+//               mediaUrls   :post.mediaURL,
+//               hashtags    :post.hashtags,
+//               commentsCntr:post.commentsCntr,
+//               tags :post.tags,
+//               //place
+//               placeId     :post.place?.id,
+//               //category
+//               CategoryName:post.category?.name,
+//             }
+//         );
 
         
 
-        return post;
+//         return post;
+//     } catch (err) {
+//         console.error(`Error fetching user posts: ${err}`);
+//         throw err;
+//     }
+//   }
+
+
+public async CreatePost(post : Post): Promise<Post> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+          `
+          MATCH (author:User {username : $username}),
+              (place : Place{id:$placeId}),
+              (category : Category{name:$CategoryName})
+  
+          CREATE (post:Post {
+              id:$postId ,
+              caption: $caption ,
+              postingDate: $postingDate ,
+              likesCntr: $likesCntr,
+              mediaUrls: $mediaUrls,
+              hashtags: $hashtags,
+              commentsCntr: $commentsCntr
+  
+          })<-[:ADD_POST]-(author),  
+          (post)-[:HAPPEND_AT]->(place),
+          (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
+  
+  
+          WITH post, author  
+          UNWIND $tags AS taggedUser
+          MATCH (tu:User {username: taggedUser})
+          CREATE (post)-[:TAG]->(tu)
+          
+          SET author.postCntr = coalesce(author.postCntr, 0) + 1
+  
+          RETURN post
+          
+          `
+          ,
+          {
+            //user
+            username    :post.author?.username, 
+            //post
+            postId      :post.id,
+            caption     :post.caption,
+            postingDate :post.date,
+            likesCntr   :post.likesCntr,
+            mediaUrls   :post.mediaURL,
+            hashtags    :post.hashtags,
+            commentsCntr:post.commentsCntr,
+            tags: post.tags?.map(tag => ({ username: tag })) || [],
+            //place
+            placeId     :post.place?.id,
+            //category
+            CategoryName:post.category?.name,
+          }
+      );
+  
+      return post;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
+  
+
+  
+
 
   public async LikePost(us :string , postId: string) : Promise<void>
   {

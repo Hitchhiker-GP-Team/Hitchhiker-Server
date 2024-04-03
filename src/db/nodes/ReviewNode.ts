@@ -1,6 +1,7 @@
 import { dbDriver } from "../dbConnection.js";
 import { User } from "../../entities/User.js";
 import { Review } from "../../entities/Review.js";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -106,7 +107,7 @@ export class ReviewNode {
                 };
 
                 const currentReview: Review = {
-                    id: parseInt(reviewProb.id),
+                    id: reviewProb.id,
                     author: author,
                     place: record.get("place"), // Assuming place is a complete Place object
                     text: record.get("text"),
@@ -127,53 +128,102 @@ export class ReviewNode {
         }
     }
 
+    // public async AddReview(review: Review): Promise<Review> {
+    //     try {
+    //         if (!review.place || !review.author) {
+    //             throw new Error("Place ID or author is missing in the review data.");
+    //         }
+    
+    //         const driver = dbDriver;
+    //         const session = driver.session();
+    
+    //         const result = await session.run(
+    //             `
+    //       MATCH (author:User {username: $username}),
+    //             (place:Place {id: $placeId})
+    
+    //       CREATE (review:Review {
+    //         id: $reviewId,
+    //         text: $text,
+    //         rating: $rating,
+    //         date: $date,
+    //         likesCntr: 0,
+    //         dislikesCntr: 0
+    //       })<-[:ADD_REVIEW]-(author),
+    //       (review)-[:REVIEW_ON_PLACE]->(place)
+          
+    //       SET author.reviewsCntr = author.reviewsCntr + 1
+    
+    //       RETURN review
+    //       `,
+    //             {
+    //                 username: review.author?.username,
+    //                 placeId: review.place?.id,
+    //                 reviewId: review.id, // Assuming review ID is provided
+    //                 text: review.text,
+    //                 rating: review.rating,
+    //                 date: review.date
+    //             }
+    //         );
+    
+    //         return review;
+    
+    //     } catch (err) {
+    //         console.error(`Error adding review: ${err}`);
+    //         throw err;
+    //     }
+    // }
+    
     public async AddReview(review: Review): Promise<Review> {
         try {
-            if (!review.place || !review.author) {
-                throw new Error("Place ID or author is missing in the review data.");
+          if (!review.place || !review.author) {
+            throw new Error("Place ID or author is missing in the review data.");
+          }
+      
+          const driver = dbDriver;
+          const session = driver.session();
+      
+          // Generate a UUID for the review ID
+          review.id = uuidv4();
+      
+          const result = await session.run(
+            `
+            MATCH (author:User {username: $username}),
+                  (place:Place {id: $placeId})
+      
+            CREATE (review:Review {
+              id: $reviewId,
+              text: $text,
+              rating: $rating,
+              date: $date,
+              likesCntr: 0,
+              dislikesCntr: 0
+            })<-[:ADD_REVIEW]-(author),
+            (review)-[:REVIEW_ON_PLACE]->(place)
+            
+            SET author.reviewsCntr = coalesce(author.reviewsCntr, 0) + 1
+      
+            RETURN review
+            `,
+            {
+              username: review.author?.username,
+              placeId: review.place?.id,
+              reviewId: review.id,
+              text: review.text,
+              rating: review.rating,
+              date: review.date
             }
-    
-            const driver = dbDriver;
-            const session = driver.session();
-    
-            const result = await session.run(
-                `
-          MATCH (author:User {username: $username}),
-                (place:Place {id: $placeId})
-    
-          CREATE (review:Review {
-            id: $reviewId,
-            text: $text,
-            rating: $rating,
-            date: $date,
-            likesCntr: 0,
-            dislikesCntr: 0
-          })<-[:ADD_REVIEW]-(author),
-          (review)-[:REVIEW_ON_PLACE]->(place)
-          
-          SET author.reviewsCntr = author.reviewsCntr + 1
-    
-          RETURN review
-          `,
-                {
-                    username: review.author?.username,
-                    placeId: review.place?.id,
-                    reviewId: review.id, // Assuming review ID is provided
-                    text: review.text,
-                    rating: review.rating,
-                    date: review.date
-                }
-            );
-    
-            return review;
-    
+          );
+      
+          return review;
+      
         } catch (err) {
-            console.error(`Error adding review: ${err}`);
-            throw err;
+          console.error(`Error adding review: ${err}`);
+          throw err;
         }
-    }
-    
-    
+      }
+      
+
     public async DeleteReview(reviewId: string): Promise<void> {
         try {
             const driver = dbDriver;
