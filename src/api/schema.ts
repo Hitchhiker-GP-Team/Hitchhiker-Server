@@ -74,7 +74,7 @@ export const typeDefs = `#graphql
   }
 
   type Review { 
-    id: Int
+    id: String
     author: User
     place: Place
     text: String
@@ -209,17 +209,29 @@ export const typeDefs = `#graphql
     Name: String,
     Bio: String
   ): User
+  # createPost(
+  #   authorUsername: String!,
+  #   caption: String!,
+  #   date: Int!,
+  #   likesCntr: Int!,
+  #   mediaUrls: [String!]!,  
+  #   hashtags: [String!]!,    
+  #   commentsCntr: Int!,
+  #   tags: [String!]!,
+  #   placeId: String!,
+  #   categoryName: String!
+  # ): Post
   createPost(
-    authorUsername: String!,
-    caption: String!,
-    date: Int!,
-    likesCntr: Int!,
-    mediaUrls: [String!]!,  
-    hashtags: [String!]!,    
-    commentsCntr: Int!,
-    tags: [String!]!,
-    placeId: String!,
-    categoryName: String!
+  authorUsername: String!,
+  caption: String!,
+  date: Int!,
+  likesCntr: Int!,
+  mediaUrls: [String!]!,
+  hashtags: [String!]!,
+  commentsCntr: Int!,
+  tags: [String!]!,
+  placeId: String!,
+  categoryName: String!
   ): Post
   addPlace(
     name: String!,

@@ -3,6 +3,7 @@ import { Journey } from "../../entities/Journey.js";
 import { Post } from "../../entities/Post.js";
 import { Place } from "../../entities/Place.js";
 import { User } from "../../entities/User.js";
+import { v4 as uuidv4 } from 'uuid';
 
 export class JourneyNode {
   
@@ -10,24 +11,63 @@ export class JourneyNode {
     // creations ----------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
 
+    // public async CreateJourney(journey: Journey): Promise<Journey> {
+    //     try {
+    //         if (!journey.author) {
+    //             throw new Error('Journey author is undefined');
+    //         }
+    //         const driver = dbDriver;
+    //         const result = await driver.executeQuery(
+    //             `
+    //     MATCH (author:User {username: $username})
+      
+    //     CREATE (journey:Journey {
+    //       id: $journeyId,
+    //       title: $title,
+    //       date: $date
+    //     })<-[:ADD_JOURNEY]-(author)
+        
+    //     RETURN journey
+    //     `,
+    //             {
+    //                 username: journey.author.username,
+    //                 journeyId: journey.id,
+    //                 title: journey.title,
+    //                 date: journey.date
+    //             }
+    //         );
+
+    //         return journey;
+    //     } catch (err) {
+    //         console.error(`Error creating journey: ${err}`);
+    //         throw err;
+    //     }
+    // }
+
     public async CreateJourney(journey: Journey): Promise<Journey> {
         try {
             if (!journey.author) {
                 throw new Error('Journey author is undefined');
             }
+    
+            // Generate UUID if journey id is not provided
+            if (!journey.id) {
+                journey.id = uuidv4();
+            }
+    
             const driver = dbDriver;
             const result = await driver.executeQuery(
                 `
-        MATCH (author:User {username: $username})
-      
-        CREATE (journey:Journey {
-          id: $journeyId,
-          title: $title,
-          date: $date
-        })<-[:ADD_JOURNEY]-(author)
-        
-        RETURN journey
-        `,
+                MATCH (author:User {username: $username})
+    
+                CREATE (journey:Journey {
+                    id: $journeyId,
+                    title: $title,
+                    date: $date
+                })<-[:ADD_JOURNEY]-(author)
+    
+                RETURN journey
+                `,
                 {
                     username: journey.author.username,
                     journeyId: journey.id,
@@ -35,14 +75,14 @@ export class JourneyNode {
                     date: journey.date
                 }
             );
-
+    
             return journey;
         } catch (err) {
             console.error(`Error creating journey: ${err}`);
             throw err;
         }
     }
-
+    
 
 
     // --------------------------------------------------------------------------------------
