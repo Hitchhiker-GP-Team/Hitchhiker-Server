@@ -9,7 +9,7 @@ import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
 import { v4 as uuidv4 } from 'uuid';
 
-// USER NODE FUNCTIONALITES TILL LINE 66//
+// USER NODE FUNCTIONALITES TILL LINE 108//
 export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
   try {
     const newUser: User = {
@@ -467,6 +467,18 @@ export async function SearchPlace(_: any, { place }: { place: string }): Promise
 //     throw error;
 //   }
 // }
+
+export async function fetchPostComments(_: any, { postId }: { postId: string}) : Promise<Comment[]> {
+  try {
+    const fetchedComments = await DbHelper.CommentNode.FetchPostComments(postId);
+    console.log("Comment fetched:", fetchedComments);
+    return fetchedComments;
+  } catch (error) {
+    console.error("Error fetching comment:", error);
+    throw error;
+  }
+
+}
 
 export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<Comment[]> {
   try {

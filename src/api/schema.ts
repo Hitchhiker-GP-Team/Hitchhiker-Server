@@ -61,10 +61,10 @@ export const typeDefs = `#graphql
     mediaURL: [String]
     caption: String
     author:User
-    tags: [String]
+    tags: [User]
     likesCntr: Int
     commentsCntr: Int
-    category: String
+    category: Category
     keywords: [String]
     hashtags: [String]
     date: Int
@@ -183,6 +183,7 @@ export const typeDefs = `#graphql
     updateComment(commentId: String!,text: String!,date: Int!,likesCounter: Int!,repliesCntr: Int!):[Comment]
     fetchReplies(parentCommentId: String):[Comment]
     deleteComment(commentId: String):[Comment]
+    getPostComments(postId: String):[Comment]
     #END COMMENT
   }
   type Mutation {
