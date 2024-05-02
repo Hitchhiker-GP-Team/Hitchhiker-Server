@@ -2,6 +2,7 @@ import { dbDriver } from "../dbConnection.js";
 import { Comment } from "../../entities/Comment.js";
 import { User } from "../../entities/User.js";
 import { v4 } from "uuid";
+import { auth } from "neo4j-driver";
 console.log(v4());
 
 export class CommentNode {
@@ -59,6 +60,7 @@ export class CommentNode {
           repliesCntr: $repliesCntr
         })<-[:ADD_COMMENT]-(user)
         CREATE (comment)-[:COMMENT_ON_POST]->(post)
+        SET post.commentsCntr = post.commentsCntr +1 
         RETURN comment
         `,
         {
@@ -503,6 +505,58 @@ export class CommentNode {
       console.error(`Error deleting comment: ${err}`);
       throw err;
     }
+  }
+
+  public async FetchPostComments(postId: string): Promise<Comment[]>
+  {
+
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+          `
+          MATCH (comment:Comment)-[:COMMENT_ON_POST]->(post:Post{id:$id})
+          OPTIONAL MATCH (author)-[:ADD_COMMENT]->(comment)
+          RETURN comment,
+                 author.username AS authorUsername,
+                 author.profilePic AS authorProfilePic
+          ORDER BY comment.date DESC
+          SKIP 0
+          LIMIT 50
+          `,
+          { 'id' : postId }
+      );
+
+      // a list to hold all comments retrieved from the database
+      const postComments: Comment[] = [];
+
+      result.records.forEach((record) => {
+
+          // load User Card
+          const author: User = {
+              profilePic: record.get("authorProfilePic"),
+              username: record.get("authorUsername"),
+          };
+
+          //---------------------------------
+          // load Comment object
+          //---------------------------------
+          const currentPost: Comment = {
+              author : author,
+              text : record.get("comment").properties.text
+          };
+
+
+          //pushing current comment object into the list
+          postComments.push(currentPost);
+      });
+
+      return postComments;
+  } catch (err) {
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
+  }
+
+    
   }
 
 
