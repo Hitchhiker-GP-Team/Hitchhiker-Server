@@ -11,7 +11,7 @@ export class Post {
   caption?: string;
   date?: number;
   hashtags?: string[];
-  tags?: User[];
+  tags?: string[];
   place?: Place;
   keywords?: string[];
   likesCntr?: number;
