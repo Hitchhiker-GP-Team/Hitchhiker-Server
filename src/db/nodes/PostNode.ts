@@ -634,124 +634,65 @@ export class PostNode  {
 //   public async CreatePost(post : Post): Promise<Post> {
 //     try {
 
-//         post.id = '0ebe80ce-87da-43b5-a320-888706665605'
-//         const d = Math.floor(Number(post.date))
+// //         const d = Math.floor(Number(post.date))
 
-//         const driver = dbDriver;
-//         const result = await driver.executeQuery(
-//             `
-//             MATCH (author:User {username : $username}),
-//                 (place : Place{id:$placeId}),
-//                 (category : Category{name:$CategoryName})
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (author:User {username: $username}),
+                  (place:Place {id: $placeId}),
+                  (category:Category {name: $CategoryName})
 
-//             CREATE (post:Post {
-//                 id:$postId ,
-//                 caption: $caption ,
-//                 postingDate: $postingDate ,
-//                 likesCntr: $likesCntr,
-//                 mediaUrls: $mediaUrls,
-//                 hashtags: $hashtags,
-//                 commentsCntr: $commentsCntr
+            CREATE (post:Post {
+                id: $postId,
+                caption: $caption,
+                postingDate: $postingDate,
+                likesCntr: $likesCntr,
+                mediaUrls: $mediaUrls,
+                hashtags: $hashtags,
+                commentsCntr: $commentsCntr
+            })<-[:ADD_POST]-(author),  
+                  (post)-[:HAPPEND_AT]->(place),
+                  (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
 
-//             })<-[:ADD_POST]-(author),  
-//             (post)-[:HAPPEND_AT]->(place),
-//             (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
-
-
-//             WITH post  
-//             UNWIND $tags AS taggedUser
-//             MATCH (tu:User {username: taggedUser.username})
-//             CREATE (post)-[:TAG]->(tu)
             
-//             SET author.postCntr = author.postCntr + 1 
 
-//             RETURN post
+            WITH  author ,post, $predictions AS predictedCategories
+            UNWIND predictedCategories AS prediction
+            MERGE (category:Category {name: prediction.class})
+            MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(category)
+            SET rel.confidence = prediction.perc
+            SET author.postCntr = author.postCntr + 1
+
             
-//             `
-//             ,
-//             {
-//               //user
-//               username    :post.author?.username, 
-//               //post
-//               postId      :post.id,
-//               caption     :post.caption,
-//               postingDate :post.date,
-//               likesCntr   :post.likesCntr,
-//               mediaUrls   :post.mediaURL,
-//               hashtags    :post.hashtags,
-//               commentsCntr:post.commentsCntr,
-//               tags :post.tags,
-//               //place
-//               placeId     :post.place?.id,
-//               //category
-//               CategoryName:post.category?.name,
-//             }
-//         );
+            
+
+            RETURN post
+            `
+            ,
+            {
+              //user
+              username    :post.author?.username, 
+              //post
+              postId      :post.id,
+              caption     :post.caption,
+              postingDate :post.date,
+              likesCntr   :post.likesCntr,
+              mediaUrls   :post.mediaURL,
+              hashtags    :post.hashtags,
+              commentsCntr:post.commentsCntr,
+              tags         :post.tags,
+              //place
+              placeId     :post.place?.id,
+              //category
+              CategoryName:post.category?.name,
+              predictions:post.keywords
+            }
+        );
 
         
 
-//         return post;
-//     } catch (err) {
-//         console.error(`Error fetching user posts: ${err}`);
-//         throw err;
-//     }
-//   }
-
-
-public async CreatePost(post : Post): Promise<Post> {
-    try {
-      const driver = dbDriver;
-      const result = await driver.executeQuery(
-          `
-          MATCH (author:User {username : $username}),
-              (place : Place{id:$placeId}),
-              (category : Category{name:$CategoryName})
-  
-          CREATE (post:Post {
-              id:$postId ,
-              caption: $caption ,
-              postingDate: $postingDate ,
-              likesCntr: $likesCntr,
-              mediaUrls: $mediaUrls,
-              hashtags: $hashtags,
-              commentsCntr: $commentsCntr
-  
-          })<-[:ADD_POST]-(author),  
-          (post)-[:HAPPEND_AT]->(place),
-          (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
-  
-  
-          WITH post, author  
-          UNWIND $tags AS taggedUser
-          MATCH (tu:User {username: taggedUser})
-          CREATE (post)-[:TAG]->(tu)
-          
-          SET author.postCntr = coalesce(author.postCntr, 0) + 1
-  
-          RETURN post
-          
-          `
-          ,
-          {
-            //user
-            username    :post.author?.username, 
-            //post
-            postId      :post.id,
-            caption     :post.caption,
-            postingDate :post.date,
-            likesCntr   :post.likesCntr,
-            mediaUrls   :post.mediaURL,
-            hashtags    :post.hashtags,
-            commentsCntr:post.commentsCntr,
-            tags: post.tags?.map(tag => ({ username: tag })) || [],
-            //place
-            placeId     :post.place?.id,
-            //category
-            CategoryName:post.category?.name,
-          }
-      );
-  
-      return post;
+        return post;
     } catch (err) {
       console.error(`Error fetching user posts: ${err}`);
       throw err;

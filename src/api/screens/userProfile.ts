@@ -7,6 +7,7 @@ import { Coordinates, Place } from "../../entities/Place.js";
 import { Post } from "../../entities/Post.js";
 import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
+
 import { v4 as uuidv4 } from 'uuid';
 
 // USER NODE FUNCTIONALITES TILL LINE 108//
@@ -211,8 +212,11 @@ export async function getArchivedPosts(_: any, { username }: { username: string 
 // }
 export async function createPost(_: any, { authorUsername, caption, date, likesCntr, mediaUrls, hashtags, commentsCntr, placeId, categoryName }: { authorUsername: string; caption: string; date: number; likesCntr: number; mediaUrls: string[]; hashtags: string[]; commentsCntr: number; tags: string[]; placeId: string; categoryName: string; }): Promise<Post> {
   try {
+
+    
+    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+
     const post: Post = {
-      id: '', // Leave this empty, it will be generated automatically
       author: { username: authorUsername },
       caption,
       date,
@@ -221,7 +225,8 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       hashtags,
       commentsCntr,
       place: { id: placeId },
-      category: { name: categoryName }
+      category: { name: categoryName },
+      keywords: Keywords
     };
 
     await DbHelper.PostNode.CreatePost(post);
@@ -468,6 +473,7 @@ export async function SearchPlace(_: any, { place }: { place: string }): Promise
 //   }
 // }
 
+
 export async function fetchPostComments(_: any, { postId }: { postId: string}) : Promise<Comment[]> {
   try {
     const fetchedComments = await DbHelper.CommentNode.FetchPostComments(postId);
@@ -479,6 +485,7 @@ export async function fetchPostComments(_: any, { postId }: { postId: string}) :
   }
 
 }
+
 
 export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<Comment[]> {
   try {
