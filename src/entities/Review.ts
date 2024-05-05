@@ -4,7 +4,7 @@ import { IRating } from "./Rating/IRating.js";
 import { User } from "./User.js";
 
 export class Review {
-  id?: number;
+  id?: string;
   author?: User;
   place?: Place;
   text?: string;

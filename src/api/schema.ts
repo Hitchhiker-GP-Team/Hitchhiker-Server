@@ -74,7 +74,7 @@ export const typeDefs = `#graphql
   }
 
   type Review { 
-    id: Int
+    id: String
     author: User
     place: Place
     text: String
@@ -138,7 +138,7 @@ export const typeDefs = `#graphql
     #END POST
 
     #PLACE
-    addPlace(id: String, name: String, mapsId: String, type: String, description: String): [Place]
+    addPlace(name: String, mapsId: String, type: String, description: String): [Place]
     updatePlace(placeId: String , name: String, mapsId: String, type: String, description: String): [Place]
     deletePlace(placeId: String): [Place]
     addPostToPlace(postId: String, placeId: String): [Place]
@@ -150,7 +150,7 @@ export const typeDefs = `#graphql
     #END PLACE
 
     #JOURNEY 
-    createJourney(authorUsername: String, journeyId: String, title: String, date: Float): [Journey]
+    createJourney(authorUsername: String,title: String, date: Float): [Journey]
     getUserJourneys(username: String):[Journey]
     fetchJourneyPosts(username: String, journeyId: String): [Journey]
     addPostToJourney(postId: String, journeyId: String): [Journey]
@@ -161,7 +161,7 @@ export const typeDefs = `#graphql
     #REVIEW
     getReviewsFun(username: String):[Review]
     fetchPlaceReviews(placeId: String):[Review]
-    addReview(authorUsername: String, placeId: String, reviewId: String, text: String, rating: Float, date: Float):[Review]
+    addReview(authorUsername: String, placeId: String, text: String, rating: Float, date: Float):[Review]
     deleteReview(reviewId: String):[Review]
     #END REVIEW
 
@@ -209,20 +209,31 @@ export const typeDefs = `#graphql
     Name: String,
     Bio: String
   ): User
+  # createPost(
+  #   authorUsername: String!,
+  #   caption: String!,
+  #   date: Int!,
+  #   likesCntr: Int!,
+  #   mediaUrls: [String!]!,  
+  #   hashtags: [String!]!,    
+  #   commentsCntr: Int!,
+  #   tags: [String!]!,
+  #   placeId: String!,
+  #   categoryName: String!
+  # ): Post
   createPost(
-    authorUsername: String!,
-    caption: String!,
-    date: Int!,
-    likesCntr: Int!,
-    mediaUrls: [String!]!,  
-    hashtags: [String!]!,    
-    commentsCntr: Int!,
-    tags: [String!]!,
-    placeId: String!,
-    categoryName: String!
+  authorUsername: String!,
+  caption: String!,
+  date: Int!,
+  likesCntr: Int!,
+  mediaUrls: [String!]!,
+  hashtags: [String!]!,
+  commentsCntr: Int!,
+  tags: [String!]!,
+  placeId: String!,
+  categoryName: String!
   ): Post
   addPlace(
-    id: String!,
     name: String!,
     mapsId: String!,
     type: String!,
@@ -237,14 +248,12 @@ export const typeDefs = `#graphql
   ): Place
   createJourney(
     authorUsername: String!,
-    journeyId: String!,
     title: String!,
     date: Float!
   ): Journey
   addReview(
     authorUsername: String!,
     placeId: String!,
-    reviewId: String!,
     text: String!,
     rating: Float!,
     date: Float!

@@ -2,6 +2,7 @@ import { dbDriver } from "../dbConnection.js";
 import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
 import { Place } from "../../entities/Place.js";
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -561,10 +562,10 @@ export class PostNode  {
   // Creations ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async CreatePost(post : Post): Promise<Post> {
-    try {
+//   public async CreatePost(post : Post): Promise<Post> {
+//     try {
 
-        const d = Math.floor(Number(post.date))
+// //         const d = Math.floor(Number(post.date))
 
         const driver = dbDriver;
         const result = await driver.executeQuery(
@@ -624,10 +625,14 @@ export class PostNode  {
 
         return post;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
+  
+
+  
+
 
   public async LikePost(us :string , postId: string) : Promise<void>
   {
