@@ -40,7 +40,7 @@ export class UserNode {
           followingCntr: user.followingCntr,
           followersCntr: user.followersCntr,
           postCntr: user.postCntr,
-          reviewsCntr: user.reviewsCntr
+          reviewsCntr: user.reviewsCntr,
         }
       );
 
@@ -66,7 +66,7 @@ export class UserNode {
           profilePic: updatedUser.profilePic,
           email: updatedUser.email,
           name: updatedUser.Name,
-          bio: updatedUser.Bio
+          bio: updatedUser.Bio,
         }
       );
       return updatedUser;
@@ -84,7 +84,7 @@ export class UserNode {
         DETACH DELETE user
         `,
         {
-          username: username
+          username: username,
         }
       );
     } catch (err) {
@@ -98,48 +98,47 @@ export class UserNode {
       const result = await driver.executeQuery(
         `
         MATCH (user:User {username: $username})
-        RETURN user.username AS username,
-               user.profilePic AS profilePic,
-               user.Bio AS bio,
-               user.Name AS Name,
-               user.followingCntr AS followingCntr,
-               user.followersCntr AS followersCntr,
-               user.postCntr AS postCntr,
-               user.reviewsCntr AS reviewsCntr
+        RETURN user
         `,
         { username }
       );
 
-      const userData = result.records[0].toObject();
+      let userProfile: User = {} as User;
 
-      // Fetch user profile posts
-      // const postNode = new PostNode(); 
-      //const posts = await postNode.FetchUserProfilePosts(username);
+      result.records.forEach((record) => {
+        const userData = record.get("user").properties;
 
-      // Fetch user reviews
-      //const reviewNode = new ReviewNode(); 
-      //const reviews = await reviewNode.FetchUserReviews(username);
+        // Fetch user profile posts
+        // const postNode = new PostNode();
+        //const posts = await postNode.FetchUserProfilePosts(username);
 
-      const userProfile: User = {
-        username: userData.username,
-        profilePic: userData.profilePic,
-        Name: userData.Name,
-        Bio: userData.bio,
-        followingCntr: parseFloat(userData.followingCntr),
-        followersCntr: parseFloat(userData.followersCntr),
-        //posts: posts,
-        postCntr: parseFloat(userData.postCntr),
-        // reviews: reviews,
-        reviewsCntr: parseFloat(userData.reviewsCntr),
-      };
+        // Fetch user reviews
+        //const reviewNode = new ReviewNode();
+        //const reviews = await reviewNode.FetchUserReviews(username);
 
+        userProfile = {
+          username: userData.username,
+          profilePic: userData.profilePic,
+          Name: userData.Name,
+          Bio: userData.Bio,
+          followingCntr: parseFloat(userData.followingCntr),
+          followersCntr: parseFloat(userData.followersCntr),
+          //posts: posts,
+          postCntr: parseFloat(userData.postCntr),
+          // reviews: reviews,
+          reviewsCntr: parseFloat(userData.reviewsCntr),
+        };
+      });
       return userProfile;
     } catch (err) {
       console.error(`Error fetching user profile: ${err}`);
       throw err;
     }
   }
-  public async FollowUser(username: string, userToFollow: string): Promise<void> {
+  public async FollowUser(
+    username: string,
+    userToFollow: string
+  ): Promise<void> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -156,7 +155,10 @@ export class UserNode {
       throw err;
     }
   }
-  public async UnfollowUser(username: string, userToUnfollow: string): Promise<void> {
+  public async UnfollowUser(
+    username: string,
+    userToUnfollow: string
+  ): Promise<void> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -173,19 +175,20 @@ export class UserNode {
   }
   public async SearchUser(user: string): Promise<User[]> {
     try {
-        const result = await dbDriver.executeQuery(
-            `
+      const result = await dbDriver.executeQuery(
+        `
             MATCH (user:User)
             WHERE toLower(user.username) STARTS WITH toLower($user)
             RETURN user
             `,
-            { user: user }
-        );
-        return result.records.map(record => record.get("user").properties as User);
-      } catch (err) {
-        console.error(`Error searching for users: ${err}`);
-        throw err;
+        { user: user }
+      );
+      return result.records.map(
+        (record) => record.get("user").properties as User
+      );
+    } catch (err) {
+      console.error(`Error searching for users: ${err}`);
+      throw err;
     }
-}
-
+  }
 }

@@ -3,6 +3,7 @@ import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
 import { Place } from "../../entities/Place.js";
 import { v4 as uuidv4 } from 'uuid';
+import { Category } from "../../entities/Category.js";
 
 
 
@@ -17,7 +18,7 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: "kandeel00"})-[:ADD_POST]->(post:Post)
+            MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
             OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
@@ -42,18 +43,28 @@ export class PostNode  {
         const userPosts: Post[] = [];
 
         result.records.forEach((record) => {
+            
             // load the list with tagged usernames
-            //const taggedUsers = record.get("tags");
+            const taggedUsers = record.get("tags");
+            const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                username: taggedUsername
+            }));
 
+            //load post properties
             const postProb = record.get("post").properties;
-            //const placeProb = record.get("place").properties;
+            
+            //load category
+            const Category: Category={
+                name:record.get("categoryName")
+            }
 
             // load Place
-            // const place: Place = {
-            //     name: placeProb.name,
-            //     mapsId: placeProb.mapsId,
-            //     id: placeProb.id
-            // };
+            const placeProb = record.get("place").properties;
+             const place: Place = {
+                 name: placeProb.name,
+                 mapsId: placeProb.mapsId,
+                 id: placeProb.id
+            };
 
             // load User Card
             const author: User = {
@@ -69,12 +80,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                //tags: taggedUsers,
-                //place: place,
+                tags: tags,
+                place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                //category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };
@@ -94,8 +105,8 @@ export class PostNode  {
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)-[:ADD_POST]->(post:Post)
-
+            MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)
+            OPTIONAL MATCH (following)-[:ADD_POST]->(post:Post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
             OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
@@ -121,18 +132,27 @@ export class PostNode  {
         const userPosts: Post[] = [];
 
         result.records.forEach((record) => {
-            // load the list with tags usernames
-            const taggedUsers = record.get("tags");
-
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
-
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id: placeProb.id
-            };
+              // load the list with tagged usernames
+              const taggedUsers = record.get("tags");
+              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                  username: taggedUsername
+              }));
+  
+              //load post properties
+              const postProb = record.get("post").properties;
+              
+              //load category
+              const Category: Category={
+                  name:record.get("categoryName")
+              }
+  
+              // load Place
+              const placeProb = record.get("place").properties;
+               const place: Place = {
+                   name: placeProb.name,
+                   mapsId: placeProb.mapsId,
+                   id: placeProb.id
+              };
 
             // load User Card
             const author: User = {
@@ -148,12 +168,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };
@@ -174,13 +194,14 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (user:User {username: $username})-[:SAVE_POST]->(post:Post)
+            OPTIONAL MATCH (author:User)-[:ADD_POST]->(post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
             OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
             OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             RETURN post,
-                   user.username AS username,
-                   user.profilePic AS profilePic,
+                   author.username AS authorUsername,
+                   author.profilePic AS authorProfilePic,
                    category.name AS categoryName,
                    place,
                    CASE WHEN like IS NOT NULL THEN true ELSE false END AS liked,
@@ -198,22 +219,33 @@ export class PostNode  {
 
         result.records.forEach((record) => {
             // load the list with tags usernames
-            const taggedUsers = record.get("tags");
-
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
-
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id: placeProb.id
-            };
+              // load the list with tagged usernames
+              const taggedUsers = record.get("tags");
+              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                  username: taggedUsername
+              }));
+  
+              //load post properties
+              const postProb = record.get("post").properties;
+              
+              //load category
+              const Category: Category={
+                  name:record.get("categoryName")
+              }
+  
+              // load Place
+              const placeProb = record.get("place").properties;
+               const place: Place = {
+                   name: placeProb.name,
+                   mapsId: placeProb.mapsId,
+                   id: placeProb.id
+              };
 
             // load User Card
             const author: User = {
                 profilePic: record.get("profilePic"),
                 username: record.get("username"),
+            
             };
 
             // load Post object
@@ -224,12 +256,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };
@@ -250,14 +282,15 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (user:User {username: $username})-[:LIKES_POST]->(post:Post)
+            OPTIONAL MATCH (author:User)-[:ADD_POST]->(post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
             OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
-            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category),
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
             RETURN post,
-                   user.username AS username,
-                   user.profilePic AS profilePic,
+                   author.username AS authorUsername,
+                   author.profilePic AS authorProfilePic,
                    category.name AS categoryName,
                    place,
                    true AS liked,
@@ -274,24 +307,34 @@ export class PostNode  {
         const userPosts: Post[] = [];
 
         result.records.forEach((record) => {
-            // load the list with tags usernames
-            const taggedUsers = record.get("tags");
+           
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+            username: taggedUsername
+        }));
 
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
+        //load post properties
+        const postProb = record.get("post").properties;
+        
+        //load category
+        const Category: Category={
+            name:record.get("categoryName")
+        }
 
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id: placeProb.id
-            };
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+            name: placeProb.name,
+            mapsId: placeProb.mapsId,
+            id: placeProb.id
+        };
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("username"),
-            };
+        // load User Card
+        const author: User = {
+            profilePic: record.get("authorProfilePic"),
+            username: record.get("authorUsername"),
+        };
 
             // load Post object
             const currentPost: Post = {
@@ -301,12 +344,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };
@@ -329,8 +372,8 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (author:User)-[:ADD_POST]->(post:Post)-[:HAPPEND_AT]->(place:Place {id : $placeId})
-            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (user:User{username:$username})
+            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
             OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
@@ -353,18 +396,27 @@ export class PostNode  {
         const userPosts: Post[] = [];
 
         result.records.forEach((record) => {
-            // load the list with tags usernames
-            const taggedUsers = record.get("tags");
-
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
-
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id : placeProb.id
-            };
+              // load the list with tagged usernames
+              const taggedUsers = record.get("tags");
+              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                  username: taggedUsername
+              }));
+  
+              //load post properties
+              const postProb = record.get("post").properties;
+              
+              //load category
+              const Category: Category={
+                  name:record.get("categoryName")
+              }
+  
+              // load Place
+              const placeProb = record.get("place").properties;
+               const place: Place = {
+                   name: placeProb.name,
+                   mapsId: placeProb.mapsId,
+                   id: placeProb.id
+              };
 
             // load User Card
             const author: User = {
@@ -380,12 +432,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved")
             };
@@ -408,7 +460,6 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category{name:$category})
-
             OPTIONAL MATCH (user:User{username:$username})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
@@ -416,7 +467,7 @@ export class PostNode  {
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
 
             RETURN post,
-                   author.username AS username,
+                   author.username AS authorUsername,
                    author.profilePic AS profilePic,
                    category.name AS categoryName,
                    place,
@@ -435,24 +486,33 @@ export class PostNode  {
 
         result.records.forEach((record) => {
             // load the list with tags usernames
-            const taggedUsers = record.get("tags");
-
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
-
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id : placeProb.id
-            };
+              // load the list with tagged usernames
+              const taggedUsers = record.get("tags");
+              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                  username: taggedUsername
+              }));
+  
+              //load post properties
+              const postProb = record.get("post").properties;
+              
+              //load category
+              const Category: Category={
+                  name:record.get("categoryName")
+              }
+  
+              // load Place
+              const placeProb = record.get("place").properties;
+               const place: Place = {
+                   name: placeProb.name,
+                   mapsId: placeProb.mapsId,
+                   id: placeProb.id
+              };
 
             // load User Card
             const author: User = {
                 profilePic: record.get("profilePic"),
-                username: record.get("username"),
+                username: record.get("authorUsername"),
             };
-
             // load Post object
             const currentPost: Post = {
                 id: postProb.id,
@@ -461,12 +521,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved")
             };
@@ -510,24 +570,33 @@ export class PostNode  {
         const userPosts: Post[] = [];
 
         result.records.forEach((record) => {
-            // load the list with tags usernames
-            const taggedUsers = record.get("tags");
+             // load the list with tagged usernames
+             const taggedUsers = record.get("tags");
+             const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+                 username: taggedUsername
+             }));
+ 
+             //load post properties
+             const postProb = record.get("post").properties;
+             
+             //load category
+             const Category: Category={
+                 name:record.get("categoryName")
+             }
+ 
+             // load Place
+             const placeProb = record.get("place").properties;
+              const place: Place = {
+                  name: placeProb.name,
+                  mapsId: placeProb.mapsId,
+                  id: placeProb.id
+             };
 
-            const postProb = record.get("post").properties;
-            const placeProb = record.get("place").properties;
-
-            // load Place
-            const place: Place = {
-                name: placeProb.name,
-                mapsId: placeProb.mapsId,
-                id: placeProb.id
-            };
-
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("username"),
-            };
+           // load User Card
+           const author: User = {
+               profilePic: record.get("profilePic"),
+               username: record.get("username"),
+           };
 
             // load Post object
             const currentPost: Post = {
@@ -537,12 +606,12 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: taggedUsers,
+                tags: tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
                 commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: record.get("categoryName"),
+                category: Category,
                 liked: record.get("liked"),
                 saved: record.get("saved"),
             };
@@ -629,10 +698,6 @@ export class PostNode  {
       throw err;
     }
   }
-  
-
-  
-
 
   public async LikePost(us :string , postId: string) : Promise<void>
   {
