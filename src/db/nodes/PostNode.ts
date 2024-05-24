@@ -80,7 +80,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tagstags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -168,7 +168,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -256,7 +256,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -344,7 +344,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tagstags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -432,7 +432,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -521,7 +521,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -606,7 +606,7 @@ export class PostNode  {
                 caption: postProb.caption,
                 date: parseFloat(postProb.postingDate), // test-driven
                 hashtags: postProb.hashtags,
-                tags: tags,
+                tags: postProb.tags,
                 place: place,
                 keywords: postProb.keywords,
                 likesCntr: parseFloat(postProb.likesCntr), // test-driven
@@ -631,10 +631,10 @@ export class PostNode  {
   // Creations ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-//   public async CreatePost(post : Post): Promise<Post> {
-//     try {
+   public async CreatePost(post : Post): Promise<Post> {
+     try {
 
-// //         const d = Math.floor(Number(post.date))
+       const d = Math.floor(Number(post.date))
 
         const driver = dbDriver;
         const result = await driver.executeQuery(

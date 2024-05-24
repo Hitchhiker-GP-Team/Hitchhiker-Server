@@ -9,6 +9,7 @@ import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
 
 import { v4 as uuidv4 } from 'uuid';
+import { DetectionModel } from "../../models/DetectionModel.js";
 
 // USER NODE FUNCTIONALITES TILL LINE 108//
 export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
