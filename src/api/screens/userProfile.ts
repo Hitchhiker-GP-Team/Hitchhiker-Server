@@ -7,7 +7,6 @@ import { Coordinates, Place } from "../../entities/Place.js";
 import { Post } from "../../entities/Post.js";
 import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
-
 import { v4 as uuidv4 } from 'uuid';
 import { DetectionModel } from "../../models/DetectionModel.js";
 
@@ -218,6 +217,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
     const Keywords = DetectionModel.predictClasses(mediaUrls[0])
 
     const post: Post = {
+      id : uuidv4(),
       author: { username: authorUsername },
       caption,
       date,
