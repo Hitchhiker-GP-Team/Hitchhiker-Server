@@ -105,8 +105,29 @@ export const typeDefs = `#graphql
     reviewsCntr: Int
   }
 
+  type Notification{
+    id: String
+    date: Int
+    initiator: String
+    body: String
+    author: String
+    receiver: String
+    referenceId: String
+    referenceType: String
+    initiatorsList: [String]
+    initiatorsCntr: Int
+    message: String
+  }
+
+  type Subscription {
+    notificationAdded(username:String):Notification
+  }
+
 
   type Query {
+    #Notification
+    notifications(username:String):[Notification]
+
     # USER
     getUserProfile(username: String):[User]
     addUser(username: String, profilePic: String, email: String, password: String, Name: String,sex:String, birthDate: Int,Bio: String, followingCntr: Int, followersCntr: Int, postCntr: Int, reviewsCntr: Int,homeLocation:[Int]): [User]
@@ -186,7 +207,14 @@ export const typeDefs = `#graphql
     getPostComments(postId: String):[Comment]
     #END COMMENT
   }
+
   type Mutation {
+  createNotification(
+    username:String!,
+    message:String!
+  ):Notification 
+
+
   addUser(
     username: String!,
     profilePic: String,

@@ -1,7 +1,24 @@
-import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, SearchPlace, SearchUser, fetchPostComments } from "./screens/userProfile.js";
+import { Notification } from "../entities/Notification.js";
+import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, SearchPlace, SearchUser, fetchPostComments, subscsribe } from "./screens/userProfile.js";
+import { PubSub } from 'graphql-subscriptions';
+
+const pubsub = new PubSub();
 
 export const resolvers = {
   Query: {
+
+    // Notification
+    notifications: async (_:any,{username}: {username:String})=>
+      {
+      const notifications: Notification[] = [];
+      const noti: Notification = {
+        
+      }
+      notifications.push(noti);
+      return notifications;
+    },
+
+
     // USER NODE
     getUserProfile: getUserProfileFun,
     addUser: addUser,
@@ -82,5 +99,20 @@ export const resolvers = {
     deleteComment: deleteComment,
     getPostComments : fetchPostComments
     //END COMMENT
+  },
+  Mutation:{
+    createNotification : async (_:any, {username,message}:{username:String,message:String} )=>{
+        const noti : Notification = {
+        }
+        pubsub.publish('NOTIFICATION_ADDED',{notificationAdded: noti});
+        return noti;
+    }
+  },
+
+  Subscription:{
+    notificationAdded: {
+    subscribe:subscsribe
+  },
+
   },
 }

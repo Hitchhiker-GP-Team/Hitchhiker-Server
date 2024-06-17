@@ -5,6 +5,7 @@ import { UserNode } from "./nodes/UserNode.js";
 import { CommentNode } from "./nodes/CommentNode.js";
 import { JourneyNode } from "./nodes/JourneyNode.js";
 import { PlaceNode } from "./nodes/PlaceNode.js";
+import { NotificationNode } from "./nodes/NotificationNode.js";
 
 
 export class DbHelper {
@@ -15,5 +16,6 @@ export class DbHelper {
   public static CommentNode: CommentNode = new CommentNode();
   public static JourneyNode: JourneyNode = new JourneyNode();
   public static PlaceNode: PlaceNode = new PlaceNode();
+  public static NotificationNode : NotificationNode = new NotificationNode();
 
 }

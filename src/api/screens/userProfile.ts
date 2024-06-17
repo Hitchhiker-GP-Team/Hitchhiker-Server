@@ -9,6 +9,12 @@ import { Review } from "../../entities/Review.js";
 import { User , sex } from "../../entities/User.js";
 import { v4 as uuidv4 } from 'uuid';
 import { DetectionModel } from "../../models/DetectionModel.js";
+import { Notification } from "../../entities/Notification.js";
+import { PubSub } from "graphql-subscriptions";
+import { likePostNotificationService } from "../../entities/Notifications/LikePostNotificationService.js";
+import { likeCommentNotificationService } from "../../entities/Notifications/LikeCommentNotificationService.js";
+
+const pubsub = new PubSub();
 
 // USER NODE FUNCTIONALITES TILL LINE 108//
 export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
@@ -239,15 +245,44 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   }
 }
 
+export async function  createNotification  (_: any, { username, message }: { username: string, message: string }) : Promise<Notification> {
+  const noti: Notification = {
+    
+  };
+
+  // Publish the notification to a specific topic for the user
+  pubsub.publish(`NOTIFICATION_ADDED_${username}`, { notificationAdded: noti });
+
+  return noti;
+}
+
+export function subscsribe (_:any, { username }: {username:String}) : AsyncIterator<unknown, any, undefined> {
+  return pubsub.asyncIterator(`NOTIFICATION_ADDED_${username}`);
+}
+
 export async function likePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
   try {
+
+    // Like the post in the database
     await DbHelper.PostNode.LikePost(username, postId);
+    
+    //initialize notification service
+    const notiService = new likePostNotificationService()
+
+    //call notification service method
+    const noti = await notiService.gnerateNotification(username,postId) 
+
+    //push the notification to the reciver 
+    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`,{notificationAdded: noti});
+
     console.log(`Post liked by ${username}: ${postId}`);
   } catch (error) {
     console.error(`Error liking post ${postId} by ${username}:`, error);
     throw error;
   }
 }
+
+
 export async function savePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
   try {
     await DbHelper.PostNode.SavePost(username, postId);
@@ -549,7 +584,19 @@ export async function replyComment(_: any, { text, date, authorUsername, parentI
 
 export async function likeComment(_: any, { username, commentId }: { username: string; commentId: string }): Promise<void> {
   try {
+
     await DbHelper.CommentNode.LikeComment(username, commentId);
+
+    //initialize notification service
+    const notiService = new likeCommentNotificationService()
+
+    //call notification service method
+    const noti = await notiService.gnerateNotification(username,commentId) 
+
+    //push the notification to the reciver 
+    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`,{notificationAdded: noti});
+
+
     console.log(`Comment ${commentId} liked by ${username}`);
   } catch (error) {
     console.error(`Error liking comment: ${error}`);

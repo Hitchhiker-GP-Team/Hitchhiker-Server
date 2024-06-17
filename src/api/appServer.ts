@@ -1,33 +1,49 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import { ApolloServer } from '@apollo/server';
+import { createServer } from 'http';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import bodyParser from 'body-parser';
+import express from 'express';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
+import { PubSub } from 'graphql-subscriptions';
 import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolver.js";
-import { DbHelper } from "../db/DbHelper.js";
+
+
 export async function startServer() {
-  // The ApolloServer constructor requires two parameters: your schema
-  // definition and your set of resolvers.
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-  });
 
-  // Passing an ApolloServer instance to the `startStandaloneServer` function:
-  //  1. creates an Express app
-  //  2. installs your ApolloServer instance as middleware
-  //  3. prepares your app to handle incoming requests
-  const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 },
-  });
 
-  // console.log(await  DbHelper.ReviewNode.FetchUserReviews("kandeel00"));
-  // console.log(await  DbHelper.ReviewNode.FetchPlaceReviews("0ebe80ce-87dd-44b5-a320-888705855605"));
-  // console.log(await DbHelper.ReviewNode.AddReview({id: 0 ,author: {username: "authorUsername",profilePic: "authorProfilePic"},place: {id: "placeId", mapsId: "mapsId", name: "placeName", type: "placeType", },text: "Review text", rating: 5,  date: Date.now(), likesCntr: 0,dislikesCntr: 0}));
-  // console.log(await  DbHelper.ReviewNode.DeleteReview("0ebe80ce-87dd-44b5-a320-885605855605"));
-  // console.log(await DbHelper.UserNode.FetchUserProfile("kandeel00"));
-  // console.log(await DbHelper.CommentNode.DeleteComment("0ebe80ce-87dd-44b5-a320-888734565605"));
-  // console.log(await DbHelper.CommentNode.UpdateComment("0ebe80ce-87dd-44b5-a320-888734565605", {id: "0ebe80ce-87dd-44b5-a320-888734565605",text: "Updated comment text",date: Date.now(),likesCounter: 10,repliesCntr: 0,}));
- // console.log(await DbHelper.UserNode.DeleteUser("alimo"));
+const port = 4000;
 
-  
-  console.log(`🚀  Server ready at: ${url}`);
+
+const pubSub = new PubSub();
+
+
+
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+const app = express();
+const httpServer = createServer(app);
+
+const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql'
+});
+
+const wsServerCleanup = useServer({schema}, wsServer);
+
+const apolloServer = new ApolloServer({
+    schema,
+});
+
+await apolloServer.start();
+
+app.use('/graphql', bodyParser.json(), expressMiddleware(apolloServer));
+
+httpServer.listen(port, () => {
+    console.log(`🚀 Query endpoint ready at http://localhost:${port}/graphql`);
+    console.log(`🚀 Subscription endpoint ready at ws://localhost:${port}/graphql`);
+});
 }
