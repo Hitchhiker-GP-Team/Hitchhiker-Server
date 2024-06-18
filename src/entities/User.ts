@@ -4,6 +4,7 @@ import { Post } from "./Post.js";
 import { Review } from "./Review.js";
 
 export class User {
+  id?: string;
   username?: string;
   profilePic?: string;
   email?: string;

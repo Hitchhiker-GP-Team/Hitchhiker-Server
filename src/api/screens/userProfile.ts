@@ -13,17 +13,51 @@ import { Notification } from "../../entities/Notification.js";
 import { PubSub } from "graphql-subscriptions";
 import { likePostNotificationService } from "../../entities/Notifications/LikePostNotificationService.js";
 import { likeCommentNotificationService } from "../../entities/Notifications/LikeCommentNotificationService.js";
+import bcrypt from 'bcrypt';
 
 const pubsub = new PubSub();
 
 // USER NODE FUNCTIONALITES TILL LINE 108//
-export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
+// export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr ,homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number;sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number;homeLocation:[number] }): Promise<User[]> {
+//   try {
+//     const newUser: User = {
+//       username,
+//       profilePic,
+//       email,
+//       password,
+//       Name,
+//       birthDate,
+//       sex,
+//       Bio,
+//       followingCntr,
+//       followersCntr,
+//       postCntr,
+//       reviewsCntr,
+//       homeLocation
+//     };
+
+    
+//     const u =[await DbHelper.UserNode.AddUser(newUser)];
+//     console.log("User added:", newUser);
+//     return u
+//   } catch (error) {
+//     console.error("Error adding user:", error);
+//     throw error;
+//   }
+// }
+const SALT_ROUNDS = 10;
+
+export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr, homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number; sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number; homeLocation: [number] }): Promise<User[]> {
   try {
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    console.log(`Plain password: ${password}`);
+    console.log(`Hashed password: ${hashedPassword}`);
+    
     const newUser: User = {
       username,
       profilePic,
       email,
-      password,
+      password: hashedPassword,
       Name,
       birthDate,
       sex,
@@ -35,10 +69,9 @@ export async function addUser(_: any, { username, profilePic, email, password, N
       homeLocation
     };
 
-    
-    const u =[await DbHelper.UserNode.AddUser(newUser)];
+    const u = [await DbHelper.UserNode.AddUser(newUser)];
     console.log("User added:", newUser);
-    return u
+    return u;
   } catch (error) {
     console.error("Error adding user:", error);
     throw error;
