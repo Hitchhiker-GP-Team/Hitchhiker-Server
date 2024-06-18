@@ -93,7 +93,6 @@ export const typeDefs = `#graphql
     birthDate: Int 
     homeLocation: Coordinates
     sex: String
-    #titles: titles #Not Handled
     Bio: String
     followingCntr: Int
     followings: [User]
@@ -123,30 +122,65 @@ export const typeDefs = `#graphql
     notificationAdded(username:String):Notification
   }
 
+  type AuthPayload {
+    token: String!
+  }
 
   type Query {
-    #Notification
-    notifications(username:String):[Notification]
+    # Notification
+    notifications(username: String): [Notification]
+    login(email: String!, password: String!): AuthPayload
+
 
     # USER
-    getUserProfile(username: String):[User]
-    addUser(username: String, profilePic: String, email: String, password: String, Name: String,sex:String, birthDate: Int,Bio: String, followingCntr: Int, followersCntr: Int, postCntr: Int, reviewsCntr: Int,homeLocation:[Int]): [User]
-    updateUser(username: String, Bio: String, profilePic: String, email: String, Name: String): [User]
+    getUserProfile(username: String): [User]
+    addUser(
+      username: String,
+      profilePic: String,
+      email: String,
+      password: String,
+      Name: String,
+      sex: String,
+      birthDate: Int,
+      Bio: String,
+      followingCntr: Int,
+      followersCntr: Int,
+      postCntr: Int,
+      reviewsCntr: Int,
+      homeLocation: [Int]
+    ): [User]
+    updateUser(
+      username: String,
+      Bio: String,
+      profilePic: String,
+      email: String,
+      Name: String
+    ): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
     unfollowUser(username: String, userToUnfollow: String): [User]
     SearchUser(user: String): [User]
-    # END USER with search
 
-    #POST
-    getFeedFun(username: String):[Post]
-    getPostsFun(username: String):[Post]
-    getSavedPosts(username: String):[Post]
-    getLikedPosts(username: String):[Post]
-    getPlacePosts(username: String, placeId: String):[Post]
-    getCategoryPosts(username: String, category: String):[Post]
-    getArchivedPosts(username: String):[Post]
-    createPost(authorUsername: String!,caption: String!,tags:[String]!,date: Int!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!,categoryName: String!): Post
+    # POST
+    getFeedFun(username: String): [Post]
+    getPostsFun(username: String): [Post]
+    getSavedPosts(username: String): [Post]
+    getLikedPosts(username: String): [Post]
+    getPlacePosts(username: String, placeId: String): [Post]
+    getCategoryPosts(username: String, category: String): [Post]
+    getArchivedPosts(username: String): [Post]
+    createPost(
+      authorUsername: String!,
+      caption: String!,
+      tags: [String]!,
+      date: Int!,
+      likesCntr: Int!,
+      mediaUrls: [String]!,
+      hashtags: [String]!,
+      commentsCntr: Int!,
+      placeId: String!,
+      categoryName: String!
+    ): Post
     likePost(username: String, postId: String): [Post]
     savePost(username: String, postId: String): [Post]
     archivePost(username: String, postId: String): [Post]
@@ -156,11 +190,21 @@ export const typeDefs = `#graphql
     deletePost(postId: String): [Post]
     deleteAllPosts(username: String): [Post]
     deleteAllArchivedPosts(username: String): [Post]
-    #END POST
 
-    #PLACE
-    addPlace(name: String, mapsId: String, type: String, description: String): [Place]
-    updatePlace(placeId: String , name: String, mapsId: String, type: String, description: String): [Place]
+    # PLACE
+    addPlace(
+      name: String,
+      mapsId: String,
+      type: String,
+      description: String
+    ): [Place]
+    updatePlace(
+      placeId: String,
+      name: String,
+      mapsId: String,
+      type: String,
+      description: String
+    ): [Place]
     deletePlace(placeId: String): [Place]
     addPostToPlace(postId: String, placeId: String): [Place]
     addPlaceToCategory(placeId: String, categoryName: String): [Place]
@@ -168,151 +212,179 @@ export const typeDefs = `#graphql
     addRatingToPlace(ratingId: String, placeId: String): [Place]
     addUserVisitedPlace(username: String, placeId: String): [Place]
     SearchPlace(place: String): [Place]
-    #END PLACE
 
-    #JOURNEY 
-    createJourney(authorUsername: String,title: String, date: Float): [Journey]
-    getUserJourneys(username: String):[Journey]
-    fetchJourneyPosts(username: String, journeyId: String): [Journey]
+    # JOURNEY
+    createJourney(
+      authorUsername: String,
+      title: String,
+      date: Float
+    ): [Journey]
+    getUserJourneys(username: String): [Journey]
+    fetchJourneyPosts(
+      username: String,
+      journeyId: String
+    ): [Journey]
     addPostToJourney(postId: String, journeyId: String): [Journey]
     deleteJourney(journeyId: String): [Journey]
-    deletePostFromJourney(journeyId: String, postId: String): [Journey]
-    #END JOURNEY
+    deletePostFromJourney(
+      journeyId: String,
+      postId: String
+    ): [Journey]
 
-    #REVIEW
-    getReviewsFun(username: String):[Review]
-    fetchPlaceReviews(placeId: String):[Review]
-    addReview(authorUsername: String, placeId: String, text: String, rating: Float, date: Float):[Review]
-    deleteReview(reviewId: String):[Review]
-    #END REVIEW
+    # REVIEW
+    getReviewsFun(username: String): [Review]
+    fetchPlaceReviews(placeId: String): [Review]
+    addReview(
+      authorUsername: String,
+      placeId: String,
+      text: String,
+      rating: Float,
+      date: Float
+    ): [Review]
+    deleteReview(reviewId: String): [Review]
 
-    #CATEGORY
-    createCategory(name: String, parentName: String):[Category]
-    updateCategory(oldName: String, newName: String):[Category]
-    deleteCategory(name: String):[Category]
-    fetchCategory(name: String):[Category]
-    fetchAllCategories:[Category]
-    fetchCategoryTree(name: String):[Category]
-    #END CATEGORY
+    # CATEGORY
+    createCategory(name: String, parentName: String): [Category]
+    updateCategory(oldName: String, newName: String): [Category]
+    deleteCategory(name: String): [Category]
+    fetchCategory(name: String): [Category]
+    fetchAllCategories: [Category]
+    fetchCategoryTree(name: String): [Category]
 
-    #COMMENT
-    addComment(text: String, date: Int, authorUsername: String, postId: String):[Comment]
-    replyComment(text: String!,date: Int!,authorUsername: String!,parentId: String!):[Comment]
-    likeComment(username: String, commentId: String):[Comment]
-    unLikeComment(username: String, commentId: String):[Comment]
-    fetchComment(commentId: String!):[Comment]
-    updateComment(commentId: String!,text: String!,date: Int!,likesCounter: Int!,repliesCntr: Int!):[Comment]
-    fetchReplies(parentCommentId: String):[Comment]
-    deleteComment(commentId: String):[Comment]
-    getPostComments(postId: String):[Comment]
-    #END COMMENT
+    # COMMENT
+    addComment(
+      text: String,
+      date: Int,
+      authorUsername: String,
+      postId: String
+    ): [Comment]
+    replyComment(
+      text: String!,
+      date: Int!,
+      authorUsername: String!,
+      parentId: String!
+    ): [Comment]
+    likeComment(username: String, commentId: String): [Comment]
+    unLikeComment(username: String, commentId: String): [Comment]
+    fetchComment(commentId: String!): [Comment]
+    updateComment(
+      commentId: String!,
+      text: String!,
+      date: Int!,
+      likesCounter: Int!,
+      repliesCntr: Int!
+    ): [Comment]
+    fetchReplies(parentCommentId: String): [Comment]
+    deleteComment(commentId: String): [Comment]
+    getPostComments(postId: String): [Comment]
   }
 
   type Mutation {
-  createNotification(
-    username:String!,
-    message:String!
-  ):Notification 
+    createNotification(
+      username: String!,
+      message: String!
+    ): Notification
 
+    addUser(
+      username: String!,
+      profilePic: String,
+      email: String!,
+      password: String!,
+      Name: String!,
+      birthDate: Int!,
+      sex: String!,
+      Bio: String!,
+      followingCntr: Int!,
+      followersCntr: Int!,
+      postCntr: Int!,
+      reviewsCntr: Int!,
+      homeLocation: [Int!]!
+    ): User
 
-  addUser(
-    username: String!,
-    profilePic: String,
-    email: String!,
-    password: String!,
-    Name: String!,
-    birthDate: Int!,
-    sex: String!,
-    Bio: String!,
-    followingCntr: Int!,
-    followersCntr: Int!,
-    postCntr: Int!,
-    reviewsCntr: Int!
-    homeLocation: [Int!]!
-  ): User
-  updateUser(
-    username: String!,
-    profilePic: String,
-    email: String,
-    password: String,
-    Name: String,
-    Bio: String
-  ): User
-  # createPost(
-  #   authorUsername: String!,
-  #   caption: String!,
-  #   date: Int!,
-  #   likesCntr: Int!,
-  #   mediaUrls: [String!]!,  
-  #   hashtags: [String!]!,    
-  #   commentsCntr: Int!,
-  #   tags: [String!]!,
-  #   placeId: String!,
-  #   categoryName: String!
-  # ): Post
-  createPost(
-  authorUsername: String!,
-  caption: String!,
-  date: Int!,
-  likesCntr: Int!,
-  mediaUrls: [String!]!,
-  hashtags: [String!]!,
-  commentsCntr: Int!,
-  tags: [String!]!,
-  placeId: String!,
-  categoryName: String!
-  ): Post
-  addPlace(
-    name: String!,
-    mapsId: String!,
-    type: String!,
-    description: String!
-  ): Place
-  editPlace(
-    placeId: String!,
-    name: String,
-    mapsId: String,
-    type: String,
-    description: String
-  ): Place
-  createJourney(
-    authorUsername: String!,
-    title: String!,
-    date: Float!
-  ): Journey
-  addReview(
-    authorUsername: String!,
-    placeId: String!,
-    text: String!,
-    rating: Float!,
-    date: Float!
-  ): Review
-  createCategory(
-    name: String!,
-    parentName: String
-  ): Category
-  addComment(
-    text: String!,
-    date: Int!,
-    authorUsername: String!,
-    postId: String!
+    updateUser(
+      username: String!,
+      profilePic: String,
+      email: String,
+      password: String,
+      Name: String,
+      Bio: String
+    ): User
+
+    deleteUser(username: String!): User
+
+    login(email: String!, password: String!): AuthPayload
+
+    followUser(username: String!, userToFollow: String!): User
+
+    unfollowUser(username: String!, userToUnfollow: String!): User
+
+    createPost(
+      authorUsername: String!,
+      caption: String!,
+      date: Int!,
+      likesCntr: Int!,
+      mediaUrls: [String!]!,
+      hashtags: [String!]!,
+      commentsCntr: Int!,
+      tags: [String!]!,
+      placeId: String!,
+      categoryName: String!
+    ): Post
+
+    addPlace(
+      name: String!,
+      mapsId: String!,
+      type: String!,
+      description: String!
+    ): Place
+
+    editPlace(
+      placeId: String!,
+      name: String,
+      mapsId: String,
+      type: String,
+      description: String
+    ): Place
+
+    createJourney(
+      authorUsername: String!,
+      title: String!,
+      date: Float!
+    ): Journey
+
+    addReview(
+      authorUsername: String!,
+      placeId: String!,
+      text: String!,
+      rating: Float!,
+      date: Float!
+    ): Review
+
+    createCategory(
+      name: String!,
+      parentName: String
+    ): Category
+
+    addComment(
+      text: String!,
+      date: Int!,
+      authorUsername: String!,
+      postId: String!
     ): Comment
-  replyComment(
-    text: String!,
-    date: Int!,
-    authorUsername: String!,
-    parentId: String!
-  ): Comment
-  updateComment(
-    commentId: String!,
-    text: String!,
-    date: Int!,
-    likesCounter: Int!,
-    repliesCntr: Int!
-  ): Comment
 
-}
+    replyComment(
+      text: String!,
+      date: Int!,
+      authorUsername: String!,
+      parentId: String!
+    ): Comment
+
+    updateComment(
+      commentId: String!,
+      text: String!,
+      date: Int!,
+      likesCounter: Int!,
+      repliesCntr: Int!
+    ): Comment
+  }
 `
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.

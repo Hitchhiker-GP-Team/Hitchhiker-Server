@@ -50,6 +50,43 @@ export class UserNode {
       throw err;
     }
   }
+  public async FindUserByEmail(email: string): Promise<User | null> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
+        MATCH (user:User {email: $email})
+        RETURN user
+        `,
+        { email }
+      );
+
+      const user = result.records[0]?.get('user').properties;
+      if (user) {
+        return {
+          id: user.id,
+          email: user.email,
+          password: user.password,
+          username: user.username,
+          profilePic: user.profilePic,
+          Name: user.Name,
+          birthDate: user.birthDate,
+          homeLocation: user.homeLocation,
+          sex: user.sex,
+          Bio: user.Bio,
+          followingCntr: user.followingCntr,
+          followersCntr: user.followersCntr,
+          postCntr: user.postCntr,
+          reviewsCntr: user.reviewsCntr
+        };
+      }
+
+      return null;
+    } catch (err) {
+      console.error(`Error finding user by email: ${err}`);
+      throw err;
+    }
+  }
   public async UpdateUser(username: string, updatedUser: User): Promise<User> {
     try {
       const driver = dbDriver;

@@ -3,10 +3,40 @@ import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,dele
 import { PubSub } from 'graphql-subscriptions';
 
 const pubsub = new PubSub();
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { DbHelper } from "../db/DbHelper.js";
 
 export const resolvers = {
   Query: {
+    login: async (_: any, { email, password }: { email: string; password: string }) => {
+      try {
+        console.log(`Logging in user with email: ${email}`);
+        const user = await DbHelper.UserNode.FindUserByEmail(email);
+        if (!user) {
+          console.log('User not found');
+          throw new Error('User not found');
+        }
 
+        const isPasswordValid = await bcrypt.compare(password, user.password || '');
+        if (!isPasswordValid) {
+          console.log('Invalid password');
+          throw new Error('Invalid password');
+        }
+
+        const token = jwt.sign(
+          { userId: user.id, email: user.email },
+          process.env.SECRET_KEY || 'default_secret',
+          { expiresIn: '1h' }
+        );
+
+        console.log('Login successful, returning token');
+        return { token };
+      } catch (error) {
+        console.error('Error logging in:', error);
+        throw error;
+      }
+    },
     // Notification
     notifications: async (_:any,{username}: {username:String})=>
       {
@@ -106,7 +136,35 @@ export const resolvers = {
         }
         pubsub.publish('NOTIFICATION_ADDED',{notificationAdded: noti});
         return noti;
-    }
+    },
+    login: async (_: any, { email, password }: { email: string; password: string }) => {
+      try {
+        console.log(`Logging in user with email: ${email}`);
+        const user = await DbHelper.UserNode.FindUserByEmail(email);
+        if (!user) {
+          console.log('User not found');
+          throw new Error('User not found');
+        }
+  
+        const isPasswordValid = await bcrypt.compare(password, user.password || '');
+        if (!isPasswordValid) {
+          console.log('Invalid password');
+          throw new Error('Invalid password');
+        }
+  
+        const token = jwt.sign(
+          { userId: user.id, email: user.email },
+          process.env.SECRET_KEY || 'default_secret',
+          { expiresIn: '1h' }
+        );
+  
+        console.log('Login successful, returning token');
+        return { token };
+      } catch (error) {
+        console.error('Error logging in:', error);
+        throw error;
+      }
+    },
   },
 
   Subscription:{
