@@ -4,9 +4,54 @@ import { User } from "../../entities/User.js";
 // import { ReviewNode } from "./ReviewNode.js";
 
 export class UserNode {
+  // public async AddUser(user: User): Promise<User> {
+  //   try {
+  //     // Assuming 'user.id' is already set before calling this method
+  //     const driver = dbDriver;
+  //     const result = await driver.executeQuery(
+  //       `
+  //       CREATE (user:User {
+  //         username: $username,
+  //         profilePic: $profilePic,
+  //         email: $email,
+  //         password: $password,
+  //         Name: $name,
+  //         birthDate: $birthDate,
+  //         homeLocation: $homeLocation,
+  //         sex: $sex,
+  //         Bio: $bio,
+  //         followingCntr: $followingCntr,
+  //         followersCntr: $followersCntr,
+  //         postCntr: $postCntr,
+  //         reviewsCntr: $reviewsCntr
+  //       })
+  //       RETURN user
+  //       `,
+  //       {
+  //         username: user.username,
+  //         profilePic: user.profilePic,
+  //         email: user.email,
+  //         password: user.password,
+  //         name: user.Name,
+  //         birthDate: user.birthDate,
+  //         homeLocation: user.homeLocation,
+  //         sex: user.sex,
+  //         bio: user.Bio,
+  //         followingCntr: user.followingCntr,
+  //         followersCntr: user.followersCntr,
+  //         postCntr: user.postCntr,
+  //         reviewsCntr: user.reviewsCntr,
+  //       }
+  //     );
+
+  //     return user;
+  //   } catch (err) {
+  //     console.error(`Error adding user: ${err}`);
+  //     throw err;
+  //   }
+  // }
   public async AddUser(user: User): Promise<User> {
     try {
-      // Assuming 'user.id' is already set before calling this method
       const driver = dbDriver;
       const result = await driver.executeQuery(
         `
@@ -31,7 +76,7 @@ export class UserNode {
           username: user.username,
           profilePic: user.profilePic,
           email: user.email,
-          password: user.password,
+          password: user.password, // Ensure this is the hashed password
           name: user.Name,
           birthDate: user.birthDate,
           homeLocation: user.homeLocation,
@@ -44,6 +89,7 @@ export class UserNode {
         }
       );
 
+      console.log(`User creation result: ${result}`);
       return user;
     } catch (err) {
       console.error(`Error adding user: ${err}`);
