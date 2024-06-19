@@ -224,16 +224,16 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
 
     const post: Post = {
       id : uuidv4(),
-      author: { username: authorUsername },
+      author: { username: 'kandeel00' },
       caption,
       date,
       likesCntr,
-      mediaURL: mediaUrls,
+      mediaURL: ['https://www.southernliving.com/thmb/3x3cJaiOvQ8-3YxtMQX0vvh1hQw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/2652401_QFSSL_SupremePizza_00072-d910a935ba7d448e8c7545a963ed7101.jpg'],
       hashtags,
       commentsCntr,
       place: { id: placeId },
       category: { name: categoryName },
-      keywords: []
+      keywords: [] //Keywords
     };
 
     await DbHelper.PostNode.CreatePost(post);

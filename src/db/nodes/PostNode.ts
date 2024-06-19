@@ -634,13 +634,14 @@ export class PostNode  {
    public async CreatePost(post : Post): Promise<Post> {
      try {
 
+       
+
        const d = Math.floor(Number(post.date))
 
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
             MATCH (author:User {username: $username}),
-                  (place:Place {id: $placeId}),
                   (category:Category {name: $CategoryName})
 
             CREATE (post:Post {
@@ -652,20 +653,16 @@ export class PostNode  {
                 hashtags: $hashtags,
                 commentsCntr: $commentsCntr
             })<-[:ADD_POST]-(author),  
-                  (post)-[:HAPPEND_AT]->(place),
                   (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
-
-            
+            MERGE (place:Place {id:$placeId,name:"cairo festival",type:'mall'})
+            MERGE (post)-[rel:HAPPEND_AT]->(place)
 
             WITH  author ,post, $predictions AS predictedCategories
             UNWIND predictedCategories AS prediction
             MERGE (category:Category {name: prediction.class})
-            MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(category)
+            MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(cate gory)
             SET rel.confidence = prediction.perc
             SET author.postCntr = author.postCntr + 1
-
-            
-            
 
             RETURN post
             `
