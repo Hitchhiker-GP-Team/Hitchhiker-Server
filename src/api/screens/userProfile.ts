@@ -131,7 +131,7 @@ export async function getFeedFun(_: any, { username }: { username: string }) {
   try {
     // Fetch feed posts using the database module function
     const feedPosts = await DbHelper.PostNode.FetchFollowingsPosts(username);
-    console.log(feedPosts);
+    //console.log(feedPosts);
     return feedPosts;
   } catch (error) {
     console.error("Error fetching user feed:", error);
@@ -220,7 +220,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   try {
 
     
-    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+    //const Keywords = DetectionModel.predictClasses(mediaUrls[0])
 
     const post: Post = {
       id : uuidv4(),
@@ -233,7 +233,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       commentsCntr,
       place: { id: placeId },
       category: { name: categoryName },
-      keywords: Keywords
+      keywords: []
     };
 
     await DbHelper.PostNode.CreatePost(post);
