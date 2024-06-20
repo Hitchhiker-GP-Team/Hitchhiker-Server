@@ -2,6 +2,7 @@ import { dbDriver } from "../dbConnection.js";
 import { User } from "../../entities/User.js";
 import { Review } from "../../entities/Review.js";
 import { v4 as uuidv4 } from 'uuid';
+import { Place } from "../../entities/Place.js";
 
 
 
@@ -48,21 +49,13 @@ export class ReviewNode {
                     author: author,
                     place: {
                         id: placeProb.id,
-                        mapsId: placeProb.mapsId,
                         name: placeProb.name,
-                        type: placeProb.type,
-                        location: placeProb.location,
-                        ratings: placeProb.ratings,
-                        description: placeProb.description,
-                        reviewsCntr: placeProb.reviewsCntr,
-                        reviews: placeProb.reviews,
-                        posts: placeProb.posts,
                     },
                     text: record.get("text"),
-                    rating: record.get("rating"),
+                    rating: parseInt(record.get("rating")),
                     date: record.get("date"),
-                    likesCntr: record.get("likesCntr"),
-                    dislikesCntr: record.get("dislikesCntr"),
+                    likesCntr: parseInt(record.get("likesCntr")),
+                    dislikesCntr: parseInt(record.get("dislikesCntr")),
                 };
 
                 userReviews.push(currentReview);
@@ -86,7 +79,8 @@ export class ReviewNode {
       RETURN review,
              author.username AS authorUsername,
              author.profilePic AS authorProfilePic,
-             place,
+             place.name as placeName,
+             place.id  as placeId,
              review.text AS text,
              review.rating AS rating,
              review.date AS date,
@@ -106,10 +100,15 @@ export class ReviewNode {
                     profilePic: record.get("authorProfilePic"),
                 };
 
+                const place: Place = {
+                    name: record.get("placeName"),
+                    id : record.get("placeId") 
+                }
+
                 const currentReview: Review = {
                     id: reviewProb.id,
                     author: author,
-                    place: record.get("place"), // Assuming place is a complete Place object
+                    place: place, // Assuming place is a complete Place object
                     text: record.get("text"),
                     rating: parseInt(record.get("rating")),
                     date: parseInt(record.get("date")),

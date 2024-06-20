@@ -78,7 +78,7 @@ export const typeDefs = `#graphql
     author: User
     place: Place
     text: String
-    rating: IRating
+    rating: Int
     date: Int
     likesCntr: Int
     dislikesCntr: Int
@@ -146,7 +146,7 @@ export const typeDefs = `#graphql
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]
-    createPost(authorUsername: String!,caption: String!,tags:[String]!,date: Int!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!,categoryName: String!): Post
+    createPost(placeName: String, authorUsername: String!,caption: String!,tags:[String]!,date: Int!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!): Post
     likePost(username: String, postId: String): [Post]
     savePost(username: String, postId: String): [Post]
     archivePost(username: String, postId: String): [Post]
