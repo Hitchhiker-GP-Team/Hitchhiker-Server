@@ -653,7 +653,15 @@ export class PostNode  {
                 commentsCntr: $commentsCntr
             })<-[:ADD_POST]-(author)
 
-            MERGE (place:Place {id:$placeId,name:$placeName})
+            MERGE (place:Place {id: $placeId})
+            ON CREATE SET place.name = $placeName,
+                          place.overAll = 0,
+                          place.atmosphere = 0,
+                          place.affordability = 0,
+                          place.accesability = 0,
+                          place.minPrice = 0,
+                          place.maxPrice = 0,
+                          place.reviewsCntr = 0
             MERGE (post)-[rel:HAPPEND_AT]->(place)
 
             WITH  author ,post, $predictions AS predictedCategories

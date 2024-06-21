@@ -24,9 +24,12 @@ export const typeDefs = `#graphql
   }
 
   type IRating{
-    totalRating: Int
+    overAll: Int
     affordability: Int
-    priceRange: PriceRange
+    accesability: Int
+    priceMin: Int
+    priceMax: Int
+    atmosphere: Int
   }
 
   type Journey{
@@ -78,7 +81,7 @@ export const typeDefs = `#graphql
     author: User
     place: Place
     text: String
-    rating: Int
+    rating: IRating
     date: Int
     likesCntr: Int
     dislikesCntr: Int
@@ -183,7 +186,7 @@ export const typeDefs = `#graphql
     #REVIEW
     getReviewsFun(username: String):[Review]
     fetchPlaceReviews(placeId: String):[Review]
-    addReview(authorUsername: String, placeId: String, text: String, rating: Float, date: Float):[Review]
+    addReview(authorUsername: String, placeId: String, text: String, overAll: Float, affordability: Float, accesability: Float, priceMin: Float, priceMax: Float, atmosphere: Float, date: Float):[Review]
     deleteReview(reviewId: String):[Review]
     #END REVIEW
 
@@ -286,7 +289,12 @@ export const typeDefs = `#graphql
     authorUsername: String!,
     placeId: String!,
     text: String!,
-    rating: Float!,
+    overAll: Float!, 
+    affordability: Float!, 
+    accesability: Float!, 
+    priceMin: Float!, 
+    priceMax: Float!, 
+    atmosphere: Float!,
     date: Float!
   ): Review
   createCategory(

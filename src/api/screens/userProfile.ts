@@ -13,6 +13,7 @@ import { Notification } from "../../entities/Notification.js";
 import { PubSub } from "graphql-subscriptions";
 import { likePostNotificationService } from "../../entities/Notifications/LikePostNotificationService.js";
 import { likeCommentNotificationService } from "../../entities/Notifications/LikeCommentNotificationService.js";
+import { IRating } from "../../entities/Rating/IRating.js";
 
 const pubsub = new PubSub();
 
@@ -801,8 +802,16 @@ export async function fetchPlaceReviews(_: any, { placeId }: { placeId: string }
 //     throw error;
 //   }
 // }
-export async function addReview(_: any, { authorUsername, placeId, text, rating, date }: { authorUsername: string; placeId: string; text: string; rating: number; date: number; }): Promise<Review[]> {
+export async function addReview(_: any, { authorUsername, placeId, text, overAll, affordability, accesability, priceMin, priceMax, atmosphere, date }: { authorUsername: string; placeId: string; text: string; overAll: number; affordability: number; accesability: number; priceMin: number; priceMax: number; atmosphere: number; date: number; }): Promise<Review[]> {
   try {
+    const rating: IRating = {
+      overAll, 
+      affordability,
+      accesability,
+      priceMin,
+      priceMax,
+      atmosphere
+    }
     const review: Review = {
       id: uuidv4(), // This will be generated dynamically
       text,

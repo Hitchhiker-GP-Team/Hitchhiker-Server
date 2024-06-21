@@ -1,5 +1,6 @@
 import { dbDriver } from "../dbConnection.js";
 import { Place } from "../../entities/Place.js";
+import { IRating } from "../../entities/Rating/IRating.js";
 
 
 export class PlaceNode {
@@ -183,11 +184,21 @@ export class PlaceNode {
             result.records.forEach((record) => {
                 const placeProb = record.get("place").properties;
                 
-                const place: Place = {
+                const rating : IRating = {
+                    overAll: parseInt(placeProb.overAll),
+                    affordability: parseInt(placeProb.affordability),
+                    accesability: parseInt(placeProb.accesability),
+                    priceMin: parseInt(placeProb.minPrice),
+                    priceMax: parseInt(placeProb.maxPrice),
+                    atmosphere: parseInt(placeProb.atmosphere)
+                }
 
+                const place: Place = {
                     name: placeProb.name,
-                    id: placeProb.id
-               };
+                    id: placeProb.id,
+                    reviewsCntr : parseInt(placeProb.reviewsCntr),
+                    ratings : rating
+                };
 
                places.push(place);
 
