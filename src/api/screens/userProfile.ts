@@ -376,6 +376,19 @@ export async function deleteAllArchivedPosts(_: any, { username }: { username: s
 //   }
 // }
 
+export async function getPlaceData(_: any, {username, placeId}: {username: string; placeId : string})
+{
+  try{
+    const place = await DbHelper.PlaceNode.getPlaceData(username,placeId);
+    return place;
+  }
+  catch(error)
+  {
+    console.error("Error fetching place:", error);
+    throw error;
+  }
+}
+
 export async function addPlace(_: any, { name, mapsId, type, description }: { name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
   try {
     const id = uuidv4(); // Generate a UUID for the place ID

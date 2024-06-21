@@ -3,6 +3,7 @@ import { Place } from "../../entities/Place.js";
 
 
 export class PlaceNode {
+
     public async AddPlace(place: Place): Promise<Place> {
         try {
             const driver = dbDriver;
@@ -162,6 +163,40 @@ export class PlaceNode {
             );
         } catch (err) {
             console.error(`Error adding user visited place: ${err}`);
+            throw err;
+        }
+    }
+
+    public async getPlaceData(username: string, placeId: string): Promise<Place> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (place:Place{id : $placeId})
+                return place
+                `,
+                { username, placeId }
+            );
+
+            const places: Place[] = [];
+
+            result.records.forEach((record) => {
+                const placeProb = record.get("place").properties;
+                
+                const place: Place = {
+
+                    name: placeProb.name,
+                    id: placeProb.id
+               };
+
+               places.push(place);
+
+            })
+            
+            return places[0];
+            
+        } catch (err) {
+            console.error(`Error fetching place: ${err}`);
             throw err;
         }
     }

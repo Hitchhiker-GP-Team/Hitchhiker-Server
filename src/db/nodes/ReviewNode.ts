@@ -53,7 +53,7 @@ export class ReviewNode {
                     },
                     text: record.get("text"),
                     rating: parseInt(record.get("rating")),
-                    date: record.get("date"),
+                    date: parseInt(record.get("date")),
                     likesCntr: parseInt(record.get("likesCntr")),
                     dislikesCntr: parseInt(record.get("dislikesCntr")),
                 };

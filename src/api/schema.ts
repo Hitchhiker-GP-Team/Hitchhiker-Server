@@ -168,6 +168,7 @@ export const typeDefs = `#graphql
     addRatingToPlace(ratingId: String, placeId: String): [Place]
     addUserVisitedPlace(username: String, placeId: String): [Place]
     SearchPlace(place: String): [Place]
+    getPlaceData(username:String, placeId:String) : Place
     #END PLACE
 
     #JOURNEY 
@@ -209,6 +210,7 @@ export const typeDefs = `#graphql
   }
 
   type Mutation {
+
   createNotification(
     username:String!,
     message:String!
