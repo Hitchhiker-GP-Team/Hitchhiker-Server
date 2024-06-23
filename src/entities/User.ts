@@ -22,6 +22,9 @@ export class User {
   postCntr?: Number;
   reviews?: Review[];
   reviewsCntr?: Number;
+  score?: Number;
+  totalUpvotes?: Number;
+  totalDownvotes?: Number;
 }
 interface titles {
   [key: string]: number;

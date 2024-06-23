@@ -23,7 +23,10 @@ export class UserNode {
           followingCntr: $followingCntr,
           followersCntr: $followersCntr,
           postCntr: $postCntr,
-          reviewsCntr: $reviewsCntr
+          reviewsCntr: $reviewsCntr,
+          score: 0,
+          totalUpvotes: 0,
+          totalDownvotes: 0
         })
         RETURN user
         `,
@@ -127,6 +130,9 @@ export class UserNode {
           postCntr: parseFloat(userData.postCntr),
           // reviews: reviews,
           reviewsCntr: parseFloat(userData.reviewsCntr),
+          score: parseFloat(userData.score),
+          totalUpvotes: parseFloat(userData.totalUpvotes),
+          totalDownvotes: parseFloat(userData.totalDownvotes),
         };
       });
       return userProfile;
