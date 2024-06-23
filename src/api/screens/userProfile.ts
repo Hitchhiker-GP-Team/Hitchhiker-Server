@@ -221,7 +221,14 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   try {
 
     
-    //const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+
+    var category = "Origin";
+    if(Keywords.length != 0)
+    {
+      category = DetectionModel.mapToCaetgory(Keywords[0].name as string); 
+    }
+    
 
     const post: Post = {
       id : uuidv4(),
@@ -233,7 +240,8 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       hashtags,
       commentsCntr,
       place: { id: placeId, name:placeName },
-      keywords: [] //Keywords
+      keywords: Keywords,
+      category : {name : category}
     };
 
     await DbHelper.PostNode.CreatePost(post);

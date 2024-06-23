@@ -642,6 +642,7 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (author:User {username: $username})
+            OPTIONAL MATCH (category:Category{name:$categoryName})
 
             CREATE (post:Post {
                 id: $postId,
@@ -651,7 +652,9 @@ export class PostNode  {
                 mediaUrls: $mediaUrls,
                 hashtags: $hashtags,
                 commentsCntr: $commentsCntr
-            })<-[:ADD_POST]-(author)
+            })<-[:ADD_POST]-(author),
+            (post)-[belongs:POST_BELONGS_TO_CATEGORY]->(category)
+        
 
             MERGE (place:Place {id: $placeId})
             ON CREATE SET place.name = $placeName,
@@ -666,9 +669,9 @@ export class PostNode  {
 
             WITH  author ,post, $predictions AS predictedCategories
             UNWIND predictedCategories AS prediction
-            MERGE (category:Category {name: prediction.class})
-            MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(category)
-            SET rel.confidence = prediction.perc
+            MERGE (keyword:Keyword {name: prediction.name})
+            MERGE (post)-[rel:POST_HAS_KEYWORD]->(keyword)
+            SET rel.confidence = prediction.confidence
             SET author.postCntr = author.postCntr + 1
 
             RETURN post
@@ -690,7 +693,7 @@ export class PostNode  {
               placeId     :post.place?.id,
               placeName   :post.place?.name,
               //category
-              CategoryName:post.category?.name,
+              categoryName:post.category?.name,
               predictions:post.keywords
             }
         );
