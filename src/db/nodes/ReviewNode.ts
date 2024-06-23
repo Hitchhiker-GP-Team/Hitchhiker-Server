@@ -2,6 +2,8 @@ import { dbDriver } from "../dbConnection.js";
 import { User } from "../../entities/User.js";
 import { Review } from "../../entities/Review.js";
 import { v4 as uuidv4 } from 'uuid';
+import { Place } from "../../entities/Place.js";
+import { IRating } from "../../entities/Rating/IRating.js";
 
 
 
@@ -42,27 +44,26 @@ export class ReviewNode {
                     profilePic: record.get("authorProfilePic"),
                     // Add other user properties as needed
                 };
-
+                const rating : IRating = {
+                    overAll: parseInt(reviewProb.overAll),
+                    affordability: parseInt(reviewProb.affordability),
+                    accesability: parseInt(reviewProb.accesability),
+                    priceMin: parseInt(reviewProb.priceMin),
+                    priceMax: parseInt(reviewProb.priceMax),
+                    atmosphere: parseInt(reviewProb.atmosphere)
+                }
                 const currentReview: Review = {
                     id: reviewProb.id,
                     author: author,
                     place: {
                         id: placeProb.id,
-                        mapsId: placeProb.mapsId,
                         name: placeProb.name,
-                        type: placeProb.type,
-                        location: placeProb.location,
-                        ratings: placeProb.ratings,
-                        description: placeProb.description,
-                        reviewsCntr: placeProb.reviewsCntr,
-                        reviews: placeProb.reviews,
-                        posts: placeProb.posts,
                     },
                     text: record.get("text"),
-                    rating: record.get("rating"),
-                    date: record.get("date"),
-                    likesCntr: record.get("likesCntr"),
-                    dislikesCntr: record.get("dislikesCntr"),
+                    rating:rating,
+                    date: parseInt(record.get("date")),
+                    likesCntr: parseInt(record.get("likesCntr")),
+                    dislikesCntr: parseInt(record.get("dislikesCntr")),
                 };
 
                 userReviews.push(currentReview);
@@ -86,7 +87,8 @@ export class ReviewNode {
       RETURN review,
              author.username AS authorUsername,
              author.profilePic AS authorProfilePic,
-             place,
+             place.name as placeName,
+             place.id  as placeId,
              review.text AS text,
              review.rating AS rating,
              review.date AS date,
@@ -106,12 +108,25 @@ export class ReviewNode {
                     profilePic: record.get("authorProfilePic"),
                 };
 
+                const place: Place = {
+                    name: record.get("placeName"),
+                    id : record.get("placeId") 
+                }
+                const rating : IRating = {
+                    overAll: parseInt(reviewProb.overAll),
+                    affordability: parseInt(reviewProb.affordability),
+                    accesability: parseInt(reviewProb.accesability),
+                    priceMin: parseInt(reviewProb.priceMin),
+                    priceMax: parseInt(reviewProb.priceMax),
+                    atmosphere: parseInt(reviewProb.atmosphere)
+                }
+
                 const currentReview: Review = {
                     id: reviewProb.id,
                     author: author,
-                    place: record.get("place"), // Assuming place is a complete Place object
+                    place: place, // Assuming place is a complete Place object
                     text: record.get("text"),
-                    rating: parseInt(record.get("rating")),
+                    rating: rating,
                     date: parseInt(record.get("date")),
                     likesCntr: parseInt(record.get("likesCntr")),
                     dislikesCntr: parseInt(record.get("dislikesCntr")),
@@ -128,52 +143,7 @@ export class ReviewNode {
         }
     }
 
-    // public async AddReview(review: Review): Promise<Review> {
-    //     try {
-    //         if (!review.place || !review.author) {
-    //             throw new Error("Place ID or author is missing in the review data.");
-    //         }
-    
-    //         const driver = dbDriver;
-    //         const session = driver.session();
-    
-    //         const result = await session.run(
-    //             `
-    //       MATCH (author:User {username: $username}),
-    //             (place:Place {id: $placeId})
-    
-    //       CREATE (review:Review {
-    //         id: $reviewId,
-    //         text: $text,
-    //         rating: $rating,
-    //         date: $date,
-    //         likesCntr: 0,
-    //         dislikesCntr: 0
-    //       })<-[:ADD_REVIEW]-(author),
-    //       (review)-[:REVIEW_ON_PLACE]->(place)
-          
-    //       SET author.reviewsCntr = author.reviewsCntr + 1
-    
-    //       RETURN review
-    //       `,
-    //             {
-    //                 username: review.author?.username,
-    //                 placeId: review.place?.id,
-    //                 reviewId: review.id, // Assuming review ID is provided
-    //                 text: review.text,
-    //                 rating: review.rating,
-    //                 date: review.date
-    //             }
-    //         );
-    
-    //         return review;
-    
-    //     } catch (err) {
-    //         console.error(`Error adding review: ${err}`);
-    //         throw err;
-    //     }
-    // }
-    
+
     public async AddReview(review: Review): Promise<Review> {
         try {
           if (!review.place || !review.author) {
@@ -194,14 +164,29 @@ export class ReviewNode {
             CREATE (review:Review {
               id: $reviewId,
               text: $text,
-              rating: $rating,
+              overAll: $overAll,
+              affordability: $affordability,
+              accesability : $accesability,
+              priceMin: $priceMin,
+              priceMax : $priceMax,
+              atmosphere : $atmosphere,
               date: $date,
               likesCntr: 0,
               dislikesCntr: 0
             })<-[:ADD_REVIEW]-(author),
             (review)-[:REVIEW_ON_PLACE]->(place)
             
-            SET author.reviewsCntr = coalesce(author.reviewsCntr, 0) + 1
+            SET author.reviewsCntr = author.reviewsCntr+ 1
+
+            SET place.overAll = ((place.overAll * place.reviewsCntr) + $overAll) / (place.reviewsCntr + 1)
+            SET place.affordability = ((place.affordability * place.reviewsCntr) + $affordability) / (place.reviewsCntr + 1)
+            SET place.accesability = ((place.accesability * place.reviewsCntr) + $accesability) / (place.reviewsCntr + 1)
+            SET place.minPrice = ((place.minPrice * place.reviewsCntr) + $priceMin) / (place.reviewsCntr + 1)
+            SET place.maxPrice = ((place.maxPrice * place.reviewsCntr) + $priceMax) / (place.reviewsCntr + 1)
+            SET place.atmosphere = ((place.atmosphere * place.reviewsCntr) + $atmosphere) / (place.reviewsCntr + 1)
+
+            SET place.reviewsCntr = place.reviewsCntr + 1
+
       
             RETURN review
             `,
@@ -211,7 +196,13 @@ export class ReviewNode {
               reviewId: review.id,
               text: review.text,
               rating: review.rating,
-              date: review.date
+              date: review.date,
+              overAll: review.rating?.overAll,
+              affordability: review.rating?.affordability,
+              accesability : review.rating?.accesability,
+              priceMin: review.rating?.priceMin,
+              priceMax : review.rating?.priceMax,
+              atmosphere : review.rating?.priceMax,
             }
           );
       

@@ -1,8 +1,10 @@
 import { dbDriver } from "../dbConnection.js";
 import { Place } from "../../entities/Place.js";
+import { IRating } from "../../entities/Rating/IRating.js";
 
 
 export class PlaceNode {
+
     public async AddPlace(place: Place): Promise<Place> {
         try {
             const driver = dbDriver;
@@ -162,6 +164,50 @@ export class PlaceNode {
             );
         } catch (err) {
             console.error(`Error adding user visited place: ${err}`);
+            throw err;
+        }
+    }
+
+    public async getPlaceData(username: string, placeId: string): Promise<Place> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (place:Place{id : $placeId})
+                return place
+                `,
+                { username, placeId }
+            );
+
+            const places: Place[] = [];
+
+            result.records.forEach((record) => {
+                const placeProb = record.get("place").properties;
+                
+                const rating : IRating = {
+                    overAll: parseInt(placeProb.overAll),
+                    affordability: parseInt(placeProb.affordability),
+                    accesability: parseInt(placeProb.accesability),
+                    priceMin: parseInt(placeProb.minPrice),
+                    priceMax: parseInt(placeProb.maxPrice),
+                    atmosphere: parseInt(placeProb.atmosphere)
+                }
+
+                const place: Place = {
+                    name: placeProb.name,
+                    id: placeProb.id,
+                    reviewsCntr : parseInt(placeProb.reviewsCntr),
+                    ratings : rating
+                };
+
+               places.push(place);
+
+            })
+            
+            return places[0];
+            
+        } catch (err) {
+            console.error(`Error fetching place: ${err}`);
             throw err;
         }
     }

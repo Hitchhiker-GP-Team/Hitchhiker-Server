@@ -1,13 +1,16 @@
-import { IRating, fiveStarRating, PriceRange } from "./IRating";
+import { IRating } from "./IRating";
 
 export class HotelsRating implements IRating {
-  affordability!: fiveStarRating;
-  priceRange!: PriceRange;
-  totalRating!: fiveStarRating;
+  affordability!: number;
+  overAll!: number;
+  accesability!: number;
+  priceMin!: number;
+  priceMax!: number;
+  atmosphere!: number;
   //----------------------------------
-  Comfort!: fiveStarRating;
-  hygiene!: fiveStarRating;
-  roomService!: fiveStarRating;
-  aquaServices!: fiveStarRating;
-  DinningQuality!: fiveStarRating;
+  Comfort!: number;
+  hygiene!: number;
+  roomService!: number;
+  aquaServices!: number;
+  DinningQuality!: number;
 }

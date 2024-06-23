@@ -8,7 +8,7 @@ export class Review {
   author?: User;
   place?: Place;
   text?: string;
-  rating?: number;
+  rating?: IRating;
   date?: number;
   likesCntr?: number;
   dislikesCntr?: number;

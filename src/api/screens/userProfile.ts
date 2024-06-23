@@ -13,6 +13,7 @@ import { Notification } from "../../entities/Notification.js";
 import { PubSub } from "graphql-subscriptions";
 import { likePostNotificationService } from "../../entities/Notifications/LikePostNotificationService.js";
 import { likeCommentNotificationService } from "../../entities/Notifications/LikeCommentNotificationService.js";
+import { IRating } from "../../entities/Rating/IRating.js";
 import bcrypt from 'bcrypt';
 
 const pubsub = new PubSub();
@@ -164,7 +165,7 @@ export async function getFeedFun(_: any, { username }: { username: string }) {
   try {
     // Fetch feed posts using the database module function
     const feedPosts = await DbHelper.PostNode.FetchFollowingsPosts(username);
-    console.log(feedPosts);
+    //console.log(feedPosts);
     return feedPosts;
   } catch (error) {
     console.error("Error fetching user feed:", error);
@@ -249,11 +250,11 @@ export async function getArchivedPosts(_: any, { username }: { username: string 
 //     throw error;
 //   }
 // }
-export async function createPost(_: any, { authorUsername, caption, date, likesCntr, mediaUrls, hashtags, commentsCntr, placeId, categoryName }: { authorUsername: string; caption: string; date: number; likesCntr: number; mediaUrls: string[]; hashtags: string[]; commentsCntr: number; tags: string[]; placeId: string; categoryName: string; }): Promise<Post> {
+export async function createPost(_: any, { authorUsername, caption, date, likesCntr, mediaUrls, hashtags, commentsCntr, placeId,placeName}: {placeName : string ;authorUsername: string; caption: string; date: number; likesCntr: number; mediaUrls: string[]; hashtags: string[]; commentsCntr: number; tags: string[]; placeId: string;}): Promise<Post> {
   try {
 
     
-    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+    //const Keywords = DetectionModel.predictClasses(mediaUrls[0])
 
     const post: Post = {
       id : uuidv4(),
@@ -261,12 +262,11 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       caption,
       date,
       likesCntr,
-      mediaURL: mediaUrls,
+      mediaURL: ['https://www.southernliving.com/thmb/3x3cJaiOvQ8-3YxtMQX0vvh1hQw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/2652401_QFSSL_SupremePizza_00072-d910a935ba7d448e8c7545a963ed7101.jpg'],
       hashtags,
       commentsCntr,
-      place: { id: placeId },
-      category: { name: categoryName },
-      keywords: Keywords
+      place: { id: placeId, name:placeName },
+      keywords: [] //Keywords
     };
 
     await DbHelper.PostNode.CreatePost(post);
@@ -409,6 +409,19 @@ export async function deleteAllArchivedPosts(_: any, { username }: { username: s
 //     throw error;
 //   }
 // }
+
+export async function getPlaceData(_: any, {username, placeId}: {username: string; placeId : string})
+{
+  try{
+    const place = await DbHelper.PlaceNode.getPlaceData(username,placeId);
+    return place;
+  }
+  catch(error)
+  {
+    console.error("Error fetching place:", error);
+    throw error;
+  }
+}
 
 export async function addPlace(_: any, { name, mapsId, type, description }: { name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
   try {
@@ -784,8 +797,8 @@ export async function getReviewsFun(_: any, { username }: { username: string }) 
     // Fetch user reviews using the database module function
     const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username);
     console.log(userReviews);
-    const arr =[userReviews];
-    return arr;
+    
+    return userReviews;
   } catch (error) {
     console.error("Error fetching user reviews:", error);
     throw error;
@@ -822,10 +835,18 @@ export async function fetchPlaceReviews(_: any, { placeId }: { placeId: string }
 //     throw error;
 //   }
 // }
-export async function addReview(_: any, { authorUsername, placeId, text, rating, date }: { authorUsername: string; placeId: string; text: string; rating: number; date: number; }): Promise<Review[]> {
+export async function addReview(_: any, { authorUsername, placeId, text, overAll, affordability, accesability, priceMin, priceMax, atmosphere, date }: { authorUsername: string; placeId: string; text: string; overAll: number; affordability: number; accesability: number; priceMin: number; priceMax: number; atmosphere: number; date: number; }): Promise<Review[]> {
   try {
+    const rating: IRating = {
+      overAll, 
+      affordability,
+      accesability,
+      priceMin,
+      priceMax,
+      atmosphere
+    }
     const review: Review = {
-      id: '', // This will be generated dynamically
+      id: uuidv4(), // This will be generated dynamically
       text,
       rating,
       date,

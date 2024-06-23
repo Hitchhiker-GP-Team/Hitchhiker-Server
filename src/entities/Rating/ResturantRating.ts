@@ -1,14 +1,16 @@
-import { IRating, PriceRange, fiveStarRating } from "./IRating.js";
+import { IRating} from "./IRating.js";
 
 export class ResturantRating implements IRating {
-  totalRating!: fiveStarRating;
-  affordability!: fiveStarRating;
-  priceRange!: PriceRange;
+  affordability!: number;
+  overAll!: number; 
+  atmosphere!: number;
+  accesability!: number;
+  priceMin!: number;
+  priceMax!: number;
   //----------------------------------
-  foodQuality!: fiveStarRating;
-  valueForPrice!: fiveStarRating;
-  hygiene!: fiveStarRating;
-  atmosphere!: fiveStarRating;
-  menuVariety!: fiveStarRating;
-  consistency!: fiveStarRating;
+  foodQuality!: number;
+  valueForPrice!: number;
+  hygiene!: number;
+  menuVariety!: number;
+  consistency!: number;
 }

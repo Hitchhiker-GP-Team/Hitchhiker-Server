@@ -634,14 +634,14 @@ export class PostNode  {
    public async CreatePost(post : Post): Promise<Post> {
      try {
 
+       
+
        const d = Math.floor(Number(post.date))
 
         const driver = dbDriver;
         const result = await driver.executeQuery(
             `
-            MATCH (author:User {username: $username}),
-                  (place:Place {id: $placeId}),
-                  (category:Category {name: $CategoryName})
+            MATCH (author:User {username: $username})
 
             CREATE (post:Post {
                 id: $postId,
@@ -651,11 +651,18 @@ export class PostNode  {
                 mediaUrls: $mediaUrls,
                 hashtags: $hashtags,
                 commentsCntr: $commentsCntr
-            })<-[:ADD_POST]-(author),  
-                  (post)-[:HAPPEND_AT]->(place),
-                  (post)-[:POST_BELONGS_TO_CATEGORY]->(category)
+            })<-[:ADD_POST]-(author)
 
-            
+            MERGE (place:Place {id: $placeId})
+            ON CREATE SET place.name = $placeName,
+                          place.overAll = 0,
+                          place.atmosphere = 0,
+                          place.affordability = 0,
+                          place.accesability = 0,
+                          place.minPrice = 0,
+                          place.maxPrice = 0,
+                          place.reviewsCntr = 0
+            MERGE (post)-[rel:HAPPEND_AT]->(place)
 
             WITH  author ,post, $predictions AS predictedCategories
             UNWIND predictedCategories AS prediction
@@ -663,9 +670,6 @@ export class PostNode  {
             MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(category)
             SET rel.confidence = prediction.perc
             SET author.postCntr = author.postCntr + 1
-
-            
-            
 
             RETURN post
             `
@@ -681,9 +685,10 @@ export class PostNode  {
               mediaUrls   :post.mediaURL,
               hashtags    :post.hashtags,
               commentsCntr:post.commentsCntr,
-              tags         :post.tags,
+              tags        :post.tags,
               //place
               placeId     :post.place?.id,
+              placeName   :post.place?.name,
               //category
               CategoryName:post.category?.name,
               predictions:post.keywords
