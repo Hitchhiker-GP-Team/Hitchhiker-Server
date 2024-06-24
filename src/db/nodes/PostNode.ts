@@ -642,6 +642,7 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (author:User {username: $username})
+            OPTIONAL MATCH (category:Category{name:$categoryName})
 
             CREATE (post:Post {
                 id: $postId,
@@ -651,7 +652,9 @@ export class PostNode  {
                 mediaUrls: $mediaUrls,
                 hashtags: $hashtags,
                 commentsCntr: $commentsCntr
-            })<-[:ADD_POST]-(author)
+            })<-[:ADD_POST]-(author),
+            (post)-[belongs:POST_BELONGS_TO_CATEGORY]->(category)
+
 
             MERGE (place:Place {id: $placeId})
             ON CREATE SET place.name = $placeName,
@@ -666,10 +669,19 @@ export class PostNode  {
 
             WITH  author ,post, $predictions AS predictedCategories
             UNWIND predictedCategories AS prediction
-            MERGE (category:Category {name: prediction.class})
-            MERGE (post)-[rel:POST_BELONGS_TO_CATEGORY]->(category)
-            SET rel.confidence = prediction.perc
+            MERGE (keyword:Keyword {name: prediction.name})
+            MERGE (post)-[rel:POST_HAS_KEYWORD]->(keyword)
+            SET rel.confidence = prediction.confidence
             SET author.postCntr = author.postCntr + 1
+
+            //add score to author
+            SET author.score = COALESCE(author.score, 0) + 100
+
+            //add score bettwen author and category
+            MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
+            ON CREATE SET exp.score = 100
+            ON MATCH SET exp.score = exp.score + 100
+            
 
             RETURN post
             `
@@ -690,7 +702,7 @@ export class PostNode  {
               placeId     :post.place?.id,
               placeName   :post.place?.name,
               //category
-              CategoryName:post.category?.name,
+              categoryName:post.category?.name,
               predictions:post.keywords
             }
         );
@@ -699,7 +711,7 @@ export class PostNode  {
 
         return post;
     } catch (err) {
-      console.error(`Error fetching user posts: ${err}`);
+      console.error(`Error CreatePost: ${err}`);
       throw err;
     }
   }
@@ -712,14 +724,24 @@ export class PostNode  {
     const driver =dbDriver
     const result = await driver.executeQuery(
         `
-        MATCH (user:User {username : $username}),(post : Post{id:$id})
+        MATCH (user:User {username: $username}),
+              (post:Post {id: $id})-[:POST_BELONGS_TO_CATEGORY]->(category),
+              (post)<-[:ADD_POST]-(author:User)
+
         CREATE (user)-[:LIKES_POST]->(post)
         SET post.likesCntr = post.likesCntr + 1
+
+        //add score to author
+        SET author.score = COALESCE(author.score, 0) + 10
+        //add score bettwen author and category
+        MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
+        ON CREATE SET exp.score = 10
+        ON MATCH SET exp.score = exp.score + 10
         `    
         ,{username : us , id : postId}
     )
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
+        console.error(`Error LikePost: ${err}`);
         throw err;
     }
   }
@@ -778,9 +800,28 @@ export class PostNode  {
     const driver =dbDriver
     const result = await driver.executeQuery(
         `
-        MATCH (user:User {username : $username})-[like:LIKES_POST]->(post : Post{id:$id})
-        DELETE like 
-        SET post.likesCntr = post.likesCntr -1 
+        MATCH (user:User {username : $username})-[likeRel:LIKES_POST]->(post : Post{id:$id}),
+              (post)<-[:ADD_POST]-(author:User),
+              (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category),
+              (author)-[exp:HAS_EXPERIENCE_AT]->(category)
+      
+        // Delete the LIKES_POST relationship
+        DELETE likeRel
+
+        // Decrement the likes counter on the post
+        SET post.likesCntr = post.likesCntr - 1
+
+        // Decrement the author's score
+        SET author.score = COALESCE(author.score, 0) - 10
+
+        // Decrement the score between the author and the category
+        SET exp.score = exp.score - 10
+
+        // Optionally remove the HAS_EXPERIENCE_AT relationship if the score reaches zero or below
+        WITH exp, author, category
+        WHERE exp.score <= 0
+        DELETE exp
+
         `    
         ,{username : us , id : postId}
     )

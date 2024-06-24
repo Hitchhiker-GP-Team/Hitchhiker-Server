@@ -187,6 +187,8 @@ export class ReviewNode {
 
             SET place.reviewsCntr = place.reviewsCntr + 1
 
+            //add score to author
+            SET author.score = author.score + 100
       
             RETURN review
             `,
@@ -231,6 +233,91 @@ export class ReviewNode {
             throw err;
         }
     }
+
+    public async upvoteReview(reviewId: string, username: string): Promise<void> {
+        this.undoDownvoteReview(reviewId,username);
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (review:Review {id: $reviewId}),
+                      (user:User {username: $username}),
+                      (review)<-[:ADD_REVIEW]-(author:User)
+                MERGE (user)-[upvote:UPVOTE_REVIEW]->(review)
+                ON CREATE SET review.likesCntr = COALESCE(review.likesCntr, 0) + 1
+                SET author.totalUpvotes = COALESCE(author.totalUpvotes, 0) + 1
+                `,
+                { reviewId, username }
+            );
+        } catch (err) {
+            console.error(`Error upvoting review: ${err}`);
+            throw err;
+        }
+    }
+    public async undoUpvoteReview(reviewId: string, username: string): Promise<void> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (user:User {username: $username})-[upvote:UPVOTE_REVIEW]->(review:Review {id: $reviewId}),
+                    (review)<-[:ADD_REVIEW]-(author:User)
+                DELETE upvote
+
+                WITH review, author, CASE WHEN upvote IS NOT NULL THEN 1 ELSE 0 END AS hasUpvote
+                    SET review.likesCntr = review.likesCntr - hasUpvote,
+                    author.totalUpvotes = author.totalUpvotes - hasUpvote
+                `,
+                { reviewId, username }
+            );
+        } catch (err) {
+            console.error(`Error undoing upvote for review: ${err}`);
+            throw err;
+        }
+    }
+    
+
+    public async downvoteReview(reviewId: string, username: string): Promise<void> {
+        this.undoUpvoteReview(reviewId,username);
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (review:Review {id: $reviewId}),
+                      (user:User {username: $username}),
+                      (review)<-[:ADD_REVIEW]-(author:User)
+                MERGE (user)-[downvote:DOWNVOTE_REVIEW]->(review)
+                ON CREATE SET review.dislikesCntr = COALESCE(review.dislikesCntr, 0) + 1
+                SET author.totalDownvotes = COALESCE(author.totalDownvotes, 0) + 1
+                `,
+                { reviewId, username }
+            );
+        } catch (err) {
+            console.error(`Error upvoting review: ${err}`);
+            throw err;
+        }
+    }
+    public async undoDownvoteReview(reviewId: string, username: string): Promise<void> {
+        try {
+            const driver = dbDriver;
+            const result = await driver.executeQuery(
+                `
+                MATCH (user:User {username: $username})-[downvote:DOWNVOTE_REVIEW]->(review:Review {id: $reviewId}),
+                    (review)<-[:ADD_REVIEW]-(author:User)
+                DELETE downvote
+
+                WITH review, author, CASE WHEN downvote IS NOT NULL THEN 1 ELSE 0 END AS hasDownvote
+                    SET review.dislikesCntr = review.dislikesCntr - hasDownvote,
+                    author.totalDownvotes = author.totalDownvotes - hasDownvote
+                `,
+                { reviewId, username }
+            );
+        } catch (err) {
+            console.error(`Error undoing upvote for review: ${err}`);
+            throw err;
+        }
+    }
+    
+    
     
 
 }

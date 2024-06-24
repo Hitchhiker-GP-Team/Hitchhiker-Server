@@ -3,6 +3,7 @@ import { Place } from "./Place.js";
 import { Comment } from "./Comment.js";
 import { Category } from "./Category.js";
 import { Journey } from "./Journey.js";
+import { Keyword } from "./Keyword.js";
 
 export class Post {
   id?: string;
@@ -13,7 +14,7 @@ export class Post {
   hashtags?: string[];
   tags?: string[];
   place?: Place;
-  keywords?: string[];
+  keywords?: Keyword[];
   likesCntr?: number;
   likedBy?: User[];
   commentsCntr?: number;
