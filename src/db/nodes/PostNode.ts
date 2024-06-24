@@ -725,8 +725,10 @@ export class PostNode  {
     const result = await driver.executeQuery(
         `
         MATCH (user:User {username: $username}),
-              (post:Post {id: $id})-[:POST_BELONGS_TO_CATEGORY]->(category),
+              (post:Post {id: $id}),
               (post)<-[:ADD_POST]-(author:User)
+
+        OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
 
         CREATE (user)-[:LIKES_POST]->(post)
         SET post.likesCntr = post.likesCntr + 1
