@@ -269,7 +269,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       caption,
       date,
       likesCntr,
-      mediaURL: ['https://www.southernliving.com/thmb/3x3cJaiOvQ8-3YxtMQX0vvh1hQw=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/2652401_QFSSL_SupremePizza_00072-d910a935ba7d448e8c7545a963ed7101.jpg'],
+      mediaURL: mediaUrls,
       hashtags,
       commentsCntr,
       place: { id: placeId, name:placeName },

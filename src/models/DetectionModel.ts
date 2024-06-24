@@ -10,10 +10,13 @@ public static predictClasses(imagePath: string): Keyword[] {
     // Write image path to input JSON file
     const inputData = { image_path: imagePath };
     fs.writeFileSync('input.json', JSON.stringify(inputData));
-
-    // Execute Python script
-    execSync('python src/models/yolo.py');
-
+    try {
+        // Execute Python script
+        execSync('python src/models/yolo.py');
+    } catch (error) {
+        console.error('Error while executing Python script');
+        return [];
+    }
     // Read predicted classes from output JSON file
     const outputData = JSON.parse(fs.readFileSync('output.json', 'utf-8'));
     const predictedClasses: Keyword[] = outputData.predicted_classes.map((item: { class: string; perc: number }) => {
