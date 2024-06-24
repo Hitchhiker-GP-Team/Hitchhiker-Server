@@ -297,18 +297,10 @@ export const typeDefs = `#graphql
     Name: String,
     Bio: String
   ): User
-  # createPost(
-  #   authorUsername: String!,
-  #   caption: String!,
-  #   date: Int!,
-  #   likesCntr: Int!,
-  #   mediaUrls: [String!]!,  
-  #   hashtags: [String!]!,    
-  #   commentsCntr: Int!,
-  #   tags: [String!]!,
-  #   placeId: String!,
-  #   categoryName: String!
-  # ): Post
+  deleteUser(username: String!): User
+  login(email: String!, password: String!): AuthPayload
+  followUser(username: String!, userToFollow: String!): User
+  unfollowUser(username: String!, userToUnfollow: String!): User
   createPost(
   authorUsername: String!,
   caption: String!,
