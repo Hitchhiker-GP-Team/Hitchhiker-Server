@@ -13,7 +13,7 @@ export class User {
   birthDate?: Number;
   homeLocation?: [Number];
   sex?:string;
-  titles?: titles;
+  titles?: titles[];
   Bio?: string;
   followingCntr?: Number;
   followings?: User[];
@@ -27,8 +27,10 @@ export class User {
   totalUpvotes?: Number;
   totalDownvotes?: Number;
 }
-interface titles {
-  [key: string]: number;
+
+export class titles {
+  title? : string;
+  score? : Number;
 }
 
 export type sex = "m" | "f";

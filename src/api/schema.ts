@@ -96,6 +96,7 @@ export const typeDefs = `#graphql
     birthDate: Int 
     homeLocation: Coordinates
     sex: String
+    titles: [Title]
     Bio: String
     followingCntr: Int
     followings: [User]
@@ -105,6 +106,14 @@ export const typeDefs = `#graphql
     postCntr: Int
     reviews: [Review]
     reviewsCntr: Int
+    score: Int
+    totalUpvotes: Int
+    totalDownvotes: Int
+  }
+
+  type Title{
+    title: String
+    score: Int
   }
 
   type Notification{
@@ -132,7 +141,7 @@ export const typeDefs = `#graphql
   type Query {
     # Notification
     notifications(username: String): [Notification]
-    login(email: String!, password: String!): AuthPayload
+    login(username: String!, password: String!): AuthPayload
 
 
     # USER

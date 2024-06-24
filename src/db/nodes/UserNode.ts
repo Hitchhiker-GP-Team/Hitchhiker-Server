@@ -1,5 +1,5 @@
 import { dbDriver } from "../dbConnection.js";
-import { User } from "../../entities/User.js";
+import { User, titles } from "../../entities/User.js";
 // import { PostNode } from "./PostNode.js";
 // import { ReviewNode } from "./ReviewNode.js";
 
@@ -53,15 +53,15 @@ export class UserNode {
       throw err;
     }
   }
-  public async FindUserByEmail(email: string): Promise<User | null> {
+  public async FindUserByEmail(username: string): Promise<User | null> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
         `
-        MATCH (user:User {email: $email})
+        MATCH (user:User {username: $username})
         RETURN user
         `,
-        { email }
+        { username }
       );
 
       const user = result.records[0]?.get('user').properties;
@@ -138,7 +138,9 @@ export class UserNode {
       const result = await driver.executeQuery(
         `
         MATCH (user:User {username: $username})
-        RETURN user
+        OPTIONAL MATCH (user)-[exp:HAS_EXPERIENCE_AT]->(category:Category)
+        RETURN user, collect({category: category.name, score: exp.score}) AS scores
+
         `,
         { username }
       );
@@ -147,15 +149,6 @@ export class UserNode {
 
       result.records.forEach((record) => {
         const userData = record.get("user").properties;
-
-        // Fetch user profile posts
-        // const postNode = new PostNode();
-        //const posts = await postNode.FetchUserProfilePosts(username);
-
-        // Fetch user reviews
-        //const reviewNode = new ReviewNode();
-        //const reviews = await reviewNode.FetchUserReviews(username);
-
         userProfile = {
           username: userData.username,
           profilePic: userData.profilePic,
@@ -163,11 +156,10 @@ export class UserNode {
           Bio: userData.Bio,
           followingCntr: parseFloat(userData.followingCntr),
           followersCntr: parseFloat(userData.followersCntr),
-          //posts: posts,
           postCntr: parseFloat(userData.postCntr),
-          // reviews: reviews,
           reviewsCntr: parseFloat(userData.reviewsCntr),
           score: parseFloat(userData.score),
+          titles: this.processScores(record.get("scores")),
           totalUpvotes: parseFloat(userData.totalUpvotes),
           totalDownvotes: parseFloat(userData.totalDownvotes),
         };
@@ -178,6 +170,33 @@ export class UserNode {
       throw err;
     }
   }
+  public modifyCategory(category: string, score:number): string {
+    // mapping the category to a title
+    
+        if(score > 0 && score < 100)
+          return category + " Beginner "  
+        else if(score > 100 && score < 200)
+          return category + " Lover";
+        else if(score >= 200 && score < 300)
+          return category + " Enthusiast";
+        else if(score >= 300 && score < 400)
+          return category + " Critic"
+        else
+          return category + " Hater";
+
+  }
+  
+  public processScores(scores: any[]): titles[] {
+    return scores.map(score => ({
+      title: this.modifyCategory(score.category, score.score),
+      score: parseFloat(score.score),
+    }));
+  }
+
+
+
+ 
+  
   public async FollowUser(
     username: string,
     userToFollow: string

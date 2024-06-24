@@ -9,16 +9,22 @@ import { DbHelper } from "../db/DbHelper.js";
 
 export const resolvers = {
   Query: {
-    login: async (_: any, { email, password }: { email: string; password: string }) => {
+    login: async (_: any, { username, password }: { username: string; password: string }) => {
       try {
-        console.log(`Logging in user with email: ${email}`);
-        const user = await DbHelper.UserNode.FindUserByEmail(email);
+        console.log(`Logging in user with email: ${username}`);
+        const user = await DbHelper.UserNode.FindUserByEmail(username);
         if (!user) {
           console.log('User not found');
           throw new Error('User not found');
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password || '');
+        var isPasswordValid = false;
+
+        //const isPasswordValid = await bcrypt.compare(password, user.password || '');
+        if(password !== user.password){
+           isPasswordValid = true;
+        }
+       
         if (!isPasswordValid) {
           console.log('Invalid password');
           throw new Error('Invalid password');
@@ -27,7 +33,7 @@ export const resolvers = {
         const token = jwt.sign(
           { userId: user.id, email: user.email },
           process.env.SECRET_KEY || 'default_secret',
-          { expiresIn: '1h' }
+          { expiresIn: '15d' }
         );
 
         console.log('Login successful, returning token');
