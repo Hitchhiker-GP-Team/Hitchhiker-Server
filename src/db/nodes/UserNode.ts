@@ -4,52 +4,6 @@ import { User } from "../../entities/User.js";
 // import { ReviewNode } from "./ReviewNode.js";
 
 export class UserNode {
-  // public async AddUser(user: User): Promise<User> {
-  //   try {
-  //     // Assuming 'user.id' is already set before calling this method
-  //     const driver = dbDriver;
-  //     const result = await driver.executeQuery(
-  //       `
-  //       CREATE (user:User {
-  //         username: $username,
-  //         profilePic: $profilePic,
-  //         email: $email,
-  //         password: $password,
-  //         Name: $name,
-  //         birthDate: $birthDate,
-  //         homeLocation: $homeLocation,
-  //         sex: $sex,
-  //         Bio: $bio,
-  //         followingCntr: $followingCntr,
-  //         followersCntr: $followersCntr,
-  //         postCntr: $postCntr,
-  //         reviewsCntr: $reviewsCntr
-  //       })
-  //       RETURN user
-  //       `,
-  //       {
-  //         username: user.username,
-  //         profilePic: user.profilePic,
-  //         email: user.email,
-  //         password: user.password,
-  //         name: user.Name,
-  //         birthDate: user.birthDate,
-  //         homeLocation: user.homeLocation,
-  //         sex: user.sex,
-  //         bio: user.Bio,
-  //         followingCntr: user.followingCntr,
-  //         followersCntr: user.followersCntr,
-  //         postCntr: user.postCntr,
-  //         reviewsCntr: user.reviewsCntr,
-  //       }
-  //     );
-
-  //     return user;
-  //   } catch (err) {
-  //     console.error(`Error adding user: ${err}`);
-  //     throw err;
-  //   }
-  // }
   public async AddUser(user: User): Promise<User> {
     try {
       const driver = dbDriver;
@@ -236,6 +190,8 @@ export class UserNode {
               (following:User {username: $userToFollow})
       
         CREATE (follower)-[:FOLLOWS]->(following)
+        SET follower.followingCntr = follower.followingCntr + 1
+        SET following.followersCntr = following.followersCntr +1 
         `,
         { username, userToFollow }
       );
@@ -253,6 +209,8 @@ export class UserNode {
       const result = await driver.executeQuery(
         `
       MATCH (follower:User {username: $username})-[follows:FOLLOWS]->(following:User {username: $userToUnfollow})
+      SET follower.followingCntr = follower.followingCntr - 1
+      SET following.followersCntr = following.followersCntr - 1 
       DELETE follows
       `,
         { username, userToUnfollow }
