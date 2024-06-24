@@ -882,6 +882,50 @@ export async function deleteReview(_: any, { reviewId }: { reviewId: string }): 
     throw error;
   }
 }
+
+export async function upvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+  try {
+    await DbHelper.ReviewNode.upvoteReview(reviewId, username);
+    console.log(`Review upvoted by ${username}: ${reviewId}`);
+  } catch (error) {
+    console.error(`Error upvoting review ${reviewId} by ${username}:`, error);
+    console.error(`Error upvote for review ${reviewId} by ${username}:`, error);
+    throw error;
+  }
+}
+
+export async function undoUpvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+  try {
+    await DbHelper.ReviewNode.undoUpvoteReview(reviewId, username);
+    console.log(`Undoing upvote for review ${reviewId} by ${username}`);
+  } catch (error) {
+    console.error(`Error undoing upvote for review ${reviewId} by ${username}:`, error);
+    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
+    throw error;
+  }
+}
+
+export async function downvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+  try {
+    await DbHelper.ReviewNode.downvoteReview(reviewId, username);
+    console.log(`Review downvoted by ${username}: ${reviewId}`);
+  } catch (error) {
+    console.error(`Error downvoting review ${reviewId} by ${username}:`, error);
+    console.error(`Error downvote for review ${reviewId} by ${username}:`, error);
+    throw error;
+  }
+}
+
+export async function undoDownvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+  try {
+    await DbHelper.ReviewNode.undoDownvoteReview(reviewId, username);
+    console.log(`Undoing downvote for review ${reviewId} by ${username}`);
+  } catch (error) {
+    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
+    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
+    throw error;
+  }
+}
 //END OF REVIEW NODE FUNCTIONALITIES // 
 
 // CATEGORY NODE FUNCTIONALITES TILL LINE 434//

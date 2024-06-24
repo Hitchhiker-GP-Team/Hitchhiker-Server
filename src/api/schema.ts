@@ -228,6 +228,10 @@ export const typeDefs = `#graphql
     fetchPlaceReviews(placeId: String):[Review]
     addReview(authorUsername: String, placeId: String, text: String, overAll: Float, affordability: Float, accesability: Float, priceMin: Float, priceMax: Float, atmosphere: Float, date: Float):[Review]
     deleteReview(reviewId: String):[Review]
+    upvoteReview(reviewId: String, username: String ):[Review]
+    undoUpvoteReview(reviewId: String, username: String ):[Review]
+    downvoteReview(reviewId: String, username: String ):[Review]
+    undoDownvoteReview(reviewId: String, username: String ):[Review]
     #END REVIEW
 
     # CATEGORY

@@ -244,8 +244,8 @@ export class ReviewNode {
                       (user:User {username: $username}),
                       (review)<-[:ADD_REVIEW]-(author:User)
                 MERGE (user)-[upvote:UPVOTE_REVIEW]->(review)
-                ON CREATE SET review.likesCntr = COALESCE(review.likesCntr, 0) + 1
-                SET author.totalUpvotes = COALESCE(author.totalUpvotes, 0) + 1
+                ON CREATE SET review.likesCntr = COALESCE(review.likesCntr, 0) + 1,
+                              author.totalUpvotes = COALESCE(author.totalUpvotes, 0) + 1
                 `,
                 { reviewId, username }
             );
@@ -286,8 +286,8 @@ export class ReviewNode {
                       (user:User {username: $username}),
                       (review)<-[:ADD_REVIEW]-(author:User)
                 MERGE (user)-[downvote:DOWNVOTE_REVIEW]->(review)
-                ON CREATE SET review.dislikesCntr = COALESCE(review.dislikesCntr, 0) + 1
-                SET author.totalDownvotes = COALESCE(author.totalDownvotes, 0) + 1
+                ON CREATE SET review.dislikesCntr = COALESCE(review.dislikesCntr, 0) + 1,
+                              author.totalDownvotes = COALESCE(author.totalDownvotes, 0) + 1
                 `,
                 { reviewId, username }
             );
