@@ -730,15 +730,18 @@ export class PostNode  {
 
         OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
 
-        CREATE (user)-[:LIKES_POST]->(post)
-        SET post.likesCntr = post.likesCntr + 1
-
-        //add score to author
-        SET author.score = COALESCE(author.score, 0) + 10
-        //add score bettwen author and category
-        MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
-        ON CREATE SET exp.score = 10
-        ON MATCH SET exp.score = exp.score + 10
+        MERGE (user)-[:LIKES_POST]->(post)
+        ON CREATE SET 
+            post.likesCntr = post.likesCntr + 1,
+            author.score = COALESCE(author.score, 0) + 10,
+            user.madeLike = [true]
+        FOREACH(ifthen in user.madeLike |
+            //add score bettwen author and category
+            MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
+            ON CREATE SET exp.score = 10
+            ON MATCH SET exp.score = exp.score + 10
+            REMOVE user.madeLike
+        )
         `    
         ,{username : us , id : postId}
     )
