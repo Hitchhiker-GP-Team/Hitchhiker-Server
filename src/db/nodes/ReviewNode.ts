@@ -214,7 +214,7 @@ export class ReviewNode {
           console.error(`Error adding review: ${err}`);
           throw err;
         }
-      }
+    }
       
 
     public async DeleteReview(reviewId: string): Promise<void> {

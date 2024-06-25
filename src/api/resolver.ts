@@ -6,38 +6,40 @@ const pubsub = new PubSub();
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { DbHelper } from "../db/DbHelper.js";
+import { User } from "../entities/User.js";
 
 export const resolvers = {
   Query: {
     login: async (_: any, { username, password }: { username: string; password: string }) => {
       try {
-        console.log(`Logging in user with email: ${username}`);
-        const user = await DbHelper.UserNode.FindUserByEmail(username);
+
+        console.log(`Logging in user with username : ${username}`);
+        
+        const user = await DbHelper.UserNode.FindUserByUsername(username);
+        console.log(user);
+        
         if (!user) {
           console.log('User not found');
           throw new Error('User not found');
         }
 
-        var isPasswordValid = false;
 
         //const isPasswordValid = await bcrypt.compare(password, user.password || '');
-        if(password !== user.password){
-           isPasswordValid = true;
+        if(password === user.password){
+          console.log('succesfull login')
+          return user;
         }
-       
-        if (!isPasswordValid) {
+        else{
           console.log('Invalid password');
           throw new Error('Invalid password');
         }
 
-        const token = jwt.sign(
-          { userId: user.id, email: user.email },
-          process.env.SECRET_KEY || 'default_secret',
-          { expiresIn: '15d' }
-        );
+        // const token = jwt.sign(
+        //   { userId: user.id, email: user.email },
+        //   process.env.SECRET_KEY || 'default_secret',
+        //   { expiresIn: '15d' }
+        // );
 
-        console.log('Login successful, returning token');
-        return { token };
       } catch (error) {
         console.error('Error logging in:', error);
         throw error;
@@ -151,7 +153,7 @@ export const resolvers = {
     login: async (_: any, { email, password }: { email: string; password: string }) => {
       try {
         console.log(`Logging in user with email: ${email}`);
-        const user = await DbHelper.UserNode.FindUserByEmail(email);
+        const user = await DbHelper.UserNode.FindUserByUsername(email);
         if (!user) {
           console.log('User not found');
           throw new Error('User not found');

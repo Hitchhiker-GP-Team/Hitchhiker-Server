@@ -141,11 +141,11 @@ export const typeDefs = `#graphql
   type Query {
     # Notification
     notifications(username: String): [Notification]
-    login(username: String!, password: String!): AuthPayload
+    login(username: String!, password: String!): User
 
 
     # USER
-    getUserProfile(username: String): [User]
+    getUserProfile(username: String): User
     addUser(
       username: String,
       profilePic: String,
@@ -311,7 +311,7 @@ export const typeDefs = `#graphql
     Bio: String
   ): User
   deleteUser(username: String!): User
-  login(email: String!, password: String!): AuthPayload
+  login(email: String!, password: String!): User
   followUser(username: String!, userToFollow: String!): User
   unfollowUser(username: String!, userToUnfollow: String!): User
   createPost(

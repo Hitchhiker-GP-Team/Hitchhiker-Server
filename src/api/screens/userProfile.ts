@@ -110,9 +110,8 @@ export async function getUserProfileFun(_: any, { username }: { username: string
   try {
     // Fetch user posts using the database module function
     const userInfo = await DbHelper.UserNode.FetchUserProfile(username);
-    const arr = [userInfo]; // return array is the error
-    console.log(arr); // return array is the error
-    return arr;
+    console.log(userInfo);
+    return userInfo;
   } catch (error) {
     console.error("Error fetching user profile:", error);
     throw error;
@@ -254,13 +253,13 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   try {
 
     
-    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+    // const Keywords = DetectionModel.predictClasses(mediaUrls[0])
 
     var category = "Origin";
-    if(Keywords.length != 0)
-    {
-      category = DetectionModel.mapToCaetgory(Keywords[0].name as string); 
-    }
+    // if(Keywords.length != 0)
+    // {
+    //   category = DetectionModel.mapToCaetgory(Keywords[0].name as string); 
+    // }
     
 
     const post: Post = {
@@ -273,7 +272,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       hashtags,
       commentsCntr,
       place: { id: placeId, name:placeName },
-      keywords: Keywords,
+      keywords: [],
       category : {name : category}
     };
 

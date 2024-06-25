@@ -53,7 +53,7 @@ export class UserNode {
       throw err;
     }
   }
-  public async FindUserByEmail(username: string): Promise<User | null> {
+  public async FindUserByUsername(username: string): Promise<User | null> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -64,8 +64,11 @@ export class UserNode {
         { username }
       );
 
+
+      console.log(result.records.length)
+
+      if( result.records.length > 0 ){
       const user = result.records[0]?.get('user').properties;
-      if (user) {
         return {
           id: user.id,
           email: user.email,
