@@ -145,7 +145,7 @@ export const typeDefs = `#graphql
 
 
     # USER
-    getUserProfile(username: String): User
+    getUserProfile(username: String): [User]
     addUser(
       username: String,
       profilePic: String,
