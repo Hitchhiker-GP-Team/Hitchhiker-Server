@@ -250,7 +250,7 @@ export const typeDefs = `#graphql
     fetchCategory(name: String): [Category]
     fetchAllCategories: [Category]
     fetchCategoryTree(name: String): [Category]
-
+    SearchCategory(category: String): [Category]
     # COMMENT
     addComment(
       text: String,

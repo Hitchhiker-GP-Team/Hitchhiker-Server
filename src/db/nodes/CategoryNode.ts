@@ -289,4 +289,27 @@ export class CategoryNode {
       throw err;
     }
   }
+
+  public async SearchCategory(category: string): Promise<Category[]> {
+    try {
+        const driver = dbDriver;
+        const session = driver.session();
+
+        const result = await session.run(
+            `
+            MATCH (category:Category)
+            WHERE toLower(category.name) CONTAINS toLower($category)
+            RETURN category
+            `,
+            { category: category }
+        );
+
+        session.close();
+
+        return result.records.map(record => record.get("category").properties as Category);
+    } catch (err) {
+        console.error(`Error searching categories: ${err}`);
+        throw err;
+    }
+}
 }

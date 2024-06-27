@@ -1,7 +1,6 @@
 import { ApolloServer } from '@apollo/server';
 import { createServer } from 'http';
 import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import bodyParser from 'body-parser';
 import express from 'express';

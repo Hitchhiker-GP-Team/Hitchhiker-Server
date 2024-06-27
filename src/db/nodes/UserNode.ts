@@ -142,7 +142,7 @@ export class UserNode {
         `
         MATCH (user:User {username: $username})
         OPTIONAL MATCH (user)-[exp:HAS_EXPERIENCE_AT]->(category:Category)
-        RETURN user, collect({category: category.name, score: exp.score}) AS scores
+        RETURN user, collect({title: category.name, score: exp.score}) AS ranks
 
         `,
         { username }
@@ -162,7 +162,7 @@ export class UserNode {
           postCntr: parseFloat(userData.postCntr),
           reviewsCntr: parseFloat(userData.reviewsCntr),
           score: parseFloat(userData.score),
-          titles: this.processScores(record.get("scores")),
+          titles: this.processScores(record.get("ranks"),parseFloat(userData.score)),
           totalUpvotes: parseFloat(userData.totalUpvotes),
           totalDownvotes: parseFloat(userData.totalDownvotes),
         };
@@ -173,27 +173,34 @@ export class UserNode {
       throw err;
     }
   }
-  public modifyCategory(category: string, score:number): string {
-    // mapping the category to a title
-    
-        if(score > 0 && score < 100)
-          return category + " Beginner "  
-        else if(score > 100 && score < 200)
-          return category + " Lover";
-        else if(score >= 200 && score < 300)
-          return category + " Enthusiast";
-        else if(score >= 300 && score < 400)
-          return category + " Critic"
-        else
-          return category + " Hater";
+  public modifyTitle(category: string, score:number): string {
+    if(score > 0 && score < 100)
+      return category + " Beginner "  
+    else if(score >= 100 && score < 200)
+      return category + " Lover";
+    else if(score >= 200 && score < 300)
+      return category + " Enthusiast";
+    else if(score >= 300 && score < 400)
+      return category + " Critic"
+    else if(score == 0)
+      return category + " Newbie"
+    else
+      return category + " Hater";
 
   }
   
-  public processScores(scores: any[]): titles[] {
-    return scores.map(score => ({
-      title: this.modifyCategory(score.category, score.score),
-      score: parseFloat(score.score),
-    }));
+  public processScores(scores: any[],score:number): titles[] {
+    let ranks: titles[] = [];
+    ranks.push({title: "Over all", score: score});
+    if(scores[0].title)
+    {
+      scores = scores.map(score => ({
+        title: this.modifyTitle(score.title, score.score),
+        score: parseFloat(score.score),
+      }));
+      ranks.push(...scores);
+    }
+    return ranks;
   }
 
 

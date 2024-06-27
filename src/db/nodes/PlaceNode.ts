@@ -212,28 +212,6 @@ export class PlaceNode {
         }
     }
 
-    // public async searchPlaces(place: string): Promise<Place[]> {
-    //     try {
-    //         const driver = dbDriver;
-    //         const session = driver.session();
-    
-    //         const result = await session.run(
-    //             `
-    //             MATCH (place:Place)
-    //             WHERE place.name CONTAINS $place
-    //             RETURN place
-    //             `,
-    //             { place: place }
-    //         );
-    
-    //         session.close();
-    
-    //         return result.records.map(record => record.get("place").properties as Place);
-    //     } catch (err) {
-    //         console.error(`Error searching places: ${err}`);
-    //         throw err;
-    //     }
-    // }
     public async SearchPlace(place: string): Promise<Place[]> {
         try {
             const driver = dbDriver;
@@ -242,7 +220,7 @@ export class PlaceNode {
             const result = await session.run(
                 `
                 MATCH (place:Place)
-                WHERE toLower(place.name) STARTS WITH toLower($place)
+                WHERE toLower(place.name) CONTAINS toLower($place)
                 RETURN place
                 `,
                 { place: place }
