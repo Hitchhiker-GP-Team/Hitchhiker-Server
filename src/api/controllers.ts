@@ -971,6 +971,16 @@ export async function fetchCategoryTree(_: any, { name }: { name: string }): Pro
     throw error;
   }
 }
+export async function SearchCategory(_: any, { category }: { category: string }): Promise<Category[]> {
+  try {
+      const categories = await DbHelper.CategoryNode.SearchCategory(category);
+      console.log(`Categories found for query "${category}":`, categories);
+      return categories;
+  } catch (error) {
+      console.error(`Error searching categories for query "${category}":`, error);
+      throw error;
+  }
+}
 //END OF CATEGORY NODE FUNCTIONALITIES // 
 
 export function numSevFun() {
