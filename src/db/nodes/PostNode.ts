@@ -130,7 +130,8 @@ export class PostNode  {
 
         // a list to hold all posts retrieved from the database
         const userPosts: Post[] = [];
-
+        console.log(result.records[0])
+        if(!result.records[0].get("post")) return userPosts;
         result.records.forEach((record) => {
               // load the list with tagged usernames
               const taggedUsers = record.get("tags");
@@ -642,7 +643,12 @@ export class PostNode  {
         const result = await driver.executeQuery(
             `
             MATCH (author:User {username: $username})
-            OPTIONAL MATCH (category:Category{name:$categoryName})
+            MATCH (category:Category{name:$categoryName})
+
+            //add score bettwen author and category
+            MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
+            ON CREATE SET exp.score = 100
+            ON MATCH SET exp.score = exp.score + 100
 
             CREATE (post:Post {
                 id: $postId,
@@ -658,13 +664,13 @@ export class PostNode  {
 
             MERGE (place:Place {id: $placeId})
             ON CREATE SET place.name = $placeName,
-                          place.overAll = 0,
-                          place.atmosphere = 0,
-                          place.affordability = 0,
-                          place.accesability = 0,
-                          place.minPrice = 0,
-                          place.maxPrice = 0,
-                          place.reviewsCntr = 0
+                          place.overAll = 3,
+                          place.atmosphere = 3,
+                          place.affordability = 3,
+                          place.accesability = 3,
+                          place.minPrice = 3,
+                          place.maxPrice = 3,
+                          place.reviewsCntr = 3
             MERGE (post)-[rel:HAPPEND_AT]->(place)
 
             WITH  author ,post, $predictions AS predictedCategories
@@ -677,10 +683,7 @@ export class PostNode  {
             //add score to author
             SET author.score = COALESCE(author.score, 0) + 100
 
-            //add score bettwen author and category
-            MERGE (author)-[exp:HAS_EXPERIENCE_AT]->(category)
-            ON CREATE SET exp.score = 100
-            ON MATCH SET exp.score = exp.score + 100
+
             
 
             RETURN post
@@ -706,7 +709,6 @@ export class PostNode  {
               predictions:post.keywords
             }
         );
-
         
 
         return post;
