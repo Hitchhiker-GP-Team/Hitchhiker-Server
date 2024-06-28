@@ -1,6 +1,8 @@
 export const typeDefs = `#graphql
   # Comments in GraphQL Strings (such as this one) start with the hash (#) symbol.
   
+  scalar BigInt
+
   type Category{
     name: String
     Parent: Category
@@ -11,7 +13,7 @@ export const typeDefs = `#graphql
     id: String
     author: User
     text: String
-    date: Int
+    date: BigInt
     likesCounter: Int
     likedBy: [User]
     repliesCntr: Int

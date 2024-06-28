@@ -1,13 +1,19 @@
 import { Notification } from "../entities/Notification.js";
 import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, SearchPlace, SearchUser, fetchPostComments, subscsribe, getPlaceData, upvoteReview, undoUpvoteReview, downvoteReview, undoDownvoteReview, SearchCategory } from "./controllers.js";
 import { PubSub } from 'graphql-subscriptions';
-
+import { GraphQLScalarType } from 'graphql';
+import { Kind } from 'graphql/language';
+import { BigIntResolver } from 'graphql-scalars';
 const pubsub = new PubSub();
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { DbHelper } from "../db/DbHelper.js";
 
 export const resolvers = {
+  BigInt: BigIntResolver,
+
+
+
   Query: {
     login: async (_: any, { username, password }: { username: string; password: string }) => {
       try {

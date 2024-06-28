@@ -542,9 +542,14 @@ export class CommentNode {
           //---------------------------------
           const currentPost: Comment = {
               author : author,
-              text : record.get("comment").properties.text
+              text : record.get("comment").properties.text,
+              id : record.get("comment").properties.id,
+              date: record.get("comment").properties.date,
+              likesCounter: record.get("comment").properties.likesCounter,
+              repliesCntr: record.get("comment").properties.repliesCntr
           };
 
+         console.log("comment text"+currentPost.text); 
 
           //pushing current comment object into the list
           postComments.push(currentPost);

@@ -204,7 +204,7 @@ export class ReviewNode {
               accesability : review.rating?.accesability,
               priceMin: review.rating?.priceMin,
               priceMax : review.rating?.priceMax,
-              atmosphere : review.rating?.priceMax,
+              atmosphere : review.rating?.atmosphere,
             }
           );
       
