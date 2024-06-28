@@ -3,17 +3,12 @@ import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,dele
 import { PubSub } from 'graphql-subscriptions';
 import { GraphQLScalarType } from 'graphql';
 import { Kind } from 'graphql/language';
-import { BigIntResolver } from 'graphql-scalars';
 const pubsub = new PubSub();
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { DbHelper } from "../db/DbHelper.js";
 
 export const resolvers = {
-  BigInt: BigIntResolver,
-
-
-
   Query: {
     login: async (_: any, { username, password }: { username: string; password: string }) => {
       try {

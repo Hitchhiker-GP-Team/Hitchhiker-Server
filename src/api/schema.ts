@@ -1,8 +1,6 @@
 export const typeDefs = `#graphql
   # Comments in GraphQL Strings (such as this one) start with the hash (#) symbol.
   
-  scalar BigInt
-
   type Category{
     name: String
     Parent: Category
@@ -13,7 +11,7 @@ export const typeDefs = `#graphql
     id: String
     author: User
     text: String
-    date: BigInt
+    date: String
     likesCounter: Int
     likedBy: [User]
     repliesCntr: Int
@@ -38,7 +36,7 @@ export const typeDefs = `#graphql
     id: String
     author: User
     title: String
-    date: Int
+    date: String
     posts: [Post]
   }
 
@@ -72,7 +70,7 @@ export const typeDefs = `#graphql
     category: Category
     keywords: [String]
     hashtags: [String]
-    date: Int
+    date: String
     place: Place
     liked:Boolean
     saved:Boolean
@@ -84,7 +82,7 @@ export const typeDefs = `#graphql
     place: Place
     text: String
     rating: IRating
-    date: Int
+    date: String
     likesCntr: Int
     dislikesCntr: Int
   }
@@ -95,7 +93,7 @@ export const typeDefs = `#graphql
     email: String
     password: String
     Name: String
-    birthDate: Int 
+    birthDate: String 
     homeLocation: Coordinates
     sex: String
     titles: [Title]
@@ -120,7 +118,7 @@ export const typeDefs = `#graphql
 
   type Notification{
     id: String
-    date: Int
+    date: String
     initiator: String
     body: String
     author: String
@@ -155,7 +153,7 @@ export const typeDefs = `#graphql
       password: String,
       Name: String,
       sex: String,
-      birthDate: Int,
+      birthDate: String,
       Bio: String,
       followingCntr: Int,
       followersCntr: Int,
@@ -183,7 +181,7 @@ export const typeDefs = `#graphql
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]
-    createPost(placeName: String, authorUsername: String!,caption: String!,tags:[String]!,date: Int!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!): Post
+    createPost(placeName: String, authorUsername: String!,caption: String!,tags:[String]!,date: String!,likesCntr: Int!,mediaUrls: [String]!,hashtags: [String]!,commentsCntr: Int!,placeId: String!): Post
     likePost(username: String, postId: String): [Post]
     savePost(username: String, postId: String): [Post]
     archivePost(username: String, postId: String): [Post]
@@ -222,7 +220,7 @@ export const typeDefs = `#graphql
     createJourney(
       authorUsername: String,
       title: String,
-      date: Float
+      date: String!
     ): [Journey]
     getUserJourneys(username: String): [Journey]
     fetchJourneyPosts(
@@ -237,7 +235,7 @@ export const typeDefs = `#graphql
     #REVIEW
     getReviewsFun(username: String):[Review]
     fetchPlaceReviews(placeId: String):[Review]
-    addReview(authorUsername: String, placeId: String, text: String, overAll: Float, affordability: Float, accesability: Float, priceMin: Float, priceMax: Float, atmosphere: Float, date: Float):[Review]
+    addReview(authorUsername: String, placeId: String, text: String, overAll: Float, affordability: Float, accesability: Float, priceMin: Float, priceMax: Float, atmosphere: Float, date: String):[Review]
     deleteReview(reviewId: String):[Review]
     upvoteReview(reviewId: String, username: String ):[Review]
     undoUpvoteReview(reviewId: String, username: String ):[Review]
@@ -256,13 +254,13 @@ export const typeDefs = `#graphql
     # COMMENT
     addComment(
       text: String,
-      date: Int,
+      date: String,
       authorUsername: String,
       postId: String
     ): [Comment]
     replyComment(
       text: String!,
-      date: Int!,
+      date: String!,
       authorUsername: String!,
       parentId: String!
     ): [Comment]
@@ -272,7 +270,7 @@ export const typeDefs = `#graphql
     updateComment(
       commentId: String!,
       text: String!,
-      date: Int!,
+      date: String!,
       likesCounter: Int!,
       repliesCntr: Int!
     ): [Comment]
@@ -295,7 +293,7 @@ export const typeDefs = `#graphql
     email: String!,
     password: String!,
     Name: String!,
-    birthDate: Int!,
+    birthDate: String!,
     sex: String!,
     Bio: String!,
     followingCntr: Int!,
@@ -319,7 +317,7 @@ export const typeDefs = `#graphql
   createPost(
   authorUsername: String!,
   caption: String!,
-  date: Int!,
+  date: String!,
   likesCntr: Int!,
   mediaUrls: [String!]!,
   hashtags: [String!]!,
@@ -344,7 +342,7 @@ export const typeDefs = `#graphql
   createJourney(
     authorUsername: String!,
     title: String!,
-    date: Float!
+    date: String!
   ): Journey
   addReview(
     authorUsername: String!,
@@ -356,7 +354,7 @@ export const typeDefs = `#graphql
     priceMin: Float!, 
     priceMax: Float!, 
     atmosphere: Float!,
-    date: Float!
+    date: String!
   ): Review
   createCategory(
     name: String!,
@@ -364,14 +362,14 @@ export const typeDefs = `#graphql
   ): Category
   addComment(
     text: String!,
-    date: Int!,
+    date: String!,
     authorUsername: String!,
     postId: String!
     ): Comment
 
     replyComment(
       text: String!,
-      date: Int!,
+      date: String!,
       authorUsername: String!,
       parentId: String!
     ): Comment
@@ -379,7 +377,7 @@ export const typeDefs = `#graphql
     updateComment(
       commentId: String!,
       text: String!,
-      date: Int!,
+      date: String!,
       likesCounter: Int!,
       repliesCntr: Int!
     ): Comment

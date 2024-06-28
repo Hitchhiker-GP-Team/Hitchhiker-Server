@@ -254,7 +254,7 @@ export class UserNode {
       const result = await dbDriver.executeQuery(
         `
             MATCH (user:User)
-            WHERE toLower(user.username) STARTS WITH toLower($user)
+            WHERE toLower(user.username) CONTAINS toLower($user)
             RETURN user
             `,
         { user: user }
