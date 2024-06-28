@@ -131,7 +131,7 @@ export class PostNode  {
         // a list to hold all posts retrieved from the database
         const userPosts: Post[] = [];
         console.log(result.records[0])
-        if(!result.records[0].get("post")) return userPosts;
+        if(result.records[0] === undefined) return [];
         result.records.forEach((record) => {
               // load the list with tagged usernames
               const taggedUsers = record.get("tags");
