@@ -57,7 +57,7 @@ export async function addUser(_: any, { username, profilePic, email, password, N
       username,
       profilePic,
       email,
-      password: hashedPassword,
+      password: password,
       Name,
       birthDate,
       sex,
