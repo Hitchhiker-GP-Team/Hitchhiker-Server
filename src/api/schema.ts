@@ -174,6 +174,9 @@ export const typeDefs = `#graphql
     ): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]
+    GetFollowingList(username: String): [User]
+    GetFollowersList(username: String): [User]
+    GetUsersLikedPost(postId: String!): [User]
     unfollowUser(username: String, userToUnfollow: String): [User]
     SearchUser(user: String): [User]
 
@@ -182,6 +185,7 @@ export const typeDefs = `#graphql
     getPostsFun(username: String):[Post]
     getSavedPosts(username: String):[Post]
     getLikedPosts(username: String):[Post]
+
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]

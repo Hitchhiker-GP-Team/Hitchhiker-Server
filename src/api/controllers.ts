@@ -126,6 +126,37 @@ export async function followUser(_: any, { username, userToFollow }: { username:
     throw error;
   }
 }
+export async function GetFollowingList(_:any, { username }:{ username: string}) {
+  try {
+      const followedUsers = await DbHelper.UserNode.getFollowingList(username);
+      console.log("Followed users:", followedUsers);
+      return followedUsers;
+  } catch (error) {
+      console.error("Error fetching followed users:", error);
+      throw error;
+  }
+}
+export async function GetFollowersList(_:any, { username }:{ username: string}) {
+  try {
+      const followers = await DbHelper.UserNode.getFollowersList(username);
+      console.log("Followers:", followers);
+      return followers;
+  } catch (error) {
+      console.error("Error fetching followers:", error);
+      throw error;
+  }
+}
+export async function GetUsersLikedPost(_:any, { postId}:{ postId: string}) {
+  try {
+      const users = await DbHelper.UserNode.getUsersLikedPost(postId);
+      console.log("Users who liked post:", users);
+      return users;
+  } catch (error) {
+      console.error("Error fetching users who liked post:", error);
+      throw error;
+  }
+}
+
 export async function unfollowUser(_: any, { username, userToUnfollow }: { username: string; userToUnfollow: string }): Promise<void> {
   try {
     await DbHelper.UserNode.UnfollowUser(username, userToUnfollow);

@@ -237,6 +237,47 @@ export class UserNode {
       throw err;
     }
   }
+  public async getFollowingList(username: string): Promise<{ username: string, profilePic: string }[]> {
+    try {
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)
+            RETURN following.username AS username, following.profilePic AS profilePic
+            `,
+            { username }
+        );
+
+        return result.records.map(record => ({
+            username: record.get('username'),
+            profilePic: record.get('profilePic')
+        }));
+    } catch (err) {
+        console.error(`Error fetching following list: ${err}`);
+        throw err;
+    }
+}
+
+public async getFollowersList(username: string): Promise<{ username: string, profilePic: string }[]> {
+  try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+          `
+          MATCH (user:User {username: $username})<-[:FOLLOWS]-(follower:User)
+          RETURN follower.username AS username, follower.profilePic AS profilePic
+          `,
+          { username }
+      );
+
+      return result.records.map(record => ({
+          username: record.get('username'),
+          profilePic: record.get('profilePic')
+      }));
+  } catch (err) {
+      console.error(`Error fetching followers list: ${err}`);
+      throw err;
+  }
+}
   public async UnfollowUser(
     username: string,
     userToUnfollow: string
@@ -257,6 +298,28 @@ export class UserNode {
       throw err;
     }
   }
+
+  public async getUsersLikedPost(postId: string): Promise<{ username: string, profilePic: string }[]> {
+    try {
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (post:Post {id: $postId})<-[:LIKES_POST]-(user:User)
+            RETURN user.username AS username, user.profilePic AS profilePic
+            `,
+            { postId }
+        );
+
+        return result.records.map(record => ({
+            username: record.get('username'),
+            profilePic: record.get('profilePic')
+        }));
+    } catch (err) {
+        console.error(`Error fetching users who liked post: ${err}`);
+        throw err;
+    }
+}
+
   public async SearchUser(user: string): Promise<User[]> {
     try {
       const result = await dbDriver.executeQuery(
