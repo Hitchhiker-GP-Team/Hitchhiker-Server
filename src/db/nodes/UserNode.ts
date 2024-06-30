@@ -135,17 +135,20 @@ export class UserNode {
       throw err;
     }
   }
-  public async FetchUserProfile(username: string): Promise<User> {
+  public async FetchUserProfile(profileUsername: string, currentUsername:string): Promise<User> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
         `
-        MATCH (user:User {username: $username})
+        MATCH (user:User {username: $profileUsername})
         OPTIONAL MATCH (user)-[exp:HAS_EXPERIENCE_AT]->(category:Category)
-        RETURN user, collect({title: category.name, score: exp.score}) AS ranks
+        OPTIONAL MATCH (:User{username: $currentUsername})-[follow:FOLLOWS]->(user)
+        RETURN user,
+               collect({title: category.name, score: exp.score}) AS ranks,
+               CASE WHEN follow IS NOT NULL THEN true ELSE false END AS isFollowed
 
         `,
-        { username }
+        { profileUsername , currentUsername}
       );
 
       let userProfile: User = {} as User;
@@ -165,6 +168,7 @@ export class UserNode {
           titles: this.processScores(record.get("ranks"),parseFloat(userData.score)),
           totalUpvotes: parseFloat(userData.totalUpvotes),
           totalDownvotes: parseFloat(userData.totalDownvotes),
+          isFollowed : record.get("isFollowed")
         };
       });
       return userProfile;
@@ -173,6 +177,7 @@ export class UserNode {
       throw err;
     }
   }
+  
   public modifyTitle(category: string, score:number): string {
     if(score > 0 && score < 100)
       return category + " Beginner "  

@@ -12,4 +12,6 @@ export class Review {
   date?: number;
   likesCntr?: number;
   dislikesCntr?: number;
+  isUpvoted?:boolean;
+  isDownvoted?:boolean;
 }

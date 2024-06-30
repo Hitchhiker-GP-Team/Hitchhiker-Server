@@ -105,10 +105,10 @@ export async function deleteUser(_: any, { username }: { username: string }): Pr
     throw error;
   }
 }
-export async function getUserProfileFun(_: any, { username }: { username: string }) {
+export async function getUserProfileFun(_: any, { username,currentUsername }: { username: string,currentUsername: string }) {
   try {
     // Fetch user posts using the database module function
-    const userInfo = await DbHelper.UserNode.FetchUserProfile(username);
+    const userInfo = await DbHelper.UserNode.FetchUserProfile(username,currentUsername);
     const arr = [userInfo]; // return array is the error
     console.log(arr); // return array is the error
     return arr;
@@ -777,10 +777,10 @@ export async function deletePostFromJourney(_: any, { journeyId, postId }: { jou
 //END OF JOURNEY NODE FUNCTIONALITIES // 
 
 // REVIEW NODE FUNCTIONALITES TILL LINE 434//
-export async function getReviewsFun(_: any, { username }: { username: string }) {
+export async function getReviewsFun(_: any, { username,currentUsername }: { username: string,currentUsername:string }) {
   try {
     // Fetch user reviews using the database module function
-    const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username);
+    const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username,currentUsername);
     console.log(userReviews);
     
     return userReviews;
@@ -789,9 +789,9 @@ export async function getReviewsFun(_: any, { username }: { username: string }) 
     throw error;
   }
 }
-export async function fetchPlaceReviews(_: any, { placeId }: { placeId: string }): Promise<Review[]> {
+export async function fetchPlaceReviews(_: any, { placeId ,currentUsername}: { placeId: string,currentUsername:string }): Promise<Review[]> {
   try {
-    const placeReviews = await DbHelper.ReviewNode.FetchPlaceReviews(placeId);
+    const placeReviews = await DbHelper.ReviewNode.FetchPlaceReviews(placeId,currentUsername);
     console.log("Place reviews fetched:", placeReviews);
     return placeReviews;
   } catch (error) {

@@ -26,6 +26,7 @@ export class User {
   score?: Number;
   totalUpvotes?: Number;
   totalDownvotes?: Number;
+  isFollowed? : boolean;
 }
 
 export class titles {

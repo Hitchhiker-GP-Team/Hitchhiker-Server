@@ -85,6 +85,8 @@ export const typeDefs = `#graphql
     date: String
     likesCntr: Int
     dislikesCntr: Int
+    isUpvoted: Boolean
+    isDownvoted: Boolean
   }
 
   type User{
@@ -109,6 +111,7 @@ export const typeDefs = `#graphql
     score: Int
     totalUpvotes: Int
     totalDownvotes: Int
+    isFollowed: Boolean
   }
 
   type Title{
@@ -145,7 +148,7 @@ export const typeDefs = `#graphql
 
 
     # USER
-    getUserProfile(username: String): [User]
+    getUserProfile(username: String,currentUsername: String): [User]
     addUser(
       username: String,
       profilePic: String,
@@ -233,8 +236,8 @@ export const typeDefs = `#graphql
     #END JOURNEY
 
     #REVIEW
-    getReviewsFun(username: String):[Review]
-    fetchPlaceReviews(placeId: String):[Review]
+    getReviewsFun(username: String,currentUsername:String):[Review]
+    fetchPlaceReviews(placeId: String,currentUsername:String):[Review]
     addReview(authorUsername: String, placeId: String, text: String, overAll: Float, affordability: Float, accesability: Float, priceMin: Float, priceMax: Float, atmosphere: Float, date: String):[Review]
     deleteReview(reviewId: String):[Review]
     upvoteReview(reviewId: String, username: String ):[Review]

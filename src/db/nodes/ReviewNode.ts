@@ -12,13 +12,15 @@ export class ReviewNode {
     // Fetches ------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------
 
-    public async FetchUserReviews(username: string): Promise<Review[]> {
+    public async FetchUserReviews(username: string, currentUsername:string): Promise<Review[]> {
         try {
             const driver = dbDriver;
             const session = driver.session();
             const result = await session.run(
                 `
         MATCH (user:User {username: $username})-[:ADD_REVIEW]->(review:Review)-[:REVIEW_ON_PLACE]->(place:Place)
+        OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
+        OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
         RETURN review,
                user.username AS authorUsername,
                user.profilePic AS authorProfilePic,
@@ -27,9 +29,11 @@ export class ReviewNode {
                review.rating AS rating,
                review.date AS date,
                review.likesCntr AS likesCntr,
-               review.dislikesCntr AS dislikesCntr
+               review.dislikesCntr AS dislikesCntr,
+               CASE WHEN upvote IS NOT NULL THEN true ELSE false END AS isUpVoted,
+               CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
         `,
-                { username }
+                { username ,currentUsername}
             );
             session.close();
 
@@ -64,6 +68,8 @@ export class ReviewNode {
                     date: parseInt(record.get("date")),
                     likesCntr: parseInt(record.get("likesCntr")),
                     dislikesCntr: parseInt(record.get("dislikesCntr")),
+                    isUpvoted:record.get("isUpVoted"),
+                    isDownvoted:record.get("isDownVoted")
                 };
 
                 userReviews.push(currentReview);
@@ -77,13 +83,15 @@ export class ReviewNode {
         }
     }
 
-    public async FetchPlaceReviews(placeId: string): Promise<Review[]> {
+    public async FetchPlaceReviews(placeId: string,currentUsername:string): Promise<Review[]> {
         try {
             const driver = dbDriver;
             const session = driver.session();
             const result = await session.run(
                 `
       MATCH (place:Place {id: $placeId})<-[:REVIEW_ON_PLACE]-(review:Review)<-[:ADD_REVIEW]-(author:User)
+      OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
+      OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
       RETURN review,
              author.username AS authorUsername,
              author.profilePic AS authorProfilePic,
@@ -93,9 +101,11 @@ export class ReviewNode {
              review.rating AS rating,
              review.date AS date,
              review.likesCntr AS likesCntr,
-             review.dislikesCntr AS dislikesCntr
-      `,
-                { placeId }
+             review.dislikesCntr AS dislikesCntr,
+             CASE WHEN upvote IS NOT NULL THEN true ELSE false END AS isUpVoted,
+             CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
+            `,
+                { placeId ,currentUsername}
             );
             session.close();
 
@@ -130,6 +140,8 @@ export class ReviewNode {
                     date: parseInt(record.get("date")),
                     likesCntr: parseInt(record.get("likesCntr")),
                     dislikesCntr: parseInt(record.get("dislikesCntr")),
+                    isUpvoted:record.get("isUpVoted"),
+                    isDownvoted:record.get("isDownVoted")
                 };
 
                 placeReviews.push(currentReview);
@@ -205,6 +217,7 @@ export class ReviewNode {
               priceMin: review.rating?.priceMin,
               priceMax : review.rating?.priceMax,
               atmosphere : review.rating?.atmosphere,
+              
             }
           );
       
@@ -216,7 +229,6 @@ export class ReviewNode {
         }
     }
       
-
     public async DeleteReview(reviewId: string): Promise<void> {
         try {
             const driver = dbDriver;
