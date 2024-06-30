@@ -156,6 +156,7 @@ export async function leaderBoard():Promise<User[]>{
     console.error(`Error searching for leaderboard: ${error}`);
     throw error;
   }
+
 }
 
 //END OF USER NODE FUNCTIONALITIES // 
@@ -248,7 +249,7 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
     var category = "Origin";
     if(Keywords.length != 0)
     {
-       category = DetectionModel.mapToCaetgory(Keywords[0].name as string); 
+       category = DetectionModel.mapToCategory(Keywords[0].name as string); 
     }
     
 

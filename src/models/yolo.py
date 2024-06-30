@@ -16,7 +16,7 @@ def perform_prediction(img_path):
 
     # Define confidence threshold
 
-    confidenceThreshold = 60
+    confidenceThreshold = 40
 
     # Iterate over the results and store the predicted classes in the list
     for result in results:
@@ -24,7 +24,7 @@ def perform_prediction(img_path):
             class_id = int(box.data[0][-1])
             confidence = round(float(box.data[0][4]), 2) * 100 
             predicted_class = model.names[class_id]
-            if(confidence> confidenceThreshold ) :
+            if(confidence>= confidenceThreshold ) :
                 predicted_classes.append({"class" :predicted_class,"perc" : confidence})
 
     return predicted_classes
