@@ -148,6 +148,7 @@ export const typeDefs = `#graphql
 
 
     # USER
+    leaderBoard:[User]
     getUserProfile(username: String,currentUsername: String): [User]
     addUser(
       username: String,

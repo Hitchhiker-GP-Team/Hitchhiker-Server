@@ -177,41 +177,44 @@ export class UserNode {
       throw err;
     }
   }
-  
   public modifyTitle(category: string, score:number): string {
-    if(score > 0 && score < 100)
+    
+    if (category === "Origin") {
+      return ""; // Return an empty string or any other way to indicate exclusion
+    }
+
+    if(score > 0 && score < 500)
       return category + " Beginner "  
-    else if(score >= 100 && score < 200)
+    else if(score >= 500 && score < 1000)
       return category + " Lover";
-    else if(score >= 200 && score < 300)
+    else if(score >= 1000 && score < 2000)
       return category + " Enthusiast";
-    else if(score >= 300 && score < 400)
+    else if(score >= 2000 && score < 4000)
       return category + " Critic"
+    else if(score >= 4000)
+      return category + " Master"
     else if(score == 0)
       return category + " Newbie"
     else
       return category + " Hater";
 
   }
-  
   public processScores(scores: any[],score:number): titles[] {
     let ranks: titles[] = [];
-    ranks.push({title: "Over all", score: score});
+    ranks.push({title: "Hitches", score: score});
     if(scores[0].title)
     {
       scores = scores.map(score => ({
         title: this.modifyTitle(score.title, score.score),
         score: parseFloat(score.score),
-      }));
+      })).filter(score => score.title !== "")
+      .sort((a, b) => b.score - a.score); 
+
       ranks.push(...scores);
     }
     return ranks;
   }
 
-
-
- 
-  
   public async FollowUser(
     username: string,
     userToFollow: string
@@ -272,4 +275,36 @@ export class UserNode {
       throw err;
     }
   }
+  public async leaderBoard():Promise<User[]>{
+    try {
+      const result = await dbDriver.executeQuery(
+        `
+          MATCH (user:User)
+          RETURN user.username AS username
+                ,user.score AS score
+                ,user.profilePic AS profilePic
+          ORDER  BY user.score DESC
+          LIMIT 10
+        `,
+        { }
+      );
+
+    // Mapping the result records to User objects
+    return result.records.map(record => ({
+      username: record.get("username"),
+      profilePic: record.get("profilePic"),
+      titles : [{
+        score :parseFloat(record.get("score")),
+        title : "Hitches"
+      }]
+    }));
+    } catch (err) {
+      console.error(`Error searching for users: ${err}`);
+      throw err;
+    }
+
+
+  }
+
+
 }

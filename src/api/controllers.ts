@@ -146,6 +146,18 @@ export async function SearchUser(_: any, { user }: { user: string }): Promise<Us
   }
 }
 
+export async function leaderBoard():Promise<User[]>{
+  try{
+    const users = await DbHelper.UserNode.leaderBoard();
+    console.log(users);
+    return users;
+  }catch(error)
+  {
+    console.error(`Error searching for leaderboard: ${error}`);
+    throw error;
+  }
+}
+
 //END OF USER NODE FUNCTIONALITIES // 
 
 // POST NODE FUNCTIONALITES  TILL LINE 205 BEL TARTEEB//
