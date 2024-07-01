@@ -682,8 +682,8 @@ export class PostNode  {
 
             //add score to author
             SET author.score = COALESCE(author.score, 0) + 100
-
-
+            //increase user's postCntr     
+            SET author.postCntr = COALESCE(author.score, 0) + 1
             
 
             RETURN post
@@ -891,7 +891,7 @@ export class PostNode  {
     const result = await driver.executeQuery(
         `
         MATCH (post:Post{id:$id})<-[:ADD_POST]-(user:User)
-        SET user.postCntr = user.postCntr -1
+        SET user.postCntr = COALESCE(user.postCntr, 0) - 1
         DETACH DELETE post
         `    
         ,{ id : postId}
