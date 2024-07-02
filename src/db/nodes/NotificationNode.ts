@@ -236,7 +236,7 @@ export class NotificationNode {
             notification.receiver = user.properties.username;
             notification.initiatorsList = notificationNode.properties.initiators;
             notification.initiatorsCntr = notificationNode.properties.initiators.length;
-            notification.initiatorProfilePic = notificationNode.properties.initiatorProfilePic;
+            notification.initiatorProfilePic = record.get('initiatorProfilePic');
 
             if (likereferenceId) {
                 notification.referenceId = likereferenceId;
