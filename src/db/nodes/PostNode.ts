@@ -32,7 +32,6 @@ export class PostNode  {
                    CASE WHEN like IS NOT NULL THEN true ELSE false END AS liked,
                    CASE WHEN save IS NOT NULL THEN true ELSE false END AS saved,
                    COLLECT(tagged.username) as tags
-            ORDER BY post.postingDate DESC
             SKIP 0
             LIMIT 50
             `,
@@ -121,7 +120,6 @@ export class PostNode  {
                    CASE WHEN like IS NOT NULL THEN true ELSE false END AS liked,
                    CASE WHEN save IS NOT NULL THEN true ELSE false END AS saved,
                    COLLECT(tagged.username) as tags
-            ORDER BY post.postingDate DESC
             SKIP 0
             LIMIT 50
             `,
