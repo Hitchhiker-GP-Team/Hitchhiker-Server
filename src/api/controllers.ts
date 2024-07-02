@@ -78,20 +78,10 @@ export async function addUser(_: any, { username, profilePic, email, password, N
     throw error;
   }
 }
-export async function updateUser(_: any, { username, profilePic, email, password, Name, Bio }: { username: string; profilePic: string; email: string; password: string; Name: string; Bio: string; }): Promise<User[]>{
+export async function updateUser(_: any, { username, profilePic }: { username: string; profilePic: string; }){
   try {
-    const updatedUser: User = {
-      username: username,
-      profilePic: profilePic,
-      email: email,
-      password: password, 
-      Name: Name,
-      Bio: Bio
-    };
-
-    const up = [await DbHelper.UserNode.UpdateUser(username, updatedUser)];
-    console.log("User updated:", updatedUser);
-    return up;
+    await DbHelper.UserNode.UpdateUser(username, profilePic);
+    console.log("User updated:", profilePic);
   } catch (error) {
     console.error("Error updating user:", error);
     throw new Error("Failed to update user.");

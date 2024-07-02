@@ -170,10 +170,7 @@ export const typeDefs = `#graphql
     ): [User]
     updateUser(
       username: String,
-      Bio: String,
       profilePic: String,
-      email: String,
-      Name: String
     ): [User]
     deleteUser(username: String): [User]
     followUser(username: String, userToFollow: String): [User]

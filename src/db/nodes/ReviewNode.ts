@@ -88,22 +88,23 @@ export class ReviewNode {
             const driver = dbDriver;
             const session = driver.session();
             const result = await session.run(
-                `
-      MATCH (place:Place {id: $placeId})<-[:REVIEW_ON_PLACE]-(review:Review)<-[:ADD_REVIEW]-(author:User)
-      OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
-      OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
-      RETURN review,
-             author.username AS authorUsername,
-             author.profilePic AS authorProfilePic,
-             place.name as placeName,
-             place.id  as placeId,
-             review.text AS text,
-             review.rating AS rating,
-             review.date AS date,
-             review.likesCntr AS likesCntr,
-             review.dislikesCntr AS dislikesCntr,
-             CASE WHEN upvote IS NOT NULL THEN true ELSE false END AS isUpVoted,
-             CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
+            `
+                MATCH (place:Place {id: $placeId})<-[:REVIEW_ON_PLACE]-(review:Review)<-[:ADD_REVIEW]-(author:User)
+                OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
+                OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
+                RETURN review,
+                        author.username AS authorUsername,
+                        author.profilePic AS authorProfilePic,
+                        place.name as placeName,
+                        place.id  as placeId,
+                        review.text AS text,
+                        review.rating AS rating,
+                        review.date AS date,
+                        review.likesCntr AS likesCntr,
+                        review.dislikesCntr AS dislikesCntr,
+                        CASE WHEN upvote IS NOT NULL THEN true ELSE false END AS isUpVoted,
+                        CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
+                ORDER BY review.likesCntr DESC       
             `,
                 { placeId ,currentUsername}
             );

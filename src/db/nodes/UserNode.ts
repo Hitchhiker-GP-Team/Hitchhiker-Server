@@ -93,26 +93,21 @@ export class UserNode {
       throw err;
     }
   }
-  public async UpdateUser(username: string, updatedUser: User): Promise<User> {
+  public async UpdateUser(username: string, profilePic: string): Promise<void> {
     try {
       const driver = dbDriver;
+      console.log(username);
+      console.log(profilePic);
       const result = await driver.executeQuery(
         `
         MATCH (user:User {username: $username})
-        SET user.profilePic = $profilePic,
-            user.email = $email,
-            user.Name = $name,
-            user.Bio = $bio
+        SET user.profilePic = $profilePic
         `,
         {
           username: username,
-          profilePic: updatedUser.profilePic,
-          email: updatedUser.email,
-          name: updatedUser.Name,
-          bio: updatedUser.Bio,
+          profilePic: profilePic,
         }
       );
-      return updatedUser;
     } catch (err) {
       console.error(`Error updating user: ${err}`);
       throw err;
