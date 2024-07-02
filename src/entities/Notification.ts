@@ -1,4 +1,7 @@
+import { string } from "@tensorflow/tfjs-node";
+
 export class Notification{
+    initiatorProfilePic? : String;
     id? : String;
     date?: number;
     initiator? : String;

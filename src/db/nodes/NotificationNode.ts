@@ -211,7 +211,8 @@ export class NotificationNode {
             MATCH (u:User {username: $username})-[h:HAVE_NOTIFICATION]->(n:Notification)
             OPTIONAL MATCH (n)-[l:LIKE_POST_NOTI]-(p:Post)
             OPTIONAL MATCH (n)-[lol:LIKE_COMMENT_NOTI]-(C:Comment)
-            RETURN u, h, n, p.id as LikereferenceId, C.id as CommentreferenceId
+            OPTIONAL MATCH (initiator:User {username: n.initiators[0]})
+            RETURN u, h, n, p.id as LikereferenceId, C.id as CommentreferenceId, initiator.profilePic as initiatorProfilePic
             `,
             { username: username }
         );
@@ -225,6 +226,8 @@ export class NotificationNode {
             const likereferenceId = record.get('LikereferenceId');
             const commentreferenceId = record.get('CommentreferenceId');
 
+            console.log("authorrrrr : " + notificationNode.properties.author);
+
             notification.id = notificationNode.properties.id;
             notification.date = notificationNode.properties.date;
             notification.initiator = notificationNode.properties.initiator;
@@ -233,6 +236,7 @@ export class NotificationNode {
             notification.receiver = user.properties.username;
             notification.initiatorsList = notificationNode.properties.initiators;
             notification.initiatorsCntr = notificationNode.properties.initiators.length;
+            notification.initiatorProfilePic = notificationNode.properties.initiatorProfilePic;
 
             if (likereferenceId) {
                 notification.referenceId = likereferenceId;

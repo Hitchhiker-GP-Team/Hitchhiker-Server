@@ -120,6 +120,7 @@ export const typeDefs = `#graphql
   }
 
   type Notification{
+    initiatorProfilePic: String
     id: String
     date: String
     initiator: String
