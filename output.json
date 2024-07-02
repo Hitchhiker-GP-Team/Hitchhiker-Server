@@ -1,1 +1,3 @@
-{"predicted_classes": [{"class": "bottle", "perc": 50.0}]}
+{
+    "predicted_class": "bookstore"
+}

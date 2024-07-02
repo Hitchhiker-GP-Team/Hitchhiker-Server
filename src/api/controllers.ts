@@ -14,6 +14,7 @@ import { likePostNotificationService } from "../entities/Notifications/LikePostN
 import { likeCommentNotificationService } from "../entities/Notifications/LikeCommentNotificationService.js";
 import { IRating } from "../entities/Rating/IRating.js";
 import bcrypt from 'bcrypt';
+import { ClassificationModel } from "../models/ClassificationModel.js";
 
 const pubsub = new PubSub();
 
@@ -275,7 +276,9 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   try {
 
     
-    const Keywords = DetectionModel.predictClasses(mediaUrls[0])
+    const Keywords=DetectionModel.predictClasses(mediaUrls[0]);
+    const classi = ClassificationModel.predictClasses(mediaUrls[0]);
+    console.log("classsssssss : " + classi);
 
     var category = "Origin";
     if(Keywords.length != 0)
