@@ -142,9 +142,11 @@ export const typeDefs = `#graphql
   }
 
   type Query {
+
     # Notification
     notifications(username: String): [Notification]
     login(username: String!, password: String!): User
+    getNoty(username:String): [Notification]
 
 
     # USER

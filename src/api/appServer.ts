@@ -9,10 +9,13 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { PubSub } from 'graphql-subscriptions';
 import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolver.js";
+import { DbHelper } from '../db/DbHelper.js';
 
 
 export async function startServer() {
 
+
+//console.log(await DbHelper.NotificationNode.getUserNotifications("jennifer22"));
 
 const port = 4000;
 

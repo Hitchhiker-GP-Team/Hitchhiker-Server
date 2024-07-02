@@ -199,5 +199,60 @@ export class NotificationNode {
     }
 
 
+// Function to map database results to Notification objects
+
+
+  public async getUserNotifications(username: string): Promise<Notification[]> {
+    const session = dbDriver.session(); // Assuming dbDriver is your Neo4j driver instance
+
+    try {
+        const result = await session.run(
+            `
+            MATCH (u:User {username: $username})-[h:HAVE_NOTIFICATION]->(n:Notification)
+            OPTIONAL MATCH (n)-[l:LIKE_POST_NOTI]-(p:Post)
+            OPTIONAL MATCH (n)-[lol:LIKE_COMMENT_NOTI]-(C:Comment)
+            RETURN u, h, n, p.id as LikereferenceId, C.id as CommentreferenceId
+            `,
+            { username: username }
+        );
+
+        const notifications: Notification[] = [];
+
+        result.records.map(record => {
+            const notification = new Notification();
+            const user = record.get('u');
+            const notificationNode = record.get('n');
+            const likereferenceId = record.get('LikereferenceId');
+            const commentreferenceId = record.get('CommentreferenceId');
+
+            notification.id = notificationNode.properties.id;
+            notification.date = notificationNode.properties.date;
+            notification.initiator = notificationNode.properties.initiator;
+            notification.body = notificationNode.properties.body;
+            notification.author = notificationNode.properties.author;
+            notification.receiver = user.properties.username;
+            notification.initiatorsList = notificationNode.properties.initiators;
+            notification.initiatorsCntr = notificationNode.properties.initiators.length;
+
+            if (likereferenceId) {
+                notification.referenceId = likereferenceId;
+                notification.referenceType = 'post';
+                notification.message = "liked your post";
+            } else if (commentreferenceId) {
+                notification.referenceId = commentreferenceId;
+                notification.referenceType = 'comment';
+                notification.message = "liked your comment";
+            }
+
+            notifications.push(notification);
+        });
+        return notifications;
+    } catch (error) {
+        console.error(`Error retrieving notifications for user ${username}: ${error}`);
+        throw error;
+    } finally {
+        await session.close();
+    }
+}
 
 }

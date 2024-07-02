@@ -109,9 +109,19 @@ export async function deleteUser(_: any, { username }: { username: string }): Pr
 export async function getUserProfileFun(_: any, { username,currentUsername }: { username: string,currentUsername: string }) {
   try {
     // Fetch user posts using the database module function
-    const userInfo = await DbHelper.UserNode.FetchUserProfile(username,currentUsername);
-    const arr = [userInfo]; // return array is the error
+    const Notifications = await DbHelper.UserNode.FetchUserProfile(username,currentUsername);
+    const arr = [Notifications]; // return array is the error
     console.log(arr); // return array is the error
+    return arr;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw error;
+  }
+}
+export async function getUserNotifications(_: any, { username }: { username: string }) {
+  try {
+    // Fetch user posts using the database module function
+    const arr = await DbHelper.NotificationNode.getUserNotifications(username);
     return arr;
   } catch (error) {
     console.error("Error fetching user profile:", error);
