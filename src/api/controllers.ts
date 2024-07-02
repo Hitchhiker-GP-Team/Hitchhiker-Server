@@ -270,6 +270,17 @@ export async function getCategoryPosts(_: any, { username, category }: { usernam
     throw error;
   }
 }
+export async function fetchPostById(_: any, { postId }: { postId: string }) {
+  try {
+    // Fetch category posts using the database module function
+    const post= await DbHelper.PostNode.fetchPostById(postId);
+    console.log(post);
+    return post;
+  } catch (error) {
+    console.error("Error fetching category posts:", error);
+    throw error;
+  }
+}
 export async function getArchivedPosts(_: any, { username }: { username: string }) {
   try {
     // Fetch archived posts using the database module function

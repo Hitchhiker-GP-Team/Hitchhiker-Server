@@ -187,7 +187,7 @@ export const typeDefs = `#graphql
     getPostsFun(username: String):[Post]
     getSavedPosts(username: String):[Post]
     getLikedPosts(username: String):[Post]
-
+    fetchPostById(postId: String):Post
     getPlacePosts(username: String, placeId: String):[Post]
     getCategoryPosts(username: String, category: String):[Post]
     getArchivedPosts(username: String):[Post]

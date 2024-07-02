@@ -627,7 +627,91 @@ export class PostNode  {
     }
   }
 
+  public async fetchPostById(postId: string): Promise<Post | null> {
+    try {
+        const driver = dbDriver;
+        const result = await driver.executeQuery(
+            `
+            MATCH (user:User)-[:ADD_POST]->(post:Post {id: $postId})
+            OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
+            OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
+            OPTIONAL MATCH (post)-[:TAG]->(tagged:User)
+            OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
+            OPTIONAL MATCH (post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
+            RETURN post,
+                   user.username AS username,
+                   user.profilePic AS profilePic,
+                   category.name AS categoryName,
+                   place,
+                   CASE WHEN like IS NOT NULL THEN true ELSE false END AS liked,
+                   CASE WHEN save IS NOT NULL THEN true ELSE false END AS saved,
+                   COLLECT(tagged.username) as tags
+            LIMIT 1
+            `,
+            { postId }
+        );
 
+        if (result.records.length === 0) {
+            return null;
+        }
+
+        const record = result.records[0];
+        
+        // Load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+            username: taggedUsername
+        }));
+
+        // Load post properties
+        const postProb = record.get("post").properties;
+        
+        // Load category
+        const category: Category = {
+            name: record.get("categoryName")
+        };
+
+        // Load place
+        
+
+        const placeProb = record.get("place").properties;
+              const place: Place = {
+                  name: placeProb.name,
+                  mapsId: placeProb.mapsId,
+                  id: placeProb.id
+        };
+
+        // Load user card
+        const author: User = {
+            profilePic: record.get("profilePic"),
+            username: record.get("username"),
+        };
+
+        // Load post object
+        const currentPost: Post = {
+            id: postProb.id,
+            mediaURL: postProb.mediaUrls,
+            author: author,
+            caption: postProb.caption,
+            date: parseFloat(postProb.postingDate), // test-driven
+            hashtags: postProb.hashtags,
+            tags: postProb.tags,
+            place: place,
+            keywords: postProb.keywords,
+            likesCntr: parseFloat(postProb.likesCntr), // test-driven
+            commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+            category: category,
+            liked: record.get("liked"),
+            saved: record.get("saved"),
+        };
+
+        return currentPost;
+
+    } catch (err) {
+        console.error(`Error fetching post by ID: ${err}`);
+        throw err;
+    }
+  }
   // --------------------------------------------------------------------------------------
   // Creations ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
