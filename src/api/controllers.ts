@@ -5,15 +5,15 @@ import { Journey } from "../entities/Journey.js";
 import { Coordinates, Place } from "../entities/Place.js";
 import { Post } from "../entities/Post.js";
 import { Review } from "../entities/Review.js";
-import { User , sex } from "../entities/User.js";
-import { v4 as uuidv4 } from 'uuid';
+import { User, sex } from "../entities/User.js";
+import { v4 as uuidv4 } from "uuid";
 import { DetectionModel } from "../models/DetectionModel.js";
 import { Notification } from "../entities/Notification.js";
 import { PubSub } from "graphql-subscriptions";
 import { likePostNotificationService } from "../entities/Notifications/LikePostNotificationService.js";
 import { likeCommentNotificationService } from "../entities/Notifications/LikeCommentNotificationService.js";
 import { IRating } from "../entities/Rating/IRating.js";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 import { ClassificationModel } from "../models/ClassificationModel.js";
 
 const pubsub = new PubSub();
@@ -37,7 +37,6 @@ const pubsub = new PubSub();
 //       homeLocation
 //     };
 
-    
 //     const u =[await DbHelper.UserNode.AddUser(newUser)];
 //     console.log("User added:", newUser);
 //     return u
@@ -48,12 +47,43 @@ const pubsub = new PubSub();
 // }
 const SALT_ROUNDS = 10;
 
-export async function addUser(_: any, { username, profilePic, email, password, Name, birthDate, sex, Bio, followingCntr, followersCntr, postCntr, reviewsCntr, homeLocation }: { username: string; profilePic: string; email: string; password: string; Name: string; birthDate: number; sex: string; Bio: string; followingCntr: number; followersCntr: number; postCntr: number; reviewsCntr: number; homeLocation: [number] }): Promise<User[]> {
+export async function addUser(
+  _: any,
+  {
+    username,
+    profilePic,
+    email,
+    password,
+    Name,
+    birthDate,
+    sex,
+    Bio,
+    followingCntr,
+    followersCntr,
+    postCntr,
+    reviewsCntr,
+    homeLocation,
+  }: {
+    username: string;
+    profilePic: string;
+    email: string;
+    password: string;
+    Name: string;
+    birthDate: number;
+    sex: string;
+    Bio: string;
+    followingCntr: number;
+    followersCntr: number;
+    postCntr: number;
+    reviewsCntr: number;
+    homeLocation: [number];
+  }
+): Promise<User[]> {
   try {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     console.log(`Plain password: ${password}`);
     console.log(`Hashed password: ${hashedPassword}`);
-    
+
     const newUser: User = {
       username,
       profilePic,
@@ -67,7 +97,7 @@ export async function addUser(_: any, { username, profilePic, email, password, N
       followersCntr,
       postCntr,
       reviewsCntr,
-      homeLocation
+      homeLocation,
     };
 
     const u = [await DbHelper.UserNode.AddUser(newUser)];
@@ -78,7 +108,10 @@ export async function addUser(_: any, { username, profilePic, email, password, N
     throw error;
   }
 }
-export async function updateUser(_: any, { username, profilePic }: { username: string; profilePic: string; }){
+export async function updateUser(
+  _: any,
+  { username, profilePic }: { username: string; profilePic: string }
+) {
   try {
     await DbHelper.UserNode.UpdateUser(username, profilePic);
     console.log("User updated:", profilePic);
@@ -87,7 +120,10 @@ export async function updateUser(_: any, { username, profilePic }: { username: s
     throw new Error("Failed to update user.");
   }
 }
-export async function deleteUser(_: any, { username }: { username: string }): Promise<void> {
+export async function deleteUser(
+  _: any,
+  { username }: { username: string }
+): Promise<void> {
   try {
     await DbHelper.UserNode.DeleteUser(username);
     console.log("User deleted:", username);
@@ -96,10 +132,16 @@ export async function deleteUser(_: any, { username }: { username: string }): Pr
     throw error;
   }
 }
-export async function getUserProfileFun(_: any, { username,currentUsername }: { username: string,currentUsername: string }) {
+export async function getUserProfileFun(
+  _: any,
+  { username, currentUsername }: { username: string; currentUsername: string }
+) {
   try {
     // Fetch user posts using the database module function
-    const Notifications = await DbHelper.UserNode.FetchUserProfile(username,currentUsername);
+    const Notifications = await DbHelper.UserNode.FetchUserProfile(
+      username,
+      currentUsername
+    );
     const arr = [Notifications]; // return array is the error
     console.log(arr); // return array is the error
     return arr;
@@ -108,7 +150,10 @@ export async function getUserProfileFun(_: any, { username,currentUsername }: { 
     throw error;
   }
 }
-export async function getUserNotifications(_: any, { username }: { username: string }) {
+export async function getUserNotifications(
+  _: any,
+  { username }: { username: string }
+) {
   try {
     // Fetch user posts using the database module function
     const arr = await DbHelper.NotificationNode.getUserNotifications(username);
@@ -118,7 +163,10 @@ export async function getUserNotifications(_: any, { username }: { username: str
     throw error;
   }
 }
-export async function followUser(_: any, { username, userToFollow }: { username: string; userToFollow: string }): Promise<void> {
+export async function followUser(
+  _: any,
+  { username, userToFollow }: { username: string; userToFollow: string }
+): Promise<void> {
   try {
     await DbHelper.UserNode.FollowUser(username, userToFollow);
     console.log("User followed:", userToFollow);
@@ -127,38 +175,50 @@ export async function followUser(_: any, { username, userToFollow }: { username:
     throw error;
   }
 }
-export async function GetFollowingList(_:any, { username }:{ username: string}) {
+export async function GetFollowingList(
+  _: any,
+  { username }: { username: string }
+) {
   try {
-      const followedUsers = await DbHelper.UserNode.getFollowingList(username);
-      console.log("Followed users:", followedUsers);
-      return followedUsers;
+    const followedUsers = await DbHelper.UserNode.getFollowingList(username);
+    console.log("Followed users:", followedUsers);
+    return followedUsers;
   } catch (error) {
-      console.error("Error fetching followed users:", error);
-      throw error;
+    console.error("Error fetching followed users:", error);
+    throw error;
   }
 }
-export async function GetFollowersList(_:any, { username }:{ username: string}) {
+export async function GetFollowersList(
+  _: any,
+  { username }: { username: string }
+) {
   try {
-      const followers = await DbHelper.UserNode.getFollowersList(username);
-      console.log("Followers:", followers);
-      return followers;
+    const followers = await DbHelper.UserNode.getFollowersList(username);
+    console.log("Followers:", followers);
+    return followers;
   } catch (error) {
-      console.error("Error fetching followers:", error);
-      throw error;
+    console.error("Error fetching followers:", error);
+    throw error;
   }
 }
-export async function GetUsersLikedPost(_:any, { postId}:{ postId: string}) {
+export async function GetUsersLikedPost(
+  _: any,
+  { postId }: { postId: string }
+) {
   try {
-      const users = await DbHelper.UserNode.getUsersLikedPost(postId);
-      console.log("Users who liked post:", users);
-      return users;
+    const users = await DbHelper.UserNode.getUsersLikedPost(postId);
+    console.log("Users who liked post:", users);
+    return users;
   } catch (error) {
-      console.error("Error fetching users who liked post:", error);
-      throw error;
+    console.error("Error fetching users who liked post:", error);
+    throw error;
   }
 }
 
-export async function unfollowUser(_: any, { username, userToUnfollow }: { username: string; userToUnfollow: string }): Promise<void> {
+export async function unfollowUser(
+  _: any,
+  { username, userToUnfollow }: { username: string; userToUnfollow: string }
+): Promise<void> {
   try {
     await DbHelper.UserNode.UnfollowUser(username, userToUnfollow);
     console.log("User unfollowed:", userToUnfollow);
@@ -167,31 +227,32 @@ export async function unfollowUser(_: any, { username, userToUnfollow }: { usern
     throw error;
   }
 }
-export async function SearchUser(_: any, { user }: { user: string }): Promise<User[]> {
+export async function SearchUser(
+  _: any,
+  { user }: { user: string }
+): Promise<User[]> {
   try {
-      const users = await DbHelper.UserNode.SearchUser(user);
-      console.log(`Users found with query '${user}':`, users);
-      return users;
+    const users = await DbHelper.UserNode.SearchUser(user);
+    console.log(`Users found with query '${user}':`, users);
+    return users;
   } catch (error) {
-      console.error(`Error searching for users: ${error}`);
-      throw error;
+    console.error(`Error searching for users: ${error}`);
+    throw error;
   }
 }
 
-export async function leaderBoard():Promise<User[]>{
-  try{
+export async function leaderBoard(): Promise<User[]> {
+  try {
     const users = await DbHelper.UserNode.leaderBoard();
     console.log(users);
     return users;
-  }catch(error)
-  {
+  } catch (error) {
     console.error(`Error searching for leaderboard: ${error}`);
     throw error;
   }
-
 }
 
-//END OF USER NODE FUNCTIONALITIES // 
+//END OF USER NODE FUNCTIONALITIES //
 
 // POST NODE FUNCTIONALITES  TILL LINE 205 BEL TARTEEB//
 export async function getPostsFun(_: any, { username }: { username: string }) {
@@ -216,7 +277,10 @@ export async function getFeedFun(_: any, { username }: { username: string }) {
     throw error;
   }
 }
-export async function getSavedPosts(_: any, { username }: { username: string }) {
+export async function getSavedPosts(
+  _: any,
+  { username }: { username: string }
+) {
   try {
     // Fetch saved posts using the database module function
     const savedPosts = await DbHelper.PostNode.FetchSavedPosts(username);
@@ -227,7 +291,10 @@ export async function getSavedPosts(_: any, { username }: { username: string }) 
     throw error;
   }
 }
-export async function getLikedPosts(_: any, { username }: { username: string }) {
+export async function getLikedPosts(
+  _: any,
+  { username }: { username: string }
+) {
   try {
     // Fetch liked posts using the database module function
     const likedPosts = await DbHelper.PostNode.FetchLikedPosts(username);
@@ -238,10 +305,16 @@ export async function getLikedPosts(_: any, { username }: { username: string }) 
     throw error;
   }
 }
-export async function getPlacePosts(_: any, { username, placeId }: { username: string, placeId: string }) {
+export async function getPlacePosts(
+  _: any,
+  { username, placeId }: { username: string; placeId: string }
+) {
   try {
     // Fetch place posts using the database module function
-    const placePosts = await DbHelper.PostNode.FetchPlacePosts(username, placeId);
+    const placePosts = await DbHelper.PostNode.FetchPlacePosts(
+      username,
+      placeId
+    );
     console.log(placePosts);
     return placePosts;
   } catch (error) {
@@ -249,10 +322,16 @@ export async function getPlacePosts(_: any, { username, placeId }: { username: s
     throw error;
   }
 }
-export async function getCategoryPosts(_: any, { username, category }: { username: string, category: string }) {
+export async function getCategoryPosts(
+  _: any,
+  { username, category }: { username: string; category: string }
+) {
   try {
     // Fetch category posts using the database module function
-    const categoryPosts = await DbHelper.PostNode.FetchCategoryPosts(username, category);
+    const categoryPosts = await DbHelper.PostNode.FetchCategoryPosts(
+      username,
+      category
+    );
     console.log(categoryPosts);
     return categoryPosts;
   } catch (error) {
@@ -263,7 +342,7 @@ export async function getCategoryPosts(_: any, { username, category }: { usernam
 export async function fetchPostById(_: any, { postId }: { postId: string }) {
   try {
     // Fetch category posts using the database module function
-    const post= await DbHelper.PostNode.fetchPostById(postId);
+    const post = await DbHelper.PostNode.fetchPostById(postId);
     console.log(post);
     return post;
   } catch (error) {
@@ -271,7 +350,10 @@ export async function fetchPostById(_: any, { postId }: { postId: string }) {
     throw error;
   }
 }
-export async function getArchivedPosts(_: any, { username }: { username: string }) {
+export async function getArchivedPosts(
+  _: any,
+  { username }: { username: string }
+) {
   try {
     // Fetch archived posts using the database module function
     const archivedPosts = await DbHelper.PostNode.FetchArchivedPosts(username);
@@ -283,23 +365,43 @@ export async function getArchivedPosts(_: any, { username }: { username: string 
   }
 }
 
-export async function createPost(_: any, { authorUsername, caption, date, likesCntr, mediaUrls, hashtags, commentsCntr, placeId,placeName}: {placeName : string ;authorUsername: string; caption: string; date: number; likesCntr: number; mediaUrls: string[]; hashtags: string[]; commentsCntr: number; tags: string[]; placeId: string;}): Promise<Post> {
+export async function createPost(
+  _: any,
+  {
+    authorUsername,
+    caption,
+    date,
+    likesCntr,
+    mediaUrls,
+    hashtags,
+    commentsCntr,
+    placeId,
+    placeName,
+  }: {
+    placeName: string;
+    authorUsername: string;
+    caption: string;
+    date: number;
+    likesCntr: number;
+    mediaUrls: string[];
+    hashtags: string[];
+    commentsCntr: number;
+    tags: string[];
+    placeId: string;
+  }
+): Promise<Post> {
   try {
-
-    
-    const Keywords=DetectionModel.predictClasses(mediaUrls[0]);
+    const Keywords = DetectionModel.predictClasses(mediaUrls[0]);
     const classi = ClassificationModel.predictClasses(mediaUrls[0]);
     console.log("classsssssss : " + classi);
 
     var category = "Origin";
-    if(Keywords.length != 0)
-    {
-       category = DetectionModel.mapToCategory(Keywords[0].name as string); 
+    if (Keywords.length != 0) {
+      category = DetectionModel.mapToCategory(Keywords[0].name as string);
     }
-    
 
     const post: Post = {
-      id : uuidv4(),
+      id: uuidv4(),
       author: { username: authorUsername },
       caption,
       date,
@@ -307,9 +409,9 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
       mediaURL: mediaUrls,
       hashtags,
       commentsCntr,
-      place: { id: placeId, name:placeName },
+      place: { id: placeId, name: placeName },
       keywords: Keywords,
-      category : {name : category}
+      category: { name: category },
     };
 
     await DbHelper.PostNode.CreatePost(post);
@@ -321,10 +423,11 @@ export async function createPost(_: any, { authorUsername, caption, date, likesC
   }
 }
 
-export async function  createNotification  (_: any, { username, message }: { username: string, message: string }) : Promise<Notification> {
-  const noti: Notification = {
-    
-  };
+export async function createNotification(
+  _: any,
+  { username, message }: { username: string; message: string }
+): Promise<Notification> {
+  const noti: Notification = {};
 
   // Publish the notification to a specific topic for the user
   pubsub.publish(`NOTIFICATION_ADDED_${username}`, { notificationAdded: noti });
@@ -332,24 +435,31 @@ export async function  createNotification  (_: any, { username, message }: { use
   return noti;
 }
 
-export function subscsribe (_:any, { username }: {username:String}) : AsyncIterator<unknown, any, undefined> {
+export function subscsribe(
+  _: any,
+  { username }: { username: String }
+): AsyncIterator<unknown, any, undefined> {
   return pubsub.asyncIterator(`NOTIFICATION_ADDED_${username}`);
 }
 
-export async function likePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function likePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
-
     // Like the post in the database
     await DbHelper.PostNode.LikePost(username, postId);
-    
+
     //initialize notification service
-    const notiService = new likePostNotificationService()
+    const notiService = new likePostNotificationService();
 
     //call notification service method
-    const noti = await notiService.gnerateNotification(username,postId) 
+    const noti = await notiService.gnerateNotification(username, postId);
 
-    //push the notification to the reciver 
-    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`,{notificationAdded: noti});
+    //push the notification to the reciver
+    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`, {
+      notificationAdded: noti,
+    });
 
     console.log(`Post liked by ${username}: ${postId}`);
   } catch (error) {
@@ -358,8 +468,10 @@ export async function likePost(_: any, { username, postId }: { username: string,
   }
 }
 
-
-export async function savePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function savePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.SavePost(username, postId);
     console.log(`Post saved by ${username}: ${postId}`);
@@ -368,7 +480,10 @@ export async function savePost(_: any, { username, postId }: { username: string,
     throw error;
   }
 }
-export async function archivePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function archivePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.ArchivePost(username, postId);
     console.log(`Post archived by ${username}: ${postId}`);
@@ -377,7 +492,10 @@ export async function archivePost(_: any, { username, postId }: { username: stri
     throw error;
   }
 }
-export async function unlikePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function unlikePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.UnLikePost(username, postId);
     console.log(`Post unliked by ${username}: ${postId}`);
@@ -386,7 +504,10 @@ export async function unlikePost(_: any, { username, postId }: { username: strin
     throw error;
   }
 }
-export async function unsavePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function unsavePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.UnSavePost(username, postId);
     console.log(`Post unsaved by ${username}: ${postId}`);
@@ -395,7 +516,10 @@ export async function unsavePost(_: any, { username, postId }: { username: strin
     throw error;
   }
 }
-export async function unarchivePost(_: any, { username, postId }: { username: string, postId: string }): Promise<void> {
+export async function unarchivePost(
+  _: any,
+  { username, postId }: { username: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.UnArchivePost(username, postId);
     console.log(`Post unarchived by ${username}: ${postId}`);
@@ -404,7 +528,10 @@ export async function unarchivePost(_: any, { username, postId }: { username: st
     throw error;
   }
 }
-export async function deletePost(_: any, { postId }: { postId: string }): Promise<void> {
+export async function deletePost(
+  _: any,
+  { postId }: { postId: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.DeletePost(postId);
     console.log(`Post deleted: ${postId}`);
@@ -413,7 +540,10 @@ export async function deletePost(_: any, { postId }: { postId: string }): Promis
     throw error;
   }
 }
-export async function deleteAllPosts(_: any, { username }: { username: string }): Promise<void> {
+export async function deleteAllPosts(
+  _: any,
+  { username }: { username: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.DeleteALLPosts(username);
     console.log(`All posts deleted for user: ${username}`);
@@ -422,12 +552,18 @@ export async function deleteAllPosts(_: any, { username }: { username: string })
     throw error;
   }
 }
-export async function deleteAllArchivedPosts(_: any, { username }: { username: string }): Promise<void> {
+export async function deleteAllArchivedPosts(
+  _: any,
+  { username }: { username: string }
+): Promise<void> {
   try {
     await DbHelper.PostNode.DeleteAllArchivedPosts(username);
     console.log(`All archived posts deleted for user: ${username}`);
   } catch (error) {
-    console.error(`Error deleting all archived posts for user ${username}:`, error);
+    console.error(
+      `Error deleting all archived posts for user ${username}:`,
+      error
+    );
     throw error;
   }
 }
@@ -453,20 +589,28 @@ export async function deleteAllArchivedPosts(_: any, { username }: { username: s
 //   }
 // }
 
-export async function getPlaceData(_: any, {username, placeId}: {username: string; placeId : string})
-{
-  try{
-    const place = await DbHelper.PlaceNode.getPlaceData(username,placeId);
+export async function getPlaceData(
+  _: any,
+  { username, placeId }: { username: string; placeId: string }
+) {
+  try {
+    const place = await DbHelper.PlaceNode.getPlaceData(username, placeId);
     return place;
-  }
-  catch(error)
-  {
+  } catch (error) {
     console.error("Error fetching place:", error);
     throw error;
   }
 }
 
-export async function addPlace(_: any, { name, mapsId, type, description }: { name: string; mapsId: string; type: string; description: string; }): Promise<Place[]> {
+export async function addPlace(
+  _: any,
+  {
+    name,
+    mapsId,
+    type,
+    description,
+  }: { name: string; mapsId: string; type: string; description: string }
+): Promise<Place[]> {
   try {
     const id = uuidv4(); // Generate a UUID for the place ID
     const newPlace: Place = {
@@ -474,7 +618,7 @@ export async function addPlace(_: any, { name, mapsId, type, description }: { na
       name,
       mapsId,
       type,
-      description
+      description,
     };
 
     const p = [await DbHelper.PlaceNode.AddPlace(newPlace)];
@@ -486,16 +630,29 @@ export async function addPlace(_: any, { name, mapsId, type, description }: { na
   }
 }
 
-
-
-export async function updatePlace(_: any, { placeId, name, mapsId, type, description }: { placeId: string; name?: string; mapsId?: string; type?: string; description?: string; }): Promise<Place[]>{
+export async function updatePlace(
+  _: any,
+  {
+    placeId,
+    name,
+    mapsId,
+    type,
+    description,
+  }: {
+    placeId: string;
+    name?: string;
+    mapsId?: string;
+    type?: string;
+    description?: string;
+  }
+): Promise<Place[]> {
   try {
     const updatedPlace: Place = {
       id: placeId,
       name,
       mapsId,
       type,
-      description
+      description,
     };
 
     const p = [await DbHelper.PlaceNode.EditPlace(placeId, updatedPlace)];
@@ -506,7 +663,10 @@ export async function updatePlace(_: any, { placeId, name, mapsId, type, descrip
     throw new Error("Failed to update place.");
   }
 }
-export async function deletePlace(_: any, { placeId }: { placeId: string }): Promise<void> {
+export async function deletePlace(
+  _: any,
+  { placeId }: { placeId: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.DeletePlace(placeId);
     console.log(`Place deleted: ${placeId}`);
@@ -515,7 +675,10 @@ export async function deletePlace(_: any, { placeId }: { placeId: string }): Pro
     throw error;
   }
 }
-export async function addPostToPlace(_: any, { postId, placeId }: { postId: string; placeId: string }): Promise<void> {
+export async function addPostToPlace(
+  _: any,
+  { postId, placeId }: { postId: string; placeId: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.AddPostToPlace(postId, placeId);
     console.log(`Post ${postId} added to place ${placeId}`);
@@ -524,7 +687,10 @@ export async function addPostToPlace(_: any, { postId, placeId }: { postId: stri
     throw error;
   }
 }
-export async function addPlaceToCategory(_: any, { placeId, categoryName }: { placeId: string; categoryName: string }): Promise<void> {
+export async function addPlaceToCategory(
+  _: any,
+  { placeId, categoryName }: { placeId: string; categoryName: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.AddPlaceToCategory(placeId, categoryName);
     console.log(`Place ${placeId} added to category ${categoryName}`);
@@ -533,7 +699,10 @@ export async function addPlaceToCategory(_: any, { placeId, categoryName }: { pl
     throw error;
   }
 }
-export async function addReviewToPlace(_: any, { reviewId, placeId }: { reviewId: string; placeId: string }): Promise<void> {
+export async function addReviewToPlace(
+  _: any,
+  { reviewId, placeId }: { reviewId: string; placeId: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.AddReviewToPlace(reviewId, placeId);
     console.log(`Review ${reviewId} added to place ${placeId}`);
@@ -542,7 +711,10 @@ export async function addReviewToPlace(_: any, { reviewId, placeId }: { reviewId
     throw error;
   }
 }
-export async function addRatingToPlace(_: any, { ratingId, placeId }: { ratingId: string; placeId: string }): Promise<void> {
+export async function addRatingToPlace(
+  _: any,
+  { ratingId, placeId }: { ratingId: string; placeId: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.AddRatingToPlace(ratingId, placeId);
     console.log(`Rating ${ratingId} added to place ${placeId}`);
@@ -551,7 +723,10 @@ export async function addRatingToPlace(_: any, { ratingId, placeId }: { ratingId
     throw error;
   }
 }
-export async function addUserVisitedPlace(_: any, { username, placeId }: { username: string; placeId: string }): Promise<void> {
+export async function addUserVisitedPlace(
+  _: any,
+  { username, placeId }: { username: string; placeId: string }
+): Promise<void> {
   try {
     await DbHelper.PlaceNode.AddUserVisitedPlace(username, placeId);
     console.log(`User ${username} visited place ${placeId}`);
@@ -561,18 +736,21 @@ export async function addUserVisitedPlace(_: any, { username, placeId }: { usern
   }
 }
 
-export async function SearchPlace(_: any, { place }: { place: string }): Promise<Place[]> {
+export async function SearchPlace(
+  _: any,
+  { place }: { place: string }
+): Promise<Place[]> {
   try {
-      const places = await DbHelper.PlaceNode.SearchPlace(place);
-      console.log(`Places found for query "${place}":`, places);
-      return places;
+    const places = await DbHelper.PlaceNode.SearchPlace(place);
+    console.log(`Places found for query "${place}":`, places);
+    return places;
   } catch (error) {
-      console.error(`Error searching places for query "${place}":`, error);
-      throw error;
+    console.error(`Error searching places for query "${place}":`, error);
+    throw error;
   }
 }
 //s//
-//END OF PLACE NODE FUNCTIONALITIES // 
+//END OF PLACE NODE FUNCTIONALITIES //
 
 // // COMMENT NODE FUNCTIONALITES TILL LINE 351//
 // /////// ERROR  ////////
@@ -598,21 +776,31 @@ export async function SearchPlace(_: any, { place }: { place: string }): Promise
 //   }
 // }
 
-
-export async function fetchPostComments(_: any, { postId }: { postId: string}) : Promise<Comment[]> {
+export async function fetchPostComments(
+  _: any,
+  { postId }: { postId: string }
+): Promise<Comment[]> {
   try {
-    const fetchedComments = await DbHelper.CommentNode.FetchPostComments(postId);
+    const fetchedComments = await DbHelper.CommentNode.FetchPostComments(
+      postId
+    );
     console.log("Comment fetched:", fetchedComments);
     return fetchedComments;
   } catch (error) {
     console.error("Error fetching comment:", error);
     throw error;
   }
-
 }
 
-
-export async function addComment(_: any, { text, date, authorUsername, postId }: { text: string; date: number; authorUsername: string; postId: string; }): Promise<Comment[]> {
+export async function addComment(
+  _: any,
+  {
+    text,
+    date,
+    authorUsername,
+    postId,
+  }: { text: string; date: number; authorUsername: string; postId: string }
+): Promise<Comment[]> {
   try {
     const comment: Comment = {
       id: uuidv4(), // Generate a UUID for the comment ID
@@ -622,7 +810,7 @@ export async function addComment(_: any, { text, date, authorUsername, postId }:
       repliesCntr: 0,
       author: { username: authorUsername },
       likedBy: [],
-      replies: []
+      replies: [],
     };
     const commentId = await DbHelper.CommentNode.addComment(comment, postId);
     console.log("Comment added:", commentId);
@@ -646,9 +834,15 @@ export async function addComment(_: any, { text, date, authorUsername, postId }:
 //   }
 // }
 
-
-
-export async function replyComment(_: any, { text, date, authorUsername, parentId }: { text: string; date: number; authorUsername: string; parentId: string; }): Promise<Comment[]> {
+export async function replyComment(
+  _: any,
+  {
+    text,
+    date,
+    authorUsername,
+    parentId,
+  }: { text: string; date: number; authorUsername: string; parentId: string }
+): Promise<Comment[]> {
   try {
     const comment: Comment = {
       id: uuidv4(),
@@ -658,9 +852,12 @@ export async function replyComment(_: any, { text, date, authorUsername, parentI
       repliesCntr: 0,
       author: { username: authorUsername },
       likedBy: [],
-      replies: []
+      replies: [],
     };
-    const commentId = await DbHelper.CommentNode.replyComment(comment, parentId);
+    const commentId = await DbHelper.CommentNode.replyComment(
+      comment,
+      parentId
+    );
     console.log("Reply added:", commentId);
     return [comment];
   } catch (error) {
@@ -669,22 +866,23 @@ export async function replyComment(_: any, { text, date, authorUsername, parentI
   }
 }
 
-
-
-export async function likeComment(_: any, { username, commentId }: { username: string; commentId: string }): Promise<void> {
+export async function likeComment(
+  _: any,
+  { username, commentId }: { username: string; commentId: string }
+): Promise<void> {
   try {
-
     await DbHelper.CommentNode.LikeComment(username, commentId);
 
     //initialize notification service
-    const notiService = new likeCommentNotificationService()
+    const notiService = new likeCommentNotificationService();
 
     //call notification service method
-    const noti = await notiService.gnerateNotification(username,commentId) 
+    const noti = await notiService.gnerateNotification(username, commentId);
 
-    //push the notification to the reciver 
-    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`,{notificationAdded: noti});
-
+    //push the notification to the reciver
+    pubsub.publish(`NOTIFICATION_ADDED_${noti.receiver}`, {
+      notificationAdded: noti,
+    });
 
     console.log(`Comment ${commentId} liked by ${username}`);
   } catch (error) {
@@ -692,7 +890,10 @@ export async function likeComment(_: any, { username, commentId }: { username: s
     throw error;
   }
 }
-export async function unLikeComment(_: any, { username, commentId }: { username: string; commentId: string }): Promise<void> {
+export async function unLikeComment(
+  _: any,
+  { username, commentId }: { username: string; commentId: string }
+): Promise<void> {
   try {
     await DbHelper.CommentNode.unLikeComment(username, commentId);
     console.log(`Comment ${commentId} unliked by ${username}`);
@@ -702,7 +903,10 @@ export async function unLikeComment(_: any, { username, commentId }: { username:
   }
 }
 // // /////// ERROR  ////////
-export async function fetchComment(_: any, { commentId }: { commentId: string }): Promise<Comment[]> {
+export async function fetchComment(
+  _: any,
+  { commentId }: { commentId: string }
+): Promise<Comment[]> {
   try {
     const fetchedComment = await DbHelper.CommentNode.fetchComment(commentId);
     console.log("Comment fetched:", fetchedComment);
@@ -723,14 +927,29 @@ export async function fetchComment(_: any, { commentId }: { commentId: string })
 //   }
 // }
 
-export async function updateComment(_: any, { commentId, text, date, likesCounter, repliesCntr }: { commentId: string, text: string, date: number, likesCounter: number, repliesCntr: number }): Promise<Comment[]> {
+export async function updateComment(
+  _: any,
+  {
+    commentId,
+    text,
+    date,
+    likesCounter,
+    repliesCntr,
+  }: {
+    commentId: string;
+    text: string;
+    date: number;
+    likesCounter: number;
+    repliesCntr: number;
+  }
+): Promise<Comment[]> {
   try {
     const updatedComment: Comment = {
       id: commentId,
       text,
       date,
       likesCounter,
-      repliesCntr
+      repliesCntr,
     };
 
     await DbHelper.CommentNode.UpdateComment(commentId, updatedComment);
@@ -742,9 +961,14 @@ export async function updateComment(_: any, { commentId, text, date, likesCounte
   }
 }
 
-export async function fetchReplies(_: any, { parentCommentId }: { parentCommentId: string }): Promise<Comment[]> {
+export async function fetchReplies(
+  _: any,
+  { parentCommentId }: { parentCommentId: string }
+): Promise<Comment[]> {
   try {
-    const parentComment = await DbHelper.CommentNode.fetchReplies(parentCommentId);
+    const parentComment = await DbHelper.CommentNode.fetchReplies(
+      parentCommentId
+    );
     console.log("Replies fetched for comment:", parentCommentId);
     return [parentComment];
   } catch (error) {
@@ -753,7 +977,10 @@ export async function fetchReplies(_: any, { parentCommentId }: { parentCommentI
   }
 }
 
-export async function deleteComment(_: any, { commentId }: { commentId: string }): Promise<void> {
+export async function deleteComment(
+  _: any,
+  { commentId }: { commentId: string }
+): Promise<void> {
   try {
     await DbHelper.CommentNode.DeleteComment(commentId);
     console.log(`Comment deleted: ${commentId}`);
@@ -762,15 +989,23 @@ export async function deleteComment(_: any, { commentId }: { commentId: string }
     throw error;
   }
 }
-// //END OF COMMENT NODE FUNCTIONALITIES // 
+// //END OF COMMENT NODE FUNCTIONALITIES //
 
 // JOURNEY NODE FUNCTIONALITES TILL LINE 401//
-export async function createJourney(_: any, { authorUsername, journeyId, title, date }: { authorUsername: string; journeyId: string; title: string; date: number; }): Promise<Journey[]> {
+export async function createJourney(
+  _: any,
+  {
+    authorUsername,
+    journeyId,
+    title,
+    date,
+  }: { authorUsername: string; journeyId: string; title: string; date: number }
+): Promise<Journey[]> {
   try {
     const journey: Journey = {
       id: journeyId,
       title,
-      date
+      date,
     };
 
     const author = { username: authorUsername };
@@ -784,7 +1019,10 @@ export async function createJourney(_: any, { authorUsername, journeyId, title, 
     throw error;
   }
 }
-export async function getUserJourneys(_: any, { username }: { username: string }) {
+export async function getUserJourneys(
+  _: any,
+  { username }: { username: string }
+) {
   try {
     // Fetch user journey using the database module function
     const userJournies = await DbHelper.JourneyNode.FetchUserJournies(username);
@@ -795,9 +1033,15 @@ export async function getUserJourneys(_: any, { username }: { username: string }
     throw error;
   }
 }
-export async function fetchJourneyPosts(_: any, { username, journeyId }: { username: string; journeyId: string }): Promise<Post[]> {
+export async function fetchJourneyPosts(
+  _: any,
+  { username, journeyId }: { username: string; journeyId: string }
+): Promise<Post[]> {
   try {
-    const journeyPosts = await DbHelper.JourneyNode.FetchJourneyPosts(username, journeyId);
+    const journeyPosts = await DbHelper.JourneyNode.FetchJourneyPosts(
+      username,
+      journeyId
+    );
     console.log("Journey posts fetched:", journeyPosts);
     return journeyPosts;
   } catch (error) {
@@ -805,7 +1049,10 @@ export async function fetchJourneyPosts(_: any, { username, journeyId }: { usern
     throw error;
   }
 }
-export async function addPostToJourney(_: any, { postId, journeyId }: { postId: string; journeyId: string }): Promise<void> {
+export async function addPostToJourney(
+  _: any,
+  { postId, journeyId }: { postId: string; journeyId: string }
+): Promise<void> {
   try {
     await DbHelper.JourneyNode.AddPostToJourney(postId, journeyId);
     console.log("Post added to journey:", postId, journeyId);
@@ -814,7 +1061,10 @@ export async function addPostToJourney(_: any, { postId, journeyId }: { postId: 
     throw error;
   }
 }
-export async function deleteJourney(_: any, { journeyId }: { journeyId: string }): Promise<void> {
+export async function deleteJourney(
+  _: any,
+  { journeyId }: { journeyId: string }
+): Promise<void> {
   try {
     await DbHelper.JourneyNode.DeleteJourney(journeyId);
     console.log("Journey deleted:", journeyId);
@@ -823,7 +1073,10 @@ export async function deleteJourney(_: any, { journeyId }: { journeyId: string }
     throw error;
   }
 }
-export async function deletePostFromJourney(_: any, { journeyId, postId }: { journeyId: string; postId: string }): Promise<void> {
+export async function deletePostFromJourney(
+  _: any,
+  { journeyId, postId }: { journeyId: string; postId: string }
+): Promise<void> {
   try {
     await DbHelper.JourneyNode.DeletePostFromJourney(journeyId, postId);
     console.log("Post deleted from journey:", postId, journeyId);
@@ -832,24 +1085,36 @@ export async function deletePostFromJourney(_: any, { journeyId, postId }: { jou
     throw error;
   }
 }
-//END OF JOURNEY NODE FUNCTIONALITIES // 
+//END OF JOURNEY NODE FUNCTIONALITIES //
 
 // REVIEW NODE FUNCTIONALITES TILL LINE 434//
-export async function getReviewsFun(_: any, { username,currentUsername }: { username: string,currentUsername:string }) {
+export async function getReviewsFun(
+  _: any,
+  { username, currentUsername }: { username: string; currentUsername: string }
+) {
   try {
     // Fetch user reviews using the database module function
-    const userReviews = await DbHelper.ReviewNode.FetchUserReviews(username,currentUsername);
+    const userReviews = await DbHelper.ReviewNode.FetchUserReviews(
+      username,
+      currentUsername
+    );
     console.log(userReviews);
-    
+
     return userReviews;
   } catch (error) {
     console.error("Error fetching user reviews:", error);
     throw error;
   }
 }
-export async function fetchPlaceReviews(_: any, { placeId ,currentUsername}: { placeId: string,currentUsername:string }): Promise<Review[]> {
+export async function fetchPlaceReviews(
+  _: any,
+  { placeId, currentUsername }: { placeId: string; currentUsername: string }
+): Promise<Review[]> {
   try {
-    const placeReviews = await DbHelper.ReviewNode.FetchPlaceReviews(placeId,currentUsername);
+    const placeReviews = await DbHelper.ReviewNode.FetchPlaceReviews(
+      placeId,
+      currentUsername
+    );
     console.log("Place reviews fetched:", placeReviews);
     return placeReviews;
   } catch (error) {
@@ -878,16 +1143,41 @@ export async function fetchPlaceReviews(_: any, { placeId ,currentUsername}: { p
 //     throw error;
 //   }
 // }
-export async function addReview(_: any, { authorUsername, placeId, text, overAll, affordability, accesability, priceMin, priceMax, atmosphere, date }: { authorUsername: string; placeId: string; text: string; overAll: number; affordability: number; accesability: number; priceMin: number; priceMax: number; atmosphere: number; date: number; }): Promise<Review[]> {
+export async function addReview(
+  _: any,
+  {
+    authorUsername,
+    placeId,
+    text,
+    overAll,
+    affordability,
+    accesability,
+    priceMin,
+    priceMax,
+    atmosphere,
+    date,
+  }: {
+    authorUsername: string;
+    placeId: string;
+    text: string;
+    overAll: number;
+    affordability: number;
+    accesability: number;
+    priceMin: number;
+    priceMax: number;
+    atmosphere: number;
+    date: number;
+  }
+): Promise<Review[]> {
   try {
     const rating: IRating = {
-      overAll, 
+      overAll,
       affordability,
       accesability,
       priceMin,
       priceMax,
-      atmosphere
-    }
+      atmosphere,
+    };
     const review: Review = {
       id: uuidv4(), // This will be generated dynamically
       text,
@@ -896,7 +1186,7 @@ export async function addReview(_: any, { authorUsername, placeId, text, overAll
       likesCntr: 0,
       dislikesCntr: 0,
       author: { username: authorUsername },
-      place: { id: placeId }
+      place: { id: placeId },
     };
 
     const r = [await DbHelper.ReviewNode.AddReview(review)];
@@ -908,7 +1198,10 @@ export async function addReview(_: any, { authorUsername, placeId, text, overAll
   }
 }
 
-export async function deleteReview(_: any, { reviewId }: { reviewId: string }): Promise<void> {
+export async function deleteReview(
+  _: any,
+  { reviewId }: { reviewId: string }
+): Promise<void> {
   try {
     await DbHelper.ReviewNode.DeleteReview(reviewId);
     console.log("Review deleted:", reviewId);
@@ -918,7 +1211,10 @@ export async function deleteReview(_: any, { reviewId }: { reviewId: string }): 
   }
 }
 
-export async function upvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+export async function upvoteReview(
+  _: any,
+  { reviewId, username }: { reviewId: string; username: string }
+): Promise<void> {
   try {
     await DbHelper.ReviewNode.upvoteReview(reviewId, username);
     console.log(`Review upvoted by ${username}: ${reviewId}`);
@@ -929,46 +1225,73 @@ export async function upvoteReview(_: any, { reviewId, username }: { reviewId: s
   }
 }
 
-export async function undoUpvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+export async function undoUpvoteReview(
+  _: any,
+  { reviewId, username }: { reviewId: string; username: string }
+): Promise<void> {
   try {
     await DbHelper.ReviewNode.undoUpvoteReview(reviewId, username);
     console.log(`Undoing upvote for review ${reviewId} by ${username}`);
   } catch (error) {
-    console.error(`Error undoing upvote for review ${reviewId} by ${username}:`, error);
-    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
+    console.error(
+      `Error undoing upvote for review ${reviewId} by ${username}:`,
+      error
+    );
+    console.error(
+      `Error undoing downvote for review ${reviewId} by ${username}:`,
+      error
+    );
     throw error;
   }
 }
 
-export async function downvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+export async function downvoteReview(
+  _: any,
+  { reviewId, username }: { reviewId: string; username: string }
+): Promise<void> {
   try {
     await DbHelper.ReviewNode.downvoteReview(reviewId, username);
     console.log(`Review downvoted by ${username}: ${reviewId}`);
   } catch (error) {
     console.error(`Error downvoting review ${reviewId} by ${username}:`, error);
-    console.error(`Error downvote for review ${reviewId} by ${username}:`, error);
+    console.error(
+      `Error downvote for review ${reviewId} by ${username}:`,
+      error
+    );
     throw error;
   }
 }
 
-export async function undoDownvoteReview(_: any, { reviewId, username }: { reviewId: string, username: string }): Promise<void> {
+export async function undoDownvoteReview(
+  _: any,
+  { reviewId, username }: { reviewId: string; username: string }
+): Promise<void> {
   try {
     await DbHelper.ReviewNode.undoDownvoteReview(reviewId, username);
     console.log(`Undoing downvote for review ${reviewId} by ${username}`);
   } catch (error) {
-    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
-    console.error(`Error undoing downvote for review ${reviewId} by ${username}:`, error);
+    console.error(
+      `Error undoing downvote for review ${reviewId} by ${username}:`,
+      error
+    );
+    console.error(
+      `Error undoing downvote for review ${reviewId} by ${username}:`,
+      error
+    );
     throw error;
   }
 }
-//END OF REVIEW NODE FUNCTIONALITIES // 
+//END OF REVIEW NODE FUNCTIONALITIES //
 
 // CATEGORY NODE FUNCTIONALITES TILL LINE 434//
-export async function createCategory(_: any, { name, parentName }: { name: string; parentName?: string; }): Promise<Category[]> {
+export async function createCategory(
+  _: any,
+  { name, parentName }: { name: string; parentName?: string }
+): Promise<Category[]> {
   try {
     const category: Category = {
       name,
-      parent: parentName ? { name: parentName } : undefined
+      parent: parentName ? { name: parentName } : undefined,
     };
 
     const c = [await DbHelper.CategoryNode.create(category)];
@@ -979,7 +1302,10 @@ export async function createCategory(_: any, { name, parentName }: { name: strin
     throw error;
   }
 }
-export async function updateCategory(_: any, { oldName, newName }: { oldName: string; newName: string }): Promise<void> {
+export async function updateCategory(
+  _: any,
+  { oldName, newName }: { oldName: string; newName: string }
+): Promise<void> {
   try {
     await DbHelper.CategoryNode.rename(oldName, newName);
     console.log("Category updated:", oldName, "to", newName);
@@ -988,7 +1314,10 @@ export async function updateCategory(_: any, { oldName, newName }: { oldName: st
     throw error;
   }
 }
-export async function deleteCategory(_: any, { name }: { name: string }): Promise<void> {
+export async function deleteCategory(
+  _: any,
+  { name }: { name: string }
+): Promise<void> {
   try {
     await DbHelper.CategoryNode.deleteTree(name);
     console.log("Category deleted:", name);
@@ -998,7 +1327,10 @@ export async function deleteCategory(_: any, { name }: { name: string }): Promis
   }
 }
 
-export async function fetchCategory(_: any, { name }: { name: string }): Promise<Category[]> {
+export async function fetchCategory(
+  _: any,
+  { name }: { name: string }
+): Promise<Category[]> {
   try {
     const fetchedCategories = await DbHelper.CategoryNode.fetchOne(name);
     console.log("Categories fetched:", fetchedCategories);
@@ -1011,7 +1343,9 @@ export async function fetchCategory(_: any, { name }: { name: string }): Promise
 export async function fetchAllCategories(): Promise<{ name: string }[]> {
   try {
     const allCategories = await DbHelper.CategoryNode.fetchAllName();
-    const categoriesWithNameField = allCategories.map((categoryName) => ({ name: categoryName }));
+    const categoriesWithNameField = allCategories.map((categoryName) => ({
+      name: categoryName,
+    }));
     console.log("All categories fetched:", categoriesWithNameField);
     return categoriesWithNameField;
   } catch (error) {
@@ -1019,7 +1353,10 @@ export async function fetchAllCategories(): Promise<{ name: string }[]> {
     throw error;
   }
 }
-export async function fetchCategoryTree(_: any, { name }: { name: string }): Promise<Category[]> {
+export async function fetchCategoryTree(
+  _: any,
+  { name }: { name: string }
+): Promise<Category[]> {
   try {
     const categoryTree = await DbHelper.CategoryNode.fetchTree(name);
     console.log("Category tree fetched:", categoryTree);
@@ -1029,17 +1366,20 @@ export async function fetchCategoryTree(_: any, { name }: { name: string }): Pro
     throw error;
   }
 }
-export async function SearchCategory(_: any, { category }: { category: string }): Promise<Category[]> {
+export async function SearchCategory(
+  _: any,
+  { category }: { category: string }
+): Promise<Category[]> {
   try {
-      const categories = await DbHelper.CategoryNode.SearchCategory(category);
-      console.log(`Categories found for query "${category}":`, categories);
-      return categories;
+    const categories = await DbHelper.CategoryNode.SearchCategory(category);
+    console.log(`Categories found for query "${category}":`, categories);
+    return categories;
   } catch (error) {
-      console.error(`Error searching categories for query "${category}":`, error);
-      throw error;
+    console.error(`Error searching categories for query "${category}":`, error);
+    throw error;
   }
 }
-//END OF CATEGORY NODE FUNCTIONALITIES // 
+//END OF CATEGORY NODE FUNCTIONALITIES //
 
 export function numSevFun() {
   return 7;

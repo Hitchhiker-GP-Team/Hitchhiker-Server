@@ -1,23 +1,24 @@
 import { dbDriver } from "../dbConnection.js";
 import { User } from "../../entities/User.js";
 import { Review } from "../../entities/Review.js";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Place } from "../../entities/Place.js";
 import { IRating } from "../../entities/Rating/IRating.js";
 
-
-
 export class ReviewNode {
-    // --------------------------------------------------------------------------------------
-    // Fetches ------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------
+  // Fetches ------------------------------------------------------------------------------
+  // --------------------------------------------------------------------------------------
 
-    public async FetchUserReviews(username: string, currentUsername:string): Promise<Review[]> {
-        try {
-            const driver = dbDriver;
-            const session = driver.session();
-            const result = await session.run(
-                `
+  public async FetchUserReviews(
+    username: string,
+    currentUsername: string
+  ): Promise<Review[]> {
+    try {
+      const driver = dbDriver;
+      const session = driver.session();
+      const result = await session.run(
+        `
         MATCH (user:User {username: $username})-[:ADD_REVIEW]->(review:Review)-[:REVIEW_ON_PLACE]->(place:Place)
         OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
         OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
@@ -33,62 +34,65 @@ export class ReviewNode {
                CASE WHEN upvote IS NOT NULL THEN true ELSE false END AS isUpVoted,
                CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
         `,
-                { username ,currentUsername}
-            );
-            session.close();
+        { username, currentUsername }
+      );
+      session.close();
 
-            const userReviews: Review[] = [];
+      const userReviews: Review[] = [];
 
-            result.records.forEach((record) => {
-                const reviewProb = record.get("review").properties;
-                const placeProb = record.get("place").properties;
+      result.records.forEach((record) => {
+        const reviewProb = record.get("review").properties;
+        const placeProb = record.get("place").properties;
 
-                const author: User = {
-                    username: record.get("authorUsername"),
-                    profilePic: record.get("authorProfilePic"),
-                    // Add other user properties as needed
-                };
-                const rating : IRating = {
-                    overAll: parseInt(reviewProb.overAll),
-                    affordability: parseInt(reviewProb.affordability),
-                    accesability: parseInt(reviewProb.accesability),
-                    priceMin: parseInt(reviewProb.priceMin),
-                    priceMax: parseInt(reviewProb.priceMax),
-                    atmosphere: parseInt(reviewProb.atmosphere)
-                }
-                const currentReview: Review = {
-                    id: reviewProb.id,
-                    author: author,
-                    place: {
-                        id: placeProb.id,
-                        name: placeProb.name,
-                    },
-                    text: record.get("text"),
-                    rating:rating,
-                    date: parseInt(record.get("date")),
-                    likesCntr: parseInt(record.get("likesCntr")),
-                    dislikesCntr: parseInt(record.get("dislikesCntr")),
-                    isUpvoted:record.get("isUpVoted"),
-                    isDownvoted:record.get("isDownVoted")
-                };
+        const author: User = {
+          username: record.get("authorUsername"),
+          profilePic: record.get("authorProfilePic"),
+          // Add other user properties as needed
+        };
+        const rating: IRating = {
+          overAll: parseInt(reviewProb.overAll),
+          affordability: parseInt(reviewProb.affordability),
+          accesability: parseInt(reviewProb.accesability),
+          priceMin: parseInt(reviewProb.priceMin),
+          priceMax: parseInt(reviewProb.priceMax),
+          atmosphere: parseInt(reviewProb.atmosphere),
+        };
+        const currentReview: Review = {
+          id: reviewProb.id,
+          author: author,
+          place: {
+            id: placeProb.id,
+            name: placeProb.name,
+          },
+          text: record.get("text"),
+          rating: rating,
+          date: parseInt(record.get("date")),
+          likesCntr: parseInt(record.get("likesCntr")),
+          dislikesCntr: parseInt(record.get("dislikesCntr")),
+          isUpvoted: record.get("isUpVoted"),
+          isDownvoted: record.get("isDownVoted"),
+        };
 
-                userReviews.push(currentReview);
-            });
+        userReviews.push(currentReview);
+      });
 
-            console.log(userReviews);
-            return userReviews;
-        } catch (err) {
-            console.error(`Error fetching user reviews: ${err}`);
-            throw err;
-        }
+      console.log(userReviews);
+      return userReviews;
+    } catch (err) {
+      console.error(`Error fetching user reviews: ${err}`);
+      throw err;
     }
+  }
 
-    public async FetchPlaceReviews(placeId: string,currentUsername:string): Promise<Review[]> {
-        try {
-            const driver = dbDriver;
-            const session = driver.session();
-            const result = await session.run(
-            `
+  public async FetchPlaceReviews(
+    placeId: string,
+    currentUsername: string
+  ): Promise<Review[]> {
+    try {
+      const driver = dbDriver;
+      const session = driver.session();
+      const result = await session.run(
+        `
                 MATCH (place:Place {id: $placeId})<-[:REVIEW_ON_PLACE]-(review:Review)<-[:ADD_REVIEW]-(author:User)
                 OPTIONAL MATCH (:User{username : $currentUsername})-[upvote:UPVOTE_REVIEW]->(review)
                 OPTIONAL MATCH (:User{username : $currentUsername})-[downvote:DOWNVOTE_REVIEW]->(review)
@@ -106,71 +110,70 @@ export class ReviewNode {
                         CASE WHEN downvote IS NOT NULL THEN true ELSE false END AS isDownVoted
                 ORDER BY review.likesCntr DESC       
             `,
-                { placeId ,currentUsername}
-            );
-            session.close();
+        { placeId, currentUsername }
+      );
+      session.close();
 
-            const placeReviews: Review[] = [];
+      const placeReviews: Review[] = [];
 
-            result.records.forEach((record) => {
-                const reviewProb = record.get("review").properties;
-                const author: User = {
-                    username: record.get("authorUsername"),
-                    profilePic: record.get("authorProfilePic"),
-                };
+      result.records.forEach((record) => {
+        const reviewProb = record.get("review").properties;
+        const author: User = {
+          username: record.get("authorUsername"),
+          profilePic: record.get("authorProfilePic"),
+        };
 
-                const place: Place = {
-                    name: record.get("placeName"),
-                    id : record.get("placeId") 
-                }
-                const rating : IRating = {
-                    overAll: parseInt(reviewProb.overAll),
-                    affordability: parseInt(reviewProb.affordability),
-                    accesability: parseInt(reviewProb.accesability),
-                    priceMin: parseInt(reviewProb.priceMin),
-                    priceMax: parseInt(reviewProb.priceMax),
-                    atmosphere: parseInt(reviewProb.atmosphere)
-                }
+        const place: Place = {
+          name: record.get("placeName"),
+          id: record.get("placeId"),
+        };
+        const rating: IRating = {
+          overAll: parseInt(reviewProb.overAll),
+          affordability: parseInt(reviewProb.affordability),
+          accesability: parseInt(reviewProb.accesability),
+          priceMin: parseInt(reviewProb.priceMin),
+          priceMax: parseInt(reviewProb.priceMax),
+          atmosphere: parseInt(reviewProb.atmosphere),
+        };
 
-                const currentReview: Review = {
-                    id: reviewProb.id,
-                    author: author,
-                    place: place, // Assuming place is a complete Place object
-                    text: record.get("text"),
-                    rating: rating,
-                    date: parseInt(record.get("date")),
-                    likesCntr: parseInt(record.get("likesCntr")),
-                    dislikesCntr: parseInt(record.get("dislikesCntr")),
-                    isUpvoted:record.get("isUpVoted"),
-                    isDownvoted:record.get("isDownVoted")
-                };
+        const currentReview: Review = {
+          id: reviewProb.id,
+          author: author,
+          place: place, // Assuming place is a complete Place object
+          text: record.get("text"),
+          rating: rating,
+          date: parseInt(record.get("date")),
+          likesCntr: parseInt(record.get("likesCntr")),
+          dislikesCntr: parseInt(record.get("dislikesCntr")),
+          isUpvoted: record.get("isUpVoted"),
+          isDownvoted: record.get("isDownVoted"),
+        };
 
-                placeReviews.push(currentReview);
-            });
+        placeReviews.push(currentReview);
+      });
 
-            console.log(placeReviews);
-            return placeReviews;
-        } catch (err) {
-            console.error(`Error fetching place reviews: ${err}`);
-            throw err;
-        }
+      console.log(placeReviews);
+      return placeReviews;
+    } catch (err) {
+      console.error(`Error fetching place reviews: ${err}`);
+      throw err;
     }
+  }
 
+  public async AddReview(review: Review): Promise<Review> {
+    try {
+      if (!review.place || !review.author) {
+        throw new Error("Place ID or author is missing in the review data.");
+      }
 
-    public async AddReview(review: Review): Promise<Review> {
-        try {
-          if (!review.place || !review.author) {
-            throw new Error("Place ID or author is missing in the review data.");
-          }
-      
-          const driver = dbDriver;
-          const session = driver.session();
-      
-          // Generate a UUID for the review ID
-          review.id = uuidv4();
-      
-          const result = await session.run(
-            `
+      const driver = dbDriver;
+      const session = driver.session();
+
+      // Generate a UUID for the review ID
+      review.id = uuidv4();
+
+      const result = await session.run(
+        `
             MATCH (author:User {username: $username}),
                   (place:Place {id: $placeId})
       
@@ -205,54 +208,52 @@ export class ReviewNode {
       
             RETURN review
             `,
-            {
-              username: review.author?.username,
-              placeId: review.place?.id,
-              reviewId: review.id,
-              text: review.text,
-              rating: review.rating,
-              date: review.date,
-              overAll: review.rating?.overAll,
-              affordability: review.rating?.affordability,
-              accesability : review.rating?.accesability,
-              priceMin: review.rating?.priceMin,
-              priceMax : review.rating?.priceMax,
-              atmosphere : review.rating?.atmosphere,
-              
-            }
-          );
-      
-          return review;
-      
-        } catch (err) {
-          console.error(`Error adding review: ${err}`);
-          throw err;
+        {
+          username: review.author?.username,
+          placeId: review.place?.id,
+          reviewId: review.id,
+          text: review.text,
+          rating: review.rating,
+          date: review.date,
+          overAll: review.rating?.overAll,
+          affordability: review.rating?.affordability,
+          accesability: review.rating?.accesability,
+          priceMin: review.rating?.priceMin,
+          priceMax: review.rating?.priceMax,
+          atmosphere: review.rating?.atmosphere,
         }
+      );
+
+      return review;
+    } catch (err) {
+      console.error(`Error adding review: ${err}`);
+      throw err;
     }
-      
-    public async DeleteReview(reviewId: string): Promise<void> {
-        try {
-            const driver = dbDriver;
-            const result = await driver.executeQuery(
-                `
+  }
+
+  public async DeleteReview(reviewId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
                 MATCH (review:Review {id: $id})<-[:ADD_REVIEW]-(author:User)
                 SET author.reviewsCntr = author.reviewsCntr - 1
                 DETACH DELETE review
                 `,
-                { id: reviewId }
-            );
-        } catch (err) {
-            console.error(`Error deleting review: ${err}`);
-            throw err;
-        }
+        { id: reviewId }
+      );
+    } catch (err) {
+      console.error(`Error deleting review: ${err}`);
+      throw err;
     }
+  }
 
-    public async upvoteReview(reviewId: string, username: string): Promise<void> {
-        this.undoDownvoteReview(reviewId,username);
-        try {
-            const driver = dbDriver;
-            const result = await driver.executeQuery(
-                `
+  public async upvoteReview(reviewId: string, username: string): Promise<void> {
+    this.undoDownvoteReview(reviewId, username);
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
                 MATCH (review:Review {id: $reviewId}),
                       (user:User {username: $username}),
                       (review)<-[:ADD_REVIEW]-(author:User)
@@ -260,18 +261,21 @@ export class ReviewNode {
                 ON CREATE SET review.likesCntr = COALESCE(review.likesCntr, 0) + 1,
                               author.totalUpvotes = COALESCE(author.totalUpvotes, 0) + 1
                 `,
-                { reviewId, username }
-            );
-        } catch (err) {
-            console.error(`Error upvoting review: ${err}`);
-            throw err;
-        }
+        { reviewId, username }
+      );
+    } catch (err) {
+      console.error(`Error upvoting review: ${err}`);
+      throw err;
     }
-    public async undoUpvoteReview(reviewId: string, username: string): Promise<void> {
-        try {
-            const driver = dbDriver;
-            const result = await driver.executeQuery(
-                `
+  }
+  public async undoUpvoteReview(
+    reviewId: string,
+    username: string
+  ): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
                 MATCH (user:User {username: $username})-[upvote:UPVOTE_REVIEW]->(review:Review {id: $reviewId}),
                     (review)<-[:ADD_REVIEW]-(author:User)
                 DELETE upvote
@@ -280,21 +284,23 @@ export class ReviewNode {
                     SET review.likesCntr = review.likesCntr - hasUpvote,
                     author.totalUpvotes = author.totalUpvotes - hasUpvote
                 `,
-                { reviewId, username }
-            );
-        } catch (err) {
-            console.error(`Error undoing upvote for review: ${err}`);
-            throw err;
-        }
+        { reviewId, username }
+      );
+    } catch (err) {
+      console.error(`Error undoing upvote for review: ${err}`);
+      throw err;
     }
-    
+  }
 
-    public async downvoteReview(reviewId: string, username: string): Promise<void> {
-        this.undoUpvoteReview(reviewId,username);
-        try {
-            const driver = dbDriver;
-            const result = await driver.executeQuery(
-                `
+  public async downvoteReview(
+    reviewId: string,
+    username: string
+  ): Promise<void> {
+    this.undoUpvoteReview(reviewId, username);
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
                 MATCH (review:Review {id: $reviewId}),
                       (user:User {username: $username}),
                       (review)<-[:ADD_REVIEW]-(author:User)
@@ -302,18 +308,21 @@ export class ReviewNode {
                 ON CREATE SET review.dislikesCntr = COALESCE(review.dislikesCntr, 0) + 1,
                               author.totalDownvotes = COALESCE(author.totalDownvotes, 0) + 1
                 `,
-                { reviewId, username }
-            );
-        } catch (err) {
-            console.error(`Error upvoting review: ${err}`);
-            throw err;
-        }
+        { reviewId, username }
+      );
+    } catch (err) {
+      console.error(`Error upvoting review: ${err}`);
+      throw err;
     }
-    public async undoDownvoteReview(reviewId: string, username: string): Promise<void> {
-        try {
-            const driver = dbDriver;
-            const result = await driver.executeQuery(
-                `
+  }
+  public async undoDownvoteReview(
+    reviewId: string,
+    username: string
+  ): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
                 MATCH (user:User {username: $username})-[downvote:DOWNVOTE_REVIEW]->(review:Review {id: $reviewId}),
                     (review)<-[:ADD_REVIEW]-(author:User)
                 DELETE downvote
@@ -322,15 +331,11 @@ export class ReviewNode {
                     SET review.dislikesCntr = review.dislikesCntr - hasDownvote,
                     author.totalDownvotes = author.totalDownvotes - hasDownvote
                 `,
-                { reviewId, username }
-            );
-        } catch (err) {
-            console.error(`Error undoing upvote for review: ${err}`);
-            throw err;
-        }
+        { reviewId, username }
+      );
+    } catch (err) {
+      console.error(`Error undoing upvote for review: ${err}`);
+      throw err;
     }
-    
-    
-    
-
+  }
 }

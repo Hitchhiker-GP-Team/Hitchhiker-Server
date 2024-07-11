@@ -47,7 +47,7 @@ export class CommentNode {
     try {
       const driver = dbDriver;
       const session = driver.session();
-  
+
       const result = await session.run(
         `
         MATCH (user:User {username: $username})
@@ -70,13 +70,13 @@ export class CommentNode {
           likesCounter: comment.likesCounter,
           repliesCntr: comment.repliesCntr,
           username: comment.author?.username,
-          postId: postId
+          postId: postId,
         }
       );
-  
+
       session.close();
-  
-      return comment.id || ''; // Ensure that comment.id is not undefined
+
+      return comment.id || ""; // Ensure that comment.id is not undefined
     } catch (err) {
       console.error(`Error adding comment: ${err}`);
       throw err;
@@ -103,7 +103,7 @@ export class CommentNode {
   //           CREATE (user)-[:ADD_COMMENT]->(reply)
   //           WITH reply
   //           MATCH (parentComment : Comment{id:$parentId})
-  //           SET parentComment.repliesCntr = parentComment.repliesCntr + 1  
+  //           SET parentComment.repliesCntr = parentComment.repliesCntr + 1
   //           CREATE (reply)-[:REPLY_TO]->(parentComment)
   //           `,
   //       {
@@ -126,7 +126,7 @@ export class CommentNode {
   //   try {
   //     const driver = dbDriver;
   //     const session = driver.session();
-  
+
   //     const result = await session.run(
   //       `
   //       MATCH (user:User {username: $username})
@@ -148,9 +148,9 @@ export class CommentNode {
   //         parentId: parentId
   //       }
   //     );
-  
+
   //     session.close();
-  
+
   //     return reply.id || '';
   //   } catch (err) {
   //     console.error(`Error replying to comment: ${err}`);
@@ -162,7 +162,7 @@ export class CommentNode {
   //   try {
   //     const driver = dbDriver;
   //     const session = driver.session();
-  
+
   //     const result = await session.run(
   //       `
   //       MATCH (parentComment:Comment {id: $parentId})
@@ -184,9 +184,9 @@ export class CommentNode {
   //         parentId: parentId
   //       }
   //     );
-  
+
   //     session.close();
-  
+
   //     return reply.id || '';
   //   } catch (err) {
   //     console.error(`Error replying to comment: ${err}`);
@@ -197,7 +197,7 @@ export class CommentNode {
     try {
       const driver = dbDriver;
       const session = driver.session();
-  
+
       const result = await session.run(
         `
         MATCH (parentComment:Comment {id: $parentId})
@@ -218,19 +218,18 @@ export class CommentNode {
           text: reply.text,
           date: reply.date,
           username: reply.author!.username,
-          parentId: parentId
+          parentId: parentId,
         }
       );
-  
+
       session.close();
-  
-      return reply.id || '';
+
+      return reply.id || "";
     } catch (err) {
       console.error(`Error replying to comment: ${err}`);
       throw err;
     }
   }
-  
 
   public async LikeComment(username: string, commentId: string) {
     try {
@@ -249,7 +248,7 @@ export class CommentNode {
       throw err;
     }
   }
-  
+
   public async unLikeComment(username: string, commentId: string) {
     try {
       const driver = dbDriver;
@@ -268,7 +267,6 @@ export class CommentNode {
   }
 
   //fetch
-
 
   // public async fetchComment(id: string): Promise<Comment> {
   //   try {
@@ -302,14 +300,14 @@ export class CommentNode {
         { id: id },
         { database: "neo4j" }
       );
-  
+
       if (records.length === 0) {
         throw new Error(`Comment with id ${id} not found.`);
       }
-  
+
       const commentRecord = records[0].get("comment");
       const authorRecord = records[0].get("author");
-  
+
       const comment: Comment = {
         id: commentRecord.properties.id,
         text: commentRecord.properties.text,
@@ -338,14 +336,13 @@ export class CommentNode {
         likedBy: [], // You may need to populate this if necessary
         replies: [], // You may need to populate this if necessary
       };
-  
+
       return comment;
     } catch (err) {
       console.error(`Error CommentNode.fetchComment(): ${err}`);
       throw err;
     }
   }
-  
 
   //   async fetchReplies(parentCommentId: string): Promise<Comment> {
   //     try {
@@ -391,14 +388,14 @@ export class CommentNode {
         { id: parentCommentId },
         { database: "neo4j" }
       );
-  
+
       const parentComment: Comment = await this.fetchComment(parentCommentId);
       parentComment.replies = [];
-  
+
       for (const record of records) {
         const replyRecord = record.get("reply");
         const authorRecord = record.get("author");
-  
+
         const reply: Comment = {
           id: replyRecord.properties.id,
           text: replyRecord.properties.text,
@@ -427,13 +424,15 @@ export class CommentNode {
           likedBy: [], // You may need to populate this if necessary
           replies: [], // You may need to populate this if necessary
         };
-  
+
         parentComment.replies.push(reply);
       }
-  
+
       return parentComment;
     } catch (err) {
-      console.error(`Error fetching replies for comment ${parentCommentId}: ${err}`);
+      console.error(
+        `Error fetching replies for comment ${parentCommentId}: ${err}`
+      );
       throw err;
     }
   }
@@ -464,7 +463,10 @@ export class CommentNode {
     return comment;
   }
 
-  public async UpdateComment(commentId: string, updatedComment: Comment): Promise<void> {
+  public async UpdateComment(
+    commentId: string,
+    updatedComment: Comment
+  ): Promise<void> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -480,7 +482,7 @@ export class CommentNode {
           text: updatedComment.text,
           date: updatedComment.date,
           likesCounter: updatedComment.likesCounter,
-          repliesCntr: updatedComment.repliesCntr
+          repliesCntr: updatedComment.repliesCntr,
         }
       );
     } catch (err) {
@@ -498,7 +500,7 @@ export class CommentNode {
         DETACH DELETE comment
         `,
         {
-          id: commentId
+          id: commentId,
         }
       );
     } catch (err) {
@@ -507,13 +509,11 @@ export class CommentNode {
     }
   }
 
-  public async FetchPostComments(postId: string): Promise<Comment[]>
-  {
-
+  public async FetchPostComments(postId: string): Promise<Comment[]> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
-          `
+        `
           MATCH (comment:Comment)-[:COMMENT_ON_POST]->(post:Post{id:$id})
           OPTIONAL MATCH (author)-[:ADD_COMMENT]->(comment)
           RETURN comment,
@@ -523,46 +523,41 @@ export class CommentNode {
           SKIP 0
           LIMIT 50
           `,
-          { 'id' : postId }
+        { id: postId }
       );
 
       // a list to hold all comments retrieved from the database
       const postComments: Comment[] = [];
 
       result.records.forEach((record) => {
+        // load User Card
+        const author: User = {
+          profilePic: record.get("authorProfilePic"),
+          username: record.get("authorUsername"),
+        };
 
-          // load User Card
-          const author: User = {
-              profilePic: record.get("authorProfilePic"),
-              username: record.get("authorUsername"),
-          };
+        //---------------------------------
+        // load Comment object
+        //---------------------------------
+        const currentPost: Comment = {
+          author: author,
+          text: record.get("comment").properties.text,
+          id: record.get("comment").properties.id,
+          date: record.get("comment").properties.date,
+          likesCounter: record.get("comment").properties.likesCounter,
+          repliesCntr: record.get("comment").properties.repliesCntr,
+        };
 
-          //---------------------------------
-          // load Comment object
-          //---------------------------------
-          const currentPost: Comment = {
-              author : author,
-              text : record.get("comment").properties.text,
-              id : record.get("comment").properties.id,
-              date: record.get("comment").properties.date,
-              likesCounter: record.get("comment").properties.likesCounter,
-              repliesCntr: record.get("comment").properties.repliesCntr
-          };
+        console.log("comment text" + currentPost.text);
 
-         console.log("comment text"+currentPost.text); 
-
-          //pushing current comment object into the list
-          postComments.push(currentPost);
+        //pushing current comment object into the list
+        postComments.push(currentPost);
       });
 
       return postComments;
-  } catch (err) {
+    } catch (err) {
       console.error(`Error fetching user posts: ${err}`);
       throw err;
+    }
   }
-
-    
-  }
-
-
 }

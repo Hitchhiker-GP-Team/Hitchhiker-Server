@@ -2,22 +2,19 @@ import { dbDriver } from "../dbConnection.js";
 import { Post } from "../../entities/Post.js";
 import { User } from "../../entities/User.js";
 import { Place } from "../../entities/Place.js";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Category } from "../../entities/Category.js";
 
-
-
-export class PostNode  {
-
+export class PostNode {
   // --------------------------------------------------------------------------------------
   // Fetches ------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
   public async FetchUserProfilePosts(username: string): Promise<Post[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:ADD_POST]->(post:Post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
@@ -35,75 +32,74 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            { username }
-        );
+        { username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-            
-            // load the list with tagged usernames
-            const taggedUsers = record.get("tags");
-            const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                username: taggedUsername
-            }));
+      result.records.forEach((record) => {
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-            //load post properties
-            const postProb = record.get("post").properties;
-            
-            //load category
-            const Category: Category={
-                name:record.get("categoryName")
-            }
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            // load Place
-            const placeProb = record.get("place").properties;
-             const place: Place = {
-                 name: placeProb.name,
-                 mapsId: placeProb.mapsId,
-                 id: placeProb.id
-            };
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("username"),
-            };
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tagstags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved"),
-            };
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("username"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tagstags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
 
-        return userPosts;
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
   public async FetchFollowingsPosts(username: string): Promise<Post[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)
             OPTIONAL MATCH (following)-[:ADD_POST]->(post:Post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
@@ -123,75 +119,75 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            { username }
-        );
+        { username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
-        console.log(result.records[0])
-        if(result.records[0] === undefined) return [];
-        result.records.forEach((record) => {
-              // load the list with tagged usernames
-              const taggedUsers = record.get("tags");
-              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                  username: taggedUsername
-              }));
-  
-              //load post properties
-              const postProb = record.get("post").properties;
-              
-              //load category
-              const Category: Category={
-                  name:record.get("categoryName")
-              }
-  
-              // load Place
-              const placeProb = record.get("place").properties;
-               const place: Place = {
-                   name: placeProb.name,
-                   mapsId: placeProb.mapsId,
-                   id: placeProb.id
-              };
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
+      console.log(result.records[0]);
+      if (result.records[0] === undefined) return [];
+      result.records.forEach((record) => {
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("username"),
-            };
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved"),
-            };
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
 
-        return userPosts;
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("username"),
+        };
+
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
+
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
   public async FetchSavedPosts(username: string): Promise<Post[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:SAVE_POST]->(post:Post)
             OPTIONAL MATCH (author:User)-[:ADD_POST]->(post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
@@ -210,76 +206,75 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            { username }
-        );
+        { username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-            // load the list with tags usernames
-              // load the list with tagged usernames
-              const taggedUsers = record.get("tags");
-              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                  username: taggedUsername
-              }));
-  
-              //load post properties
-              const postProb = record.get("post").properties;
-              
-              //load category
-              const Category: Category={
-                  name:record.get("categoryName")
-              }
-  
-              // load Place
-              const placeProb = record.get("place").properties;
-               const place: Place = {
-                   name: placeProb.name,
-                   mapsId: placeProb.mapsId,
-                   id: placeProb.id
-              };
+      result.records.forEach((record) => {
+        // load the list with tags usernames
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("username"),
-            
-            };
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved"),
-            };
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
 
-        return userPosts;
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("username"),
+        };
+
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
+
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
   public async FetchLikedPosts(username: string): Promise<Post[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:LIKES_POST]->(post:Post)
             OPTIONAL MATCH (author:User)-[:ADD_POST]->(post)
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
@@ -299,77 +294,77 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            { username }
-        );
+        { username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-           
+      result.records.forEach((record) => {
         // load the list with tagged usernames
         const taggedUsers = record.get("tags");
         const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-            username: taggedUsername
+          username: taggedUsername,
         }));
 
         //load post properties
         const postProb = record.get("post").properties;
-        
+
         //load category
-        const Category: Category={
-            name:record.get("categoryName")
-        }
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
         // load Place
         const placeProb = record.get("place").properties;
         const place: Place = {
-            name: placeProb.name,
-            mapsId: placeProb.mapsId,
-            id: placeProb.id
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
         };
 
         // load User Card
         const author: User = {
-            profilePic: record.get("authorProfilePic"),
-            username: record.get("authorUsername"),
+          profilePic: record.get("authorProfilePic"),
+          username: record.get("authorUsername"),
         };
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tagstags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved"),
-            };
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tagstags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        userPosts.push(currentPost);
+      });
 
-        return userPosts;
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async FetchPlacePosts(username: string ,placeId : string): Promise<Post[]> {
+  public async FetchPlacePosts(
+    username: string,
+    placeId: string
+  ): Promise<Post[]> {
     try {
-
-
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (author:User)-[:ADD_POST]->(post:Post)-[:HAPPEND_AT]->(place:Place {id : $placeId})
             OPTIONAL MATCH (user:User{username:$username})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
@@ -388,76 +383,77 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            {placeId,username}
-        );
+        { placeId, username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-              // load the list with tagged usernames
-              const taggedUsers = record.get("tags");
-              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                  username: taggedUsername
-              }));
-  
-              //load post properties
-              const postProb = record.get("post").properties;
-              
-              //load category
-              const Category: Category={
-                  name:record.get("categoryName")
-              }
-  
-              // load Place
-              const placeProb = record.get("place").properties;
-               const place: Place = {
-                   name: placeProb.name,
-                   mapsId: placeProb.mapsId,
-                   id: placeProb.id
-              };
+      result.records.forEach((record) => {
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("authorUsername"),
-            };
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved")
-            };
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
 
-        return userPosts;
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("authorUsername"),
+        };
+
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
+
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async FetchCategoryPosts(username : string ,category : string): Promise<Post[]> {
+  public async FetchCategoryPosts(
+    username: string,
+    category: string
+  ): Promise<Post[]> {
     try {
-
-
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (author:User)-[:ADD_POST]->(post:Post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category{name:$category})
             OPTIONAL MATCH (user:User{username:$username})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
@@ -477,74 +473,74 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            {username ,category}
-        );
+        { username, category }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-            // load the list with tags usernames
-              // load the list with tagged usernames
-              const taggedUsers = record.get("tags");
-              const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                  username: taggedUsername
-              }));
-  
-              //load post properties
-              const postProb = record.get("post").properties;
-              
-              //load category
-              const Category: Category={
-                  name:record.get("categoryName")
-              }
-  
-              // load Place
-              const placeProb = record.get("place").properties;
-               const place: Place = {
-                   name: placeProb.name,
-                   mapsId: placeProb.mapsId,
-                   id: placeProb.id
-              };
+      result.records.forEach((record) => {
+        // load the list with tags usernames
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-            // load User Card
-            const author: User = {
-                profilePic: record.get("profilePic"),
-                username: record.get("authorUsername"),
-            };
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved")
-            };
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            userPosts.push(currentPost);
-        });
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-        return userPosts;
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
+
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("authorUsername"),
+        };
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
+
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
   public async FetchArchivedPosts(username: string): Promise<Post[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:ARCHIVE_POST]->(post:Post)
             OPTIONAL MATCH (user)-[save:SAVE_POST]->(post)
             OPTIONAL MATCH (post)-[:POST_BELONGS_TO_CATEGORY]->(category:Category)
@@ -562,74 +558,74 @@ export class PostNode  {
             SKIP 0
             LIMIT 50
             `,
-            { username }
-        );
+        { username }
+      );
 
-        // a list to hold all posts retrieved from the database
-        const userPosts: Post[] = [];
+      // a list to hold all posts retrieved from the database
+      const userPosts: Post[] = [];
 
-        result.records.forEach((record) => {
-             // load the list with tagged usernames
-             const taggedUsers = record.get("tags");
-             const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-                 username: taggedUsername
-             }));
- 
-             //load post properties
-             const postProb = record.get("post").properties;
-             
-             //load category
-             const Category: Category={
-                 name:record.get("categoryName")
-             }
- 
-             // load Place
-             const placeProb = record.get("place").properties;
-              const place: Place = {
-                  name: placeProb.name,
-                  mapsId: placeProb.mapsId,
-                  id: placeProb.id
-             };
+      result.records.forEach((record) => {
+        // load the list with tagged usernames
+        const taggedUsers = record.get("tags");
+        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+          username: taggedUsername,
+        }));
 
-           // load User Card
-           const author: User = {
-               profilePic: record.get("profilePic"),
-               username: record.get("username"),
-           };
+        //load post properties
+        const postProb = record.get("post").properties;
 
-            // load Post object
-            const currentPost: Post = {
-                id: postProb.id,
-                mediaURL: postProb.mediaUrls,
-                author: author,
-                caption: postProb.caption,
-                date: parseFloat(postProb.postingDate), // test-driven
-                hashtags: postProb.hashtags,
-                tags: postProb.tags,
-                place: place,
-                keywords: postProb.keywords,
-                likesCntr: parseFloat(postProb.likesCntr), // test-driven
-                commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-                category: Category,
-                liked: record.get("liked"),
-                saved: record.get("saved"),
-            };
+        //load category
+        const Category: Category = {
+          name: record.get("categoryName"),
+        };
 
-            userPosts.push(currentPost);
-        });
+        // load Place
+        const placeProb = record.get("place").properties;
+        const place: Place = {
+          name: placeProb.name,
+          mapsId: placeProb.mapsId,
+          id: placeProb.id,
+        };
 
-        return userPosts;
+        // load User Card
+        const author: User = {
+          profilePic: record.get("profilePic"),
+          username: record.get("username"),
+        };
+
+        // load Post object
+        const currentPost: Post = {
+          id: postProb.id,
+          mediaURL: postProb.mediaUrls,
+          author: author,
+          caption: postProb.caption,
+          date: parseFloat(postProb.postingDate), // test-driven
+          hashtags: postProb.hashtags,
+          tags: postProb.tags,
+          place: place,
+          keywords: postProb.keywords,
+          likesCntr: parseFloat(postProb.likesCntr), // test-driven
+          commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+          category: Category,
+          liked: record.get("liked"),
+          saved: record.get("saved"),
+        };
+
+        userPosts.push(currentPost);
+      });
+
+      return userPosts;
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
   public async fetchPostById(postId: string): Promise<Post | null> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User)-[:ADD_POST]->(post:Post {id: $postId})
             OPTIONAL MATCH (user)-[like:LIKES_POST]->(post)
             OPTIONAL MATCH (post)-[:HAPPEND_AT]->(place:Place)
@@ -646,84 +642,79 @@ export class PostNode  {
                    COLLECT(tagged.username) as tags
             LIMIT 1
             `,
-            { postId }
-        );
+        { postId }
+      );
 
-        if (result.records.length === 0) {
-            return null;
-        }
+      if (result.records.length === 0) {
+        return null;
+      }
 
-        const record = result.records[0];
-        
-        // Load the list with tagged usernames
-        const taggedUsers = record.get("tags");
-        const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
-            username: taggedUsername
-        }));
+      const record = result.records[0];
 
-        // Load post properties
-        const postProb = record.get("post").properties;
-        
-        // Load category
-        const category: Category = {
-            name: record.get("categoryName")
-        };
+      // Load the list with tagged usernames
+      const taggedUsers = record.get("tags");
+      const tags: User[] = taggedUsers.map((taggedUsername: string) => ({
+        username: taggedUsername,
+      }));
 
-        // Load place
-        
+      // Load post properties
+      const postProb = record.get("post").properties;
 
-        const placeProb = record.get("place").properties;
-              const place: Place = {
-                  name: placeProb.name,
-                  mapsId: placeProb.mapsId,
-                  id: placeProb.id
-        };
+      // Load category
+      const category: Category = {
+        name: record.get("categoryName"),
+      };
 
-        // Load user card
-        const author: User = {
-            profilePic: record.get("profilePic"),
-            username: record.get("username"),
-        };
+      // Load place
 
-        // Load post object
-        const currentPost: Post = {
-            id: postProb.id,
-            mediaURL: postProb.mediaUrls,
-            author: author,
-            caption: postProb.caption,
-            date: parseFloat(postProb.postingDate), // test-driven
-            hashtags: postProb.hashtags,
-            tags: postProb.tags,
-            place: place,
-            keywords: postProb.keywords,
-            likesCntr: parseFloat(postProb.likesCntr), // test-driven
-            commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
-            category: category,
-            liked: record.get("liked"),
-            saved: record.get("saved"),
-        };
+      const placeProb = record.get("place").properties;
+      const place: Place = {
+        name: placeProb.name,
+        mapsId: placeProb.mapsId,
+        id: placeProb.id,
+      };
 
-        return currentPost;
+      // Load user card
+      const author: User = {
+        profilePic: record.get("profilePic"),
+        username: record.get("username"),
+      };
 
+      // Load post object
+      const currentPost: Post = {
+        id: postProb.id,
+        mediaURL: postProb.mediaUrls,
+        author: author,
+        caption: postProb.caption,
+        date: parseFloat(postProb.postingDate), // test-driven
+        hashtags: postProb.hashtags,
+        tags: postProb.tags,
+        place: place,
+        keywords: postProb.keywords,
+        likesCntr: parseFloat(postProb.likesCntr), // test-driven
+        commentsCntr: parseFloat(postProb.commentsCntr), // test-driven
+        category: category,
+        liked: record.get("liked"),
+        saved: record.get("saved"),
+      };
+
+      return currentPost;
     } catch (err) {
-        console.error(`Error fetching post by ID: ${err}`);
-        throw err;
+      console.error(`Error fetching post by ID: ${err}`);
+      throw err;
     }
   }
   // --------------------------------------------------------------------------------------
   // Creations ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-   public async CreatePost(post : Post): Promise<Post> {
-     try {
+  public async CreatePost(post: Post): Promise<Post> {
+    try {
+      const d = Math.floor(Number(post.date));
 
-       
-
-       const d = Math.floor(Number(post.date))
-
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (author:User {username: $username})
             MATCH (category:Category{name:$categoryName})
 
@@ -769,44 +760,39 @@ export class PostNode  {
             
 
             RETURN post
-            `
-            ,
-            {
-              //user
-              username    :post.author?.username, 
-              //post
-              postId      :post.id,
-              caption     :post.caption,
-              postingDate :post.date,
-              likesCntr   :post.likesCntr,
-              mediaUrls   :post.mediaURL,
-              hashtags    :post.hashtags,
-              commentsCntr:post.commentsCntr,
-              tags        :post.tags,
-              //place
-              placeId     :post.place?.id,
-              placeName   :post.place?.name,
-              //category
-              categoryName:post.category?.name,
-              predictions:post.keywords
-            }
-        );
-        
+            `,
+        {
+          //user
+          username: post.author?.username,
+          //post
+          postId: post.id,
+          caption: post.caption,
+          postingDate: post.date,
+          likesCntr: post.likesCntr,
+          mediaUrls: post.mediaURL,
+          hashtags: post.hashtags,
+          commentsCntr: post.commentsCntr,
+          tags: post.tags,
+          //place
+          placeId: post.place?.id,
+          placeName: post.place?.name,
+          //category
+          categoryName: post.category?.name,
+          predictions: post.keywords,
+        }
+      );
 
-        return post;
+      return post;
     } catch (err) {
       console.error(`Error CreatePost: ${err}`);
       throw err;
     }
   }
 
-  public async LikePost(us :string , postId: string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async LikePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User {username: $username}),
               (post:Post {id: $id}),
@@ -826,68 +812,58 @@ export class PostNode  {
             ON MATCH SET exp.score = exp.score + 10
             REMOVE user.madeLike
         )
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error LikePost: ${err}`);
-        throw err;
+      console.error(`Error LikePost: ${err}`);
+      throw err;
     }
   }
 
-  public async SavePost(us :string , postId: string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async SavePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User {username : $username}),
             (post : Post{id:$id})
     
         CREATE (user)-[:SAVE_POST]->(post)
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async ArchivePost(us :string , postId: string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async ArchivePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (u:User{username:$username})-[r:ADD_POST]->(p:Post{id:$id})
         DELETE r
         CREATE (u)-[:ARCHIVE_POST]->(p)
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
-
 
   // --------------------------------------------------------------------------------------
   // Updates ------------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
-  
-  public async UnLikePost(us :string , postId: string) : Promise<void>
-  {
 
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async UnLikePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User {username : $username})-[likeRel:LIKES_POST]->(post : Post{id:$id}),
               (post)<-[:ADD_POST]-(author:User),
@@ -911,120 +887,99 @@ export class PostNode  {
         WHERE exp.score <= 0
         DELETE exp
 
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async UnSavePost(us :string , postId: string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async UnSavePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User {username : $username})-[save:SAVE_POST]->(post : Post{id:$id})
         DELETE save 
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async UnArchivePost(us :string , postId: string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async UnArchivePost(us: string, postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (u:User{username:$username})-[r:ARCHIVE_POST]->(p:Post{id:$id})
         DELETE r
         CREATE (u)-[:ADD_POST]->(p)
-        `    
-        ,{username : us , id : postId}
-    )
+        `,
+        { username: us, id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
-
 
   // --------------------------------------------------------------------------------------
   // Deletions ----------------------------------------------------------------------------
   // --------------------------------------------------------------------------------------
 
-  public async DeletePost(postId: string ) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async DeletePost(postId: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (post:Post{id:$id})<-[:ADD_POST]-(user:User)
         SET user.postCntr = COALESCE(user.postCntr, 0) - 1
         DETACH DELETE post
-        `    
-        ,{ id : postId}
-    )
+        `,
+        { id: postId }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async DeleteALLPosts(username:string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async DeleteALLPosts(username: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User{username:$username})-[:ADD_POST]->(post:Post)
         SET user.postCntr = 0
         DETACH DELETE post
-        `    
-        ,{ username : username}
-    )
+        `,
+        { username: username }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
 
-  public async DeleteAllArchivedPosts(username:string) : Promise<void>
-  {
-
-    try{
-
-    const driver =dbDriver
-    const result = await driver.executeQuery(
+  public async DeleteAllArchivedPosts(username: string): Promise<void> {
+    try {
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
         `
         MATCH (user:User{username:$username})-[:ARCHIVE_POST]->(post:Post)
         DETACH DELETE post
-        `    
-        ,{ username : username}
-    )
+        `,
+        { username: username }
+      );
     } catch (err) {
-        console.error(`Error fetching user posts: ${err}`);
-        throw err;
+      console.error(`Error fetching user posts: ${err}`);
+      throw err;
     }
   }
-
 }
-
-
-
-

@@ -12,7 +12,7 @@ export class User {
   Name?: string;
   birthDate?: Number;
   homeLocation?: [Number];
-  sex?:string;
+  sex?: string;
   titles?: titles[];
   Bio?: string;
   followingCntr?: Number;
@@ -26,17 +26,12 @@ export class User {
   score?: Number;
   totalUpvotes?: Number;
   totalDownvotes?: Number;
-  isFollowed? : boolean;
+  isFollowed?: boolean;
 }
 
 export class titles {
-  title? : string;
-  score? : Number;
+  title?: string;
+  score?: Number;
 }
 
 export type sex = "m" | "f";
-
-/*
-let titles:titles = {};
-titles['hello'] = 123;
-*/

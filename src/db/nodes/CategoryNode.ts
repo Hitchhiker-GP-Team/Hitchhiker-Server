@@ -61,7 +61,7 @@ export class CategoryNode {
       let parentName: string = "Origin";
       if (category.parent !== undefined) parentName = category.parent.name!;
       this.linkChild(childName, parentName);
-  
+
       // Return the created category
       return category;
     } catch (err) {
@@ -69,7 +69,7 @@ export class CategoryNode {
       throw err;
     }
   }
-  
+
   /**
    * Create/Update - Make relationship "SUB_CATEGORY_TO" between (link) twoCategories.
    * @param {string} childName - child (sub) Category's name.
@@ -292,24 +292,26 @@ export class CategoryNode {
 
   public async SearchCategory(category: string): Promise<Category[]> {
     try {
-        const driver = dbDriver;
-        const session = driver.session();
+      const driver = dbDriver;
+      const session = driver.session();
 
-        const result = await session.run(
-            `
+      const result = await session.run(
+        `
             MATCH (category:Category)
             WHERE toLower(category.name) CONTAINS toLower($category)
             RETURN category
             `,
-            { category: category }
-        );
+        { category: category }
+      );
 
-        session.close();
+      session.close();
 
-        return result.records.map(record => record.get("category").properties as Category);
+      return result.records.map(
+        (record) => record.get("category").properties as Category
+      );
     } catch (err) {
-        console.error(`Error searching categories: ${err}`);
-        throw err;
+      console.error(`Error searching categories: ${err}`);
+      throw err;
     }
-}
+  }
 }

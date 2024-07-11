@@ -1,7 +1,5 @@
 import { dbDriver } from "../dbConnection.js";
 import { User, titles } from "../../entities/User.js";
-// import { PostNode } from "./PostNode.js";
-// import { ReviewNode } from "./ReviewNode.js";
 
 export class UserNode {
   public async AddUser(user: User): Promise<User> {
@@ -64,11 +62,10 @@ export class UserNode {
         { username }
       );
 
+      console.log(result.records.length);
 
-      console.log(result.records.length)
-
-      if( result.records.length > 0 ){
-      const user = result.records[0]?.get('user').properties;
+      if (result.records.length > 0) {
+        const user = result.records[0]?.get("user").properties;
         return {
           id: user.id,
           email: user.email,
@@ -83,7 +80,7 @@ export class UserNode {
           followingCntr: user.followingCntr,
           followersCntr: user.followersCntr,
           postCntr: user.postCntr,
-          reviewsCntr: user.reviewsCntr
+          reviewsCntr: user.reviewsCntr,
         };
       }
 
@@ -130,7 +127,10 @@ export class UserNode {
       throw err;
     }
   }
-  public async FetchUserProfile(profileUsername: string, currentUsername:string): Promise<User> {
+  public async FetchUserProfile(
+    profileUsername: string,
+    currentUsername: string
+  ): Promise<User> {
     try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
@@ -143,7 +143,7 @@ export class UserNode {
                CASE WHEN follow IS NOT NULL THEN true ELSE false END AS isFollowed
 
         `,
-        { profileUsername , currentUsername}
+        { profileUsername, currentUsername }
       );
 
       let userProfile: User = {} as User;
@@ -160,10 +160,13 @@ export class UserNode {
           postCntr: parseFloat(userData.postCntr),
           reviewsCntr: parseFloat(userData.reviewsCntr),
           score: parseFloat(userData.score),
-          titles: this.processScores(record.get("ranks"),parseFloat(userData.score)),
+          titles: this.processScores(
+            record.get("ranks"),
+            parseFloat(userData.score)
+          ),
           totalUpvotes: parseFloat(userData.totalUpvotes),
           totalDownvotes: parseFloat(userData.totalDownvotes),
-          isFollowed : record.get("isFollowed")
+          isFollowed: record.get("isFollowed"),
         };
       });
       return userProfile;
@@ -172,38 +175,30 @@ export class UserNode {
       throw err;
     }
   }
-  public modifyTitle(category: string, score:number): string {
-    
+  public modifyTitle(category: string, score: number): string {
     if (category === "Origin") {
       return ""; // Return an empty string or any other way to indicate exclusion
     }
 
-    if(score > 0 && score < 500)
-      return category + " Beginner "  
-    else if(score >= 500 && score < 1000)
-      return category + " Lover";
-    else if(score >= 1000 && score < 2000)
-      return category + " Enthusiast";
-    else if(score >= 2000 && score < 4000)
-      return category + " Critic"
-    else if(score >= 4000)
-      return category + " Master"
-    else if(score == 0)
-      return category + " Newbie"
-    else
-      return category + " Hater";
-
+    if (score > 0 && score < 500) return category + " Beginner ";
+    else if (score >= 500 && score < 1000) return category + " Lover";
+    else if (score >= 1000 && score < 2000) return category + " Enthusiast";
+    else if (score >= 2000 && score < 4000) return category + " Critic";
+    else if (score >= 4000) return category + " Master";
+    else if (score == 0) return category + " Newbie";
+    else return category + " Hater";
   }
-  public processScores(scores: any[],score:number): titles[] {
+  public processScores(scores: any[], score: number): titles[] {
     let ranks: titles[] = [];
-    ranks.push({title: "Hitches", score: score});
-    if(scores[0].title)
-    {
-      scores = scores.map(score => ({
-        title: this.modifyTitle(score.title, score.score),
-        score: parseFloat(score.score),
-      })).filter(score => score.title !== "")
-      .sort((a, b) => b.score - a.score); 
+    ranks.push({ title: "Hitches", score: score });
+    if (scores[0].title) {
+      scores = scores
+        .map((score) => ({
+          title: this.modifyTitle(score.title, score.score),
+          score: parseFloat(score.score),
+        }))
+        .filter((score) => score.title !== "")
+        .sort((a, b) => b.score - a.score);
 
       ranks.push(...scores);
     }
@@ -232,47 +227,51 @@ export class UserNode {
       throw err;
     }
   }
-  public async getFollowingList(username: string): Promise<{ username: string, profilePic: string }[]> {
+  public async getFollowingList(
+    username: string
+  ): Promise<{ username: string; profilePic: string }[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (user:User {username: $username})-[:FOLLOWS]->(following:User)
             RETURN following.username AS username, following.profilePic AS profilePic
             `,
-            { username }
-        );
+        { username }
+      );
 
-        return result.records.map(record => ({
-            username: record.get('username'),
-            profilePic: record.get('profilePic')
-        }));
+      return result.records.map((record) => ({
+        username: record.get("username"),
+        profilePic: record.get("profilePic"),
+      }));
     } catch (err) {
-        console.error(`Error fetching following list: ${err}`);
-        throw err;
+      console.error(`Error fetching following list: ${err}`);
+      throw err;
     }
-}
+  }
 
-public async getFollowersList(username: string): Promise<{ username: string, profilePic: string }[]> {
-  try {
+  public async getFollowersList(
+    username: string
+  ): Promise<{ username: string; profilePic: string }[]> {
+    try {
       const driver = dbDriver;
       const result = await driver.executeQuery(
-          `
+        `
           MATCH (user:User {username: $username})<-[:FOLLOWS]-(follower:User)
           RETURN follower.username AS username, follower.profilePic AS profilePic
           `,
-          { username }
+        { username }
       );
 
-      return result.records.map(record => ({
-          username: record.get('username'),
-          profilePic: record.get('profilePic')
+      return result.records.map((record) => ({
+        username: record.get("username"),
+        profilePic: record.get("profilePic"),
       }));
-  } catch (err) {
+    } catch (err) {
       console.error(`Error fetching followers list: ${err}`);
       throw err;
+    }
   }
-}
   public async UnfollowUser(
     username: string,
     userToUnfollow: string
@@ -294,26 +293,28 @@ public async getFollowersList(username: string): Promise<{ username: string, pro
     }
   }
 
-  public async getUsersLikedPost(postId: string): Promise<{ username: string, profilePic: string }[]> {
+  public async getUsersLikedPost(
+    postId: string
+  ): Promise<{ username: string; profilePic: string }[]> {
     try {
-        const driver = dbDriver;
-        const result = await driver.executeQuery(
-            `
+      const driver = dbDriver;
+      const result = await driver.executeQuery(
+        `
             MATCH (post:Post {id: $postId})<-[:LIKES_POST]-(user:User)
             RETURN user.username AS username, user.profilePic AS profilePic
             `,
-            { postId }
-        );
+        { postId }
+      );
 
-        return result.records.map(record => ({
-            username: record.get('username'),
-            profilePic: record.get('profilePic')
-        }));
+      return result.records.map((record) => ({
+        username: record.get("username"),
+        profilePic: record.get("profilePic"),
+      }));
     } catch (err) {
-        console.error(`Error fetching users who liked post: ${err}`);
-        throw err;
+      console.error(`Error fetching users who liked post: ${err}`);
+      throw err;
     }
-}
+  }
 
   public async SearchUser(user: string): Promise<User[]> {
     try {
@@ -333,7 +334,7 @@ public async getFollowersList(username: string): Promise<{ username: string, pro
       throw err;
     }
   }
-  public async leaderBoard():Promise<User[]>{
+  public async leaderBoard(): Promise<User[]> {
     try {
       const result = await dbDriver.executeQuery(
         `
@@ -344,25 +345,23 @@ public async getFollowersList(username: string): Promise<{ username: string, pro
           ORDER  BY user.score DESC
           LIMIT 10
         `,
-        { }
+        {}
       );
 
-    // Mapping the result records to User objects
-    return result.records.map(record => ({
-      username: record.get("username"),
-      profilePic: record.get("profilePic"),
-      titles : [{
-        score :parseFloat(record.get("score")),
-        title : "Hitches"
-      }]
-    }));
+      // Mapping the result records to User objects
+      return result.records.map((record) => ({
+        username: record.get("username"),
+        profilePic: record.get("profilePic"),
+        titles: [
+          {
+            score: parseFloat(record.get("score")),
+            title: "Hitches",
+          },
+        ],
+      }));
     } catch (err) {
       console.error(`Error searching for users: ${err}`);
       throw err;
     }
-
-
   }
-
-
 }
