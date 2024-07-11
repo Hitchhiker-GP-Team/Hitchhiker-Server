@@ -1,84 +1,96 @@
-import { Notification } from "../entities/Notification.js";
+import { DbHelper } from "../db/DbHelper.js";
 import {
-  getPostsFun,
-  getUserJourneys,
-  getFeedFun,
-  getUserProfileFun,
+  createCategory,
+  deleteCategory,
+  updateCategory,
+  fetchCategory,
+  fetchAllCategories,
+  fetchCategoryTree,
+  SearchCategory,
+} from "./controllers/category.js";
+
+import {
+  GetFollowersList,
+  GetFollowingList,
   addUser,
   deleteUser,
   followUser,
-  GetFollowingList,
-  GetFollowersList,
-  GetUsersLikedPost,
+  getUserNotifications,
+  getUserProfileFun,
+  updateUser,
   unfollowUser,
-  archivePost,
-  deleteAllArchivedPosts,
-  deleteAllPosts,
-  deletePost,
-  getArchivedPosts,
-  getCategoryPosts,
+  SearchUser,
+  leaderBoard,
+  GetUsersLikedPost,
+} from "./controllers/user.js";
+import {
+  fetchPostById,
+  getFeedFun,
   getLikedPosts,
-  getPlacePosts,
+  getPostsFun,
   getSavedPosts,
+  getPlacePosts,
+  getCategoryPosts,
+  getArchivedPosts,
+  createPost,
   likePost,
   savePost,
-  unarchivePost,
+  archivePost,
   unlikePost,
   unsavePost,
+  unarchivePost,
+  deletePost,
+  deleteAllPosts,
+  deleteAllArchivedPosts,
+  subscsribe,
+} from "./controllers/post.js";
+import {
   addPlace,
-  addPlaceToCategory,
   addPostToPlace,
-  addRatingToPlace,
-  addReviewToPlace,
-  addUserVisitedPlace,
   deletePlace,
+  updatePlace,
+  addPlaceToCategory,
+  addReviewToPlace,
+  addRatingToPlace,
+  addUserVisitedPlace,
+  SearchPlace,
+  getPlaceData,
+} from "./controllers/place.js";
+import {
   addPostToJourney,
   createJourney,
   deleteJourney,
   deletePostFromJourney,
   fetchJourneyPosts,
+  getUserJourneys,
+} from "./controllers/journey.js";
+import {
   addReview,
   deleteReview,
   fetchPlaceReviews,
   getReviewsFun,
-  fetchCategoryTree,
-  createCategory,
-  deleteCategory,
-  fetchAllCategories,
-  fetchCategory,
-  updateCategory,
-  createPost,
-  updateUser,
-  updatePlace,
-  addComment,
-  replyComment,
-  likeComment,
-  unLikeComment,
-  deleteComment,
-  updateComment,
-  fetchComment,
-  fetchReplies,
-  SearchPlace,
-  SearchUser,
-  fetchPostComments,
-  subscsribe,
-  getPlaceData,
-  upvoteReview,
-  undoUpvoteReview,
   downvoteReview,
   undoDownvoteReview,
-  SearchCategory,
-  leaderBoard,
-  getUserNotifications,
-  fetchPostById,
-} from "./controllers.js";
-import { PubSub } from "graphql-subscriptions";
-import { GraphQLScalarType } from "graphql";
-import { Kind } from "graphql/language";
-const pubsub = new PubSub();
+  undoUpvoteReview,
+  upvoteReview,
+} from "./controllers/review.js";
+import {
+  addComment,
+  likeComment,
+  replyComment,
+  unLikeComment,
+  fetchComment,
+  fetchReplies,
+  updateComment,
+  deleteComment,
+  fetchPostComments,
+} from "./controllers/comment.js";
+import { Notification } from "../entities/Notification.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { DbHelper } from "../db/DbHelper.js";
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 export const resolvers = {
   Query: {
@@ -97,7 +109,6 @@ export const resolvers = {
           throw new Error("User not found");
         }
 
-        //const isPasswordValid = await bcrypt.compare(password, user.password || '');
         if (password === user.password) {
           console.log("succesfull login");
           return user;
@@ -105,12 +116,6 @@ export const resolvers = {
           console.log("Invalid password");
           throw new Error("Invalid password");
         }
-
-        // const token = jwt.sign(
-        //   { userId: user.id, email: user.email },
-        //   process.env.SECRET_KEY || 'default_secret',
-        //   { expiresIn: '15d' }
-        // );
       } catch (error) {
         console.error("Error logging in:", error);
         throw error;
@@ -124,14 +129,13 @@ export const resolvers = {
       return notifications;
     },
 
-    //NOTIFICASTION
+    //NOTIFICATION
     getNoty: getUserNotifications,
 
     // USER
     getUserProfile: getUserProfileFun,
     addUser: addUser,
     updateUser: updateUser,
-    //updatebio: updatebio,
     deleteUser: deleteUser,
     followUser: followUser,
     GetFollowingList: GetFollowingList,
@@ -141,7 +145,7 @@ export const resolvers = {
     leaderBoard: leaderBoard,
     //END USER
 
-    // POST \
+    // POST
     fetchPostById: fetchPostById,
     getFeedFun: getFeedFun,
     getPostsFun: getPostsFun,

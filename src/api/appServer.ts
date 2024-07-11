@@ -10,6 +10,10 @@ import { PubSub } from "graphql-subscriptions";
 import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolver.js";
 
+/**
+ * Starts the server and initializes the necessary components.
+ * @returns {Promise<void>} A promise that resolves when the server has started.
+ */
 export async function startServer() {
   const port = 4000;
   const pubSub = new PubSub();
