@@ -1,4 +1,4 @@
-import { DbHelper } from "../../db/DbHelper";
+import { DbHelper } from "../../db/DbHelper.js";
 import { Comment } from "../../entities/Comment.js";
 import { v4 as uuidv4 } from "uuid";
 import { likeCommentNotificationService } from "../../entities/Notifications/LikeCommentNotificationService.js";

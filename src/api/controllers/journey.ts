@@ -1,6 +1,6 @@
-import { DbHelper } from "../../db/DbHelper";
-import { Journey } from "../../entities/Journey";
-import { Post } from "../../entities/Post";
+import { DbHelper } from "../../db/DbHelper.js";
+import { Journey } from "../../entities/Journey.js";
+import { Post } from "../../entities/Post.js";
 
 export async function createJourney(
   _: any,

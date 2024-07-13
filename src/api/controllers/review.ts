@@ -1,4 +1,4 @@
-import { DbHelper } from "../../db/DbHelper";
+import { DbHelper } from "../../db/DbHelper.js";
 import { Review } from "../../entities/Review.js";
 import { v4 as uuidv4 } from "uuid";
 import { IRating } from "../../entities/Rating/IRating.js";
