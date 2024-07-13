@@ -390,4 +390,4 @@ export const typeDefs = `#graphql
       repliesCntr: Int!
     ): Comment
   }
-`
+`;

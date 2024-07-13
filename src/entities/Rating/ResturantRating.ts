@@ -1,8 +1,8 @@
-import { IRating} from "./IRating.js";
+import { IRating } from "./IRating.js";
 
 export class ResturantRating implements IRating {
   affordability!: number;
-  overAll!: number; 
+  overAll!: number;
   atmosphere!: number;
   accesability!: number;
   priceMin!: number;

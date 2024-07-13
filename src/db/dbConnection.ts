@@ -1,9 +1,22 @@
 import neo4j, { Driver } from "neo4j-driver";
+import dotenv from "dotenv";
 export let dbDriver: Driver;
+/**
+ * Establishes a connection to the Neo4j database.
+ * @returns {Promise<void>} A promise that resolves when the connection is established.
+ * @throws {Error} If the connection to the database fails.
+ */
 export async function dbStart() {
-  const URI = "neo4j+s://a028b8b8.databases.neo4j.io";
-  const USER = "neo4j";
-  const PASSWORD = "MnHmGt548pFTSLOHvtGQ1a-n-x2TI8OZaI5TkTA4cMo";
+  dotenv.config();
+
+  const URI = process.env.URI;
+  const USER = process.env.USER;
+  const PASSWORD = process.env.PASSWORD;
+
+  if (!URI || !USER || !PASSWORD) {
+    throw new Error("Missing environment variables for database connection.");
+  }
+
   try {
     dbDriver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
     const serverInfo = await dbDriver.getServerInfo();

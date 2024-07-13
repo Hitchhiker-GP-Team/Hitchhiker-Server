@@ -21,6 +21,6 @@ export class Post {
   comments?: Comment[];
   category?: Category;
   journey?: Journey;
-  liked?:boolean;
-  saved?:boolean;
+  liked?: boolean;
+  saved?: boolean;
 }

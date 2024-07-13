@@ -1,81 +1,152 @@
-import { Notification } from "../entities/Notification.js";
-import { getPostsFun,getUserJourneys, getFeedFun, getUserProfileFun,addUser,deleteUser,followUser,GetFollowingList,GetFollowersList,GetUsersLikedPost,unfollowUser, archivePost, deleteAllArchivedPosts, deleteAllPosts, deletePost, getArchivedPosts, getCategoryPosts, getLikedPosts, getPlacePosts, getSavedPosts, likePost, savePost, unarchivePost, unlikePost, unsavePost, addPlace, addPlaceToCategory, addPostToPlace, addRatingToPlace, addReviewToPlace, addUserVisitedPlace, deletePlace, addPostToJourney, createJourney, deleteJourney, deletePostFromJourney, fetchJourneyPosts, addReview, deleteReview, fetchPlaceReviews, getReviewsFun, fetchCategoryTree, createCategory, deleteCategory, fetchAllCategories, fetchCategory, updateCategory, createPost, updateUser, updatePlace, addComment, replyComment, likeComment, unLikeComment, deleteComment, updateComment, fetchComment, fetchReplies, SearchPlace, SearchUser, fetchPostComments, subscsribe, getPlaceData, upvoteReview, undoUpvoteReview, downvoteReview, undoDownvoteReview, SearchCategory, leaderBoard, getUserNotifications, fetchPostById } from "./controllers.js";
-import { PubSub } from 'graphql-subscriptions';
-import { GraphQLScalarType } from 'graphql';
-import { Kind } from 'graphql/language';
-const pubsub = new PubSub();
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { DbHelper } from "../db/DbHelper.js";
+import {
+  createCategory,
+  deleteCategory,
+  updateCategory,
+  fetchCategory,
+  fetchAllCategories,
+  fetchCategoryTree,
+  SearchCategory,
+} from "./controllers/category.js";
+
+import {
+  GetFollowersList,
+  GetFollowingList,
+  addUser,
+  deleteUser,
+  followUser,
+  getUserNotifications,
+  getUserProfileFun,
+  updateUser,
+  unfollowUser,
+  SearchUser,
+  leaderBoard,
+  GetUsersLikedPost,
+} from "./controllers/user.js";
+import {
+  fetchPostById,
+  getFeedFun,
+  getLikedPosts,
+  getPostsFun,
+  getSavedPosts,
+  getPlacePosts,
+  getCategoryPosts,
+  getArchivedPosts,
+  createPost,
+  likePost,
+  savePost,
+  archivePost,
+  unlikePost,
+  unsavePost,
+  unarchivePost,
+  deletePost,
+  deleteAllPosts,
+  deleteAllArchivedPosts,
+  subscsribe,
+} from "./controllers/post.js";
+import {
+  addPlace,
+  addPostToPlace,
+  deletePlace,
+  updatePlace,
+  addPlaceToCategory,
+  addReviewToPlace,
+  addRatingToPlace,
+  addUserVisitedPlace,
+  SearchPlace,
+  getPlaceData,
+} from "./controllers/place.js";
+import {
+  addPostToJourney,
+  createJourney,
+  deleteJourney,
+  deletePostFromJourney,
+  fetchJourneyPosts,
+  getUserJourneys,
+} from "./controllers/journey.js";
+import {
+  addReview,
+  deleteReview,
+  fetchPlaceReviews,
+  getReviewsFun,
+  downvoteReview,
+  undoDownvoteReview,
+  undoUpvoteReview,
+  upvoteReview,
+} from "./controllers/review.js";
+import {
+  addComment,
+  likeComment,
+  replyComment,
+  unLikeComment,
+  fetchComment,
+  fetchReplies,
+  updateComment,
+  deleteComment,
+  fetchPostComments,
+} from "./controllers/comment.js";
+import { Notification } from "../entities/Notification.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 export const resolvers = {
   Query: {
-    login: async (_: any, { username, password }: { username: string; password: string }) => {
+    login: async (
+      _: any,
+      { username, password }: { username: string; password: string }
+    ) => {
       try {
-
         console.log(`Logging in user with username : ${username}`);
-        
+
         const user = await DbHelper.UserNode.FindUserByUsername(username);
         console.log(user);
-        
+
         if (!user) {
-          console.log('User not found');
-          throw new Error('User not found');
+          console.log("User not found");
+          throw new Error("User not found");
         }
 
-
-        //const isPasswordValid = await bcrypt.compare(password, user.password || '');
-        if(password === user.password){
-          console.log('succesfull login')
+        if (password === user.password) {
+          console.log("succesfull login");
           return user;
+        } else {
+          console.log("Invalid password");
+          throw new Error("Invalid password");
         }
-        else{
-          console.log('Invalid password');
-          throw new Error('Invalid password');
-        }
-
-        // const token = jwt.sign(
-        //   { userId: user.id, email: user.email },
-        //   process.env.SECRET_KEY || 'default_secret',
-        //   { expiresIn: '15d' }
-        // );
-
       } catch (error) {
-        console.error('Error logging in:', error);
+        console.error("Error logging in:", error);
         throw error;
       }
     },
     // Notification
-    notifications: async (_:any,{username}: {username:String})=>
-      {
+    notifications: async (_: any, { username }: { username: String }) => {
       const notifications: Notification[] = [];
-      const noti: Notification = {
-        
-      }
+      const noti: Notification = {};
       notifications.push(noti);
       return notifications;
     },
 
+    //NOTIFICATION
+    getNoty: getUserNotifications,
 
-    //NOTIFICASTION
-    getNoty:getUserNotifications,
-
-    // USER 
+    // USER
     getUserProfile: getUserProfileFun,
     addUser: addUser,
     updateUser: updateUser,
-    //updatebio: updatebio,
     deleteUser: deleteUser,
     followUser: followUser,
     GetFollowingList: GetFollowingList,
     GetFollowersList: GetFollowersList,
     unfollowUser: unfollowUser,
     SearchUser: SearchUser,
-    leaderBoard:leaderBoard,
+    leaderBoard: leaderBoard,
     //END USER
 
-    // POST \
-    fetchPostById:fetchPostById,
+    // POST
+    fetchPostById: fetchPostById,
     getFeedFun: getFeedFun,
     getPostsFun: getPostsFun,
     getSavedPosts: getSavedPosts,
@@ -96,7 +167,7 @@ export const resolvers = {
     deleteAllArchivedPosts: deleteAllArchivedPosts,
     //END POST
 
-    //PLACE 
+    //PLACE
     addPlace: addPlace,
     updatePlace: updatePlace,
     deletePlace: deletePlace,
@@ -105,8 +176,8 @@ export const resolvers = {
     addReviewToPlace: addReviewToPlace,
     addRatingToPlace: addRatingToPlace,
     addUserVisitedPlace: addUserVisitedPlace,
-    SearchPlace:SearchPlace,
-    getPlaceData:getPlaceData,
+    SearchPlace: SearchPlace,
+    getPlaceData: getPlaceData,
     //END PLACE
 
     //JOURNEY
@@ -136,10 +207,9 @@ export const resolvers = {
     fetchCategory: fetchCategory,
     fetchAllCategories: fetchAllCategories,
     fetchCategoryTree: fetchCategoryTree,
-    SearchCategory:SearchCategory,
+    SearchCategory: SearchCategory,
 
     //END CATEGORY
-
 
     //COMMENT
     addComment: addComment,
@@ -150,50 +220,57 @@ export const resolvers = {
     updateComment: updateComment,
     fetchReplies: fetchReplies,
     deleteComment: deleteComment,
-    getPostComments : fetchPostComments
+    getPostComments: fetchPostComments,
     //END COMMENT
   },
-  Mutation:{
-    createNotification : async (_:any, {username,message}:{username:String,message:String} )=>{
-        const noti : Notification = {
-        }
-        pubsub.publish('NOTIFICATION_ADDED',{notificationAdded: noti});
-        return noti;
+  Mutation: {
+    createNotification: async (
+      _: any,
+      { username, message }: { username: String; message: String }
+    ) => {
+      const noti: Notification = {};
+      pubsub.publish("NOTIFICATION_ADDED", { notificationAdded: noti });
+      return noti;
     },
-    login: async (_: any, { email, password }: { email: string; password: string }) => {
+    login: async (
+      _: any,
+      { email, password }: { email: string; password: string }
+    ) => {
       try {
         console.log(`Logging in user with email: ${email}`);
         const user = await DbHelper.UserNode.FindUserByUsername(email);
         if (!user) {
-          console.log('User not found');
-          throw new Error('User not found');
+          console.log("User not found");
+          throw new Error("User not found");
         }
-  
-        const isPasswordValid = await bcrypt.compare(password, user.password || '');
+
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          user.password || ""
+        );
         if (!isPasswordValid) {
-          console.log('Invalid password');
-          throw new Error('Invalid password');
+          console.log("Invalid password");
+          throw new Error("Invalid password");
         }
-  
+
         const token = jwt.sign(
           { userId: user.id, email: user.email },
-          process.env.SECRET_KEY || 'default_secret',
-          { expiresIn: '1h' }
+          process.env.SECRET_KEY || "default_secret",
+          { expiresIn: "1h" }
         );
-  
-        console.log('Login successful, returning token');
+
+        console.log("Login successful, returning token");
         return { token };
       } catch (error) {
-        console.error('Error logging in:', error);
+        console.error("Error logging in:", error);
         throw error;
       }
     },
   },
 
-  Subscription:{
+  Subscription: {
     notificationAdded: {
-    subscribe:subscsribe
+      subscribe: subscsribe,
+    },
   },
-
-  },
-}
+};
