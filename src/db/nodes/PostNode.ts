@@ -723,6 +723,11 @@ export class PostNode {
             ON CREATE SET exp.score = 100
             ON MATCH SET exp.score = exp.score + 100
 
+            //add score to author
+            SET author.score = COALESCE(author.score, 0) + 100
+            //increase user's postCntr     
+            SET author.postCntr = COALESCE(author.postCntr, 0) + 1
+
             CREATE (post:Post {
                 id: $postId,
                 caption: $caption,
@@ -741,9 +746,9 @@ export class PostNode {
                           place.atmosphere = 3,
                           place.affordability = 3,
                           place.accesability = 3,
-                          place.minPrice = 3,
-                          place.maxPrice = 3,
-                          place.reviewsCntr = 3
+                          place.minPrice = 0,
+                          place.maxPrice = 0,
+                          place.reviewsCntr = 0
             MERGE (post)-[rel:HAPPEND_AT]->(place)
 
             WITH  author ,post, $predictions AS predictedCategories
@@ -751,12 +756,9 @@ export class PostNode {
             MERGE (keyword:Keyword {name: prediction.name})
             MERGE (post)-[rel:POST_HAS_KEYWORD]->(keyword)
             SET rel.confidence = prediction.confidence
-            SET author.postCntr = author.postCntr + 1
+            
 
-            //add score to author
-            SET author.score = COALESCE(author.score, 0) + 100
-            //increase user's postCntr     
-            SET author.postCntr = COALESCE(author.score, 0) + 1
+
             
 
             RETURN post

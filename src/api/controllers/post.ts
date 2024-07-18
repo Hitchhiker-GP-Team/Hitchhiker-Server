@@ -5,6 +5,8 @@ import { DetectionModel } from "../../models/DetectionModel.js";
 import { Notification } from "../../entities/Notification.js";
 import { likePostNotificationService } from "../../entities/Notifications/LikePostNotificationService.js";
 import { PubSub } from "graphql-subscriptions";
+import { v4 as uuidv4 } from "uuid";
+
 
 const pubsub = new PubSub();
 
@@ -320,6 +322,4 @@ export async function deleteAllArchivedPosts(
     throw error;
   }
 }
-function uuidv4(): string | undefined {
-  throw new Error("Function not implemented.");
-}
+

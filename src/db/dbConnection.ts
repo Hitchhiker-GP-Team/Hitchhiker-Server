@@ -1,5 +1,7 @@
 import neo4j, { Driver } from "neo4j-driver";
 import dotenv from "dotenv";
+import { User } from "../entities/User";
+import { Console } from "console";
 export let dbDriver: Driver;
 /**
  * Establishes a connection to the Neo4j database.
@@ -12,6 +14,11 @@ export async function dbStart() {
   const URI = process.env.URI;
   const USER = process.env.USER;
   const PASSWORD = process.env.PASSWORD;
+
+  console.log(URI);
+  console.log(USER);
+  console.log(PASSWORD);
+  
 
   if (!URI || !USER || !PASSWORD) {
     throw new Error("Missing environment variables for database connection.");
